@@ -1,0 +1,103 @@
+@use "../../../../sass/styles.scss" as var;
+@import "../../../../sass/base/utilities";
+
+.navbar {
+
+  &-brand {
+    transition: all 50ms ease-in;
+    border-radius: 2rem;
+
+    &:active {
+      transform: scale(.97);
+      box-shadow: inset 0rem 0rem 1rem rgba(black,.2);
+    }
+
+    img {
+      width: 13rem;
+    }
+
+
+
+
+  }
+
+  .spacer {
+    display: inline-flex;
+    flex: 1 1 auto;
+  }
+
+  // &-nav {
+    //   align-items: end;
+    // }
+
+    .nav {
+      // align-content: end;
+
+      .mode-color {
+        color: var.$mode-txt-dark;
+      }
+
+      &-link {
+        color: var.$mode-txt-light;
+        letter-spacing: 0.1rem;
+        transition: all 100ms;
+        &:hover {
+          transform: scale(1.1) translateY(-0.1rem);
+        }
+        &:active {
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      &-item {
+        padding-inline: 1.5rem;
+
+          mat-slide-toggle {
+            @media only screen and (max-width: var.$bp-tablet-sm) {
+              margin-top: 2rem;
+            }
+
+            .theme-icon {
+              font-size: 2rem;
+              padding-inline-end: 2rem;
+            }
+          }
+      }
+
+
+      .navbar-btn {
+        color: var.$color-brown-dark;
+        @media only screen and (max-width: var.$bp-tablet-sm) {
+          margin-top: 2rem;
+        }
+      }
+
+
+
+
+    }
+
+
+
+
+  &-toggler {
+    border: none;
+    font-size: 2rem;
+    padding: 0.5rem;
+
+    .toggler-icon {
+      font-size: 2rem;
+      transform: translateY(-7px) translateX(-3px);
+    }
+
+    &:active {
+      transform: scale(0.98);
+      box-shadow: none;
+    }
+
+    &:focus:not(:active) {
+      box-shadow: none;
+    }
+  }
+
+}

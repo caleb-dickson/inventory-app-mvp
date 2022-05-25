@@ -1,0 +1,97 @@
+@use "../../../../sass/abstracts/variables" as var;
+
+footer {
+  position: sticky;
+  top: 100%;
+  font-size: 12px;
+
+  ul {
+    padding-left: 0;
+    // @media only screen and (max-width: var.$bp-mobile) {
+    //   align-content: center;
+    // }
+    li {
+      list-style: none;
+      display: block;
+      a {
+        text-decoration: none;
+        color: grey;
+        text-decoration: none;
+        &:hover {
+          text-decoration: none;
+          color: #f5f5f5 !important;
+        }
+      }
+    }
+  }
+
+  .logo-part {
+    border-right: 1px solid grey;
+    height: 100%;
+    .logo-footer {
+      margin-bottom: 3rem;
+    }
+  }
+
+  h6 {
+    font-family: "Playfair Display", serif;
+    margin-bottom: 40px;
+    position: relative;
+    &:after {
+      position: absolute;
+      content: "";
+      background: grey;
+      width: 12%;
+      height: 1px;
+      left: 0;
+      bottom: -20px;
+    }
+  }
+
+  .btn-footer {
+    color: grey;
+
+    text-decoration: none;
+    border: 1px solid;
+    border-radius: 43px;
+    font-size: 13px;
+    padding: 7px 30px;
+    line-height: 47px;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .social {
+    .bi {
+      margin: 1rem 1rem;
+    }
+  }
+
+  .form-footer {
+    input[type="text"] {
+      border: none;
+      border-radius: 16px 0 0 16px;
+      outline: none;
+      padding-left: 10px;
+      height: 1.36rem;
+    }
+    input[type="submit"] {
+      position: absolute;
+      border: none;
+      background: var.$color-grey-dark;
+      // margin-top: -1px;
+      margin-left: -5px;
+      color: #ffff;
+      outline: none;
+      border-radius: 0 16px 16px 0;
+      padding: 2px 12px;
+    }
+  }
+
+  ::placeholder {
+    font-size: 0.9rem;
+    padding-left: 0.5rem;
+    font-style: italic;
+  }
+}

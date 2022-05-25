@@ -1,0 +1,219 @@
+<div class="business-manage">
+  <mat-card>
+    <mat-card-header>
+      <img
+        mat-card-avatar
+        src="../../../assets/inv-logo-simple.png"
+        alt="Your profile photo"
+      />
+      <mat-card-title>Manage Business</mat-card-title>
+      <mat-card-subtitle>
+        {{ user.userProfile.firstName + " " + user.userProfile.lastName }} -
+        {{ userRole }} <span> - {{ businessName }}</span>
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content class="business">
+      <!-- <mat-spinner
+      diameter="70"
+      strokeWidth="3"
+      *ngIf="isLoading"
+      ></mat-spinner> -->
+      <section class="business-info">
+        <h5 class="business-info-title">Business Profile</h5>
+        <h6 class="business-info-subtitle">Business Name</h6>
+        <form
+          *ngIf="businessSubmitMode"
+          [formGroup]="businessForm"
+          (ngSubmit)="onBusinessSubmit()"
+          class="business-form"
+        >
+          <p *ngIf="!businessState && !businessName">Name Your Business</p>
+          <mat-form-field class="business-info-form">
+            <!-- <mat-label>Business Name</mat-label> -->
+            <input matInput type="text" formControlName="businessName" />
+            <mat-error *ngIf="businessForm.get('businessName').invalid">
+              Please enter a name for your business.
+            </mat-error>
+          </mat-form-field>
+          <button
+            class="business-submit"
+            type="submit"
+            mat-raised-button
+            [disabled]="businessForm.invalid"
+          >
+            {{ businessSubmitMode === "update" ? "Update" : "Create" }}
+          </button>
+          <button
+            class="business-cancel"
+            type="button"
+            mat-raised-button
+            (click)="onCancelForm('business')"
+          >
+            Cancel
+          </button>
+          <mat-error
+            *ngIf="businessError && !businessForm.get('businessName')"
+            >{{ businessError }}</mat-error
+          >
+        </form>
+        <mat-spinner
+          diameter="70"
+          strokeWidth="3"
+          *ngIf="isLoading"
+        ></mat-spinner>
+        <p *ngIf="!businessSubmitMode && !isLoading" class="business-info-name">
+          {{
+            businessName ? businessName : "Add your business to get started."
+          }}
+          <button mat-icon-button class="business-info-edit">
+            <mat-icon
+              *ngIf="businessName"
+              (click)="onEditBusiness('update')"
+              class="business-info-name-edit"
+              >edit</mat-icon
+            >
+            <mat-icon *ngIf="!businessName" (click)="onEditBusiness('new')"
+              >domain_add</mat-icon
+            >
+            <mat-label *ngIf="!businessName" (click)="onEditBusiness('new')">
+              Add business</mat-label
+            >
+          </button>
+        </p>
+        <h6 class="business-info-subtitle">Locations</h6>
+        <div *ngFor="let location of locations" class="business-info-locations">
+
+          <button
+          *ngIf="
+            !locationEditMode ||
+            (locationSelector &&
+              location.location.locationName !==
+                locationSelector.locationName)
+          "
+          mat-icon-button
+          class="business-info-locations-button"
+          (click)="onEditLocation('update', location.location)"
+        >
+          <mat-icon
+            (click)="onEditLocation('update', location.location)"
+            class="business-info-locations-button-icon"
+            >edit</mat-icon
+          >
+        </button>
+
+          <span
+            *ngIf="
+              !locationEditMode ||
+              (locationSelector &&
+                location.location.locationName !==
+                  locationSelector.locationName)
+            "
+            class="business-info-locations-list"
+          >
+            {{ location.location.locationName }}
+          </span>
+          <mat-spinner
+            diameter="30"
+            *ngIf="
+              locationEditMode === 'update' &&
+              location.location.locationName == locationSelector.locationName &&
+              isLoading
+            "
+          ></mat-spinner>
+          <mat-spinner
+            diameter="70"
+            strokeWidth="3"
+            *ngIf="isLoading"
+          ></mat-spinner>
+          <form
+            *ngIf="
+              locationEditMode === 'update' &&
+              location.location.locationName == locationSelector.locationName &&
+              !isLoading
+            "
+            [formGroup]="updateLocationForm"
+            (ngSubmit)="onUpdateLocationSubmit()"
+            class="business-info-locations-form"
+          >
+            <mat-form-field>
+              <input
+                matInput
+                autofocus
+                type="text"
+                formControlName="locationName"
+                class="business-info-locations-form-input"
+              />
+              <mat-error *ngIf="updateLocationForm.get('locationName').invalid"
+                >Please enter a name for the location.</mat-error
+              >
+            </mat-form-field>
+            <button
+              class="business-info-locations-form-buttons"
+              mat-raised-button
+              type="submit"
+              color="primary"
+              [disabled]="updateLocationForm.invalid"
+            >
+              Update
+            </button>
+            <button
+              class="business-info-locations-form-buttons"
+              mat-raised-button
+              type="button"
+              color="accent"
+              (click)="onCancelForm('location-update')"
+            >
+              Cancel
+            </button>
+            <mat-error *ngIf="businessError">{{ businessError }}</mat-error>
+          </form>
+
+
+        </div>
+      </section>
+
+      <br />
+
+      <p *ngIf="!businessId">Add your business to create locaitons.</p>
+      <button *ngIf="businessId" mat-icon-button class="business-info-add">
+        <mat-icon>add_business</mat-icon>
+        <mat-label
+          *ngIf="locationSubmitMode"
+          (click)="onCancelForm('location')"
+        >
+          {{ locationSubmitMode ? "Cancel" : "" }}</mat-label
+        >
+        <mat-label *ngIf="!locationSubmitMode" (click)="onCreateLocation(true)">
+          {{ locationSubmitMode ? "Cancel" : "New location" }}</mat-label
+        >
+      </button>
+      <form
+        *ngIf="locationSubmitMode"
+        [formGroup]="newLocationForm"
+        (ngSubmit)="onNewLocationSubmit()"
+        class="location-form"
+      >
+        <mat-form-field>
+          <mat-label>Location Name</mat-label>
+          <input matInput type="text" formControlName="locationName" />
+          <mat-error *ngIf="newLocationForm.get('locationName').invalid"
+            >Please enter a name for the location.</mat-error
+          >
+        </mat-form-field>
+        <button
+          class="location-submit"
+          mat-raised-button
+          type="submit"
+          color="primary"
+          [disabled]="newLocationForm.invalid"
+        >
+          Create
+        </button>
+        <mat-error *ngIf="businessError">{{ businessError }}</mat-error>
+      </form>
+    </mat-card-content>
+    <!-- <button mat-raised-button type="button" (click)="onCancelForm()">
+      Reset All
+    </button> -->
+  </mat-card>
+</div>

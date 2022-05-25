@@ -1,0 +1,56 @@
+@use "../../../sass/abstracts/variables" as var;
+
+input[type="file"] {
+  visibility: hidden;
+}
+
+.settings {
+  display: flex;
+  justify-content: center;
+  // align-content: center;
+
+  &-owner {
+    height: max-content;
+    width: calc(100% - 12rem);
+    min-width: min-content;
+
+    // mat-card-title {}
+    // mat-card-subtitle {}
+
+    mat-card-content {
+
+
+      .user-form {
+
+        p {
+          font-size: 1.2rem;
+          font-weight: 415;
+          margin-top: 1rem;
+        }
+
+        mat-form-field {
+          padding-inline: 2rem;
+        }
+
+      }
+
+      .business-form {
+
+        mat-form-field {
+          padding-inline: 2rem;
+        }
+
+        p {
+          font-size: 1.2rem;
+          font-weight: 415;
+          margin-top: 1rem;
+        }
+      }
+    }
+
+    // mat-card-actions {
+    //   button {}
+    // }
+
+  }
+}

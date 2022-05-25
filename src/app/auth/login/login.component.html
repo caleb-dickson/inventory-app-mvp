@@ -1,0 +1,51 @@
+<div class="d-flex align-items-center my-5">
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <div *ngIf="!isLoading" class="container  text-center align-items-center">
+    <img
+      *ngIf="!isLoading"
+      class="mb-4"
+      src="../../../assets/inv-logo-simple.png"
+      alt=""
+      width="72"
+      height="57"
+    />
+    <h1>Log In</h1>
+    <form (submit)="onLogin(loginForm)" #loginForm="ngForm">
+      <mat-form-field>
+        <input
+          name="email"
+          type="email"
+          placeholder="E-Mail"
+          #email="ngModel"
+          matInput
+          ngModel
+          required
+          email
+        />
+        <mat-error *ngIf="email.invalid"
+          >Please enter a valid email.</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          #password="ngModel"
+          matInput
+          ngModel
+          required
+          password
+        />
+        <mat-error *ngIf="password.invalid">Password invalid.</mat-error>
+      </mat-form-field>
+      <button
+        mat-raised-button
+        type="submit"
+      >
+        Log In
+      </button>
+      <mat-error *ngIf="error" class="mt-4">{{ this.error }}</mat-error>
+    </form>
+  </div>
+</div>

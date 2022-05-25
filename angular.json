@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "inventory-mvp-scss": {
+    "inventory-app-mvp": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/inventory-mvp-scss",
+            "outputPath": "dist/inventory-app-mvp",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -28,7 +28,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/sass/styles.scss"
             ],
             "scripts": []
           },
@@ -69,10 +69,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "inventory-mvp-scss:build:production"
+              "browserTarget": "inventory-app-mvp:build:production"
             },
             "development": {
-              "browserTarget": "inventory-mvp-scss:build:development"
+              "browserTarget": "inventory-app-mvp:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -80,7 +80,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "inventory-mvp-scss:build"
+            "browserTarget": "inventory-app-mvp:build"
           }
         },
         "test": {
@@ -96,7 +96,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/sass/styles.scss"
             ],
             "scripts": []
           }
@@ -104,5 +104,5 @@
       }
     }
   },
-  "defaultProject": "inventory-mvp-scss"
+  "defaultProject": "inventory-app-mvp"
 }

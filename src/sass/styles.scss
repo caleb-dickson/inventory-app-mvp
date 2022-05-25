@@ -1,0 +1,59 @@
+// MATERIAL IMPORT
+@use "./material/material";
+
+// MATERIAL CUSTOM STYLES
+// MATERIAL CUSTOM STYLES
+// APP CUSTOM IMPORTS
+@import "./abstracts/variables";
+@import "./base/base";
+@import "./abstracts/mixins";
+@import "./base/utilities";
+@import "./base/animations";
+
+
+mat-sidenav-container {
+  img {
+    width: 13rem;
+  }
+}
+// MATERIAL CUSTOM STYLES
+// MATERIAL CUSTOM STYLES
+
+// BOOTSTRAP IMPORT
+
+// Include any default variable overrides here (though functions won't be available)
+
+// @import "../../node_modules/bootstrap/scss/bootstrap";
+
+// Then add additional custom code here
+
+
+$inv-primary: $color-brown-dark;
+$inv-secondary: $color-brown-light;
+$inv-accent: $color-green-light;
+$light: $color-grey-light;
+$dark: $color-grey-dark;
+
+$theme-colors: (
+  "primary": $inv-primary,
+  "secondary": $inv-secondary,
+  "light": $light,
+  "dark": $dark,
+);
+
+$custom-colors: (
+  "accent": $inv-accent,
+);
+
+$theme-colors: map-merge($theme-colors, $custom-colors);
+
+
+
+
+.theme-dark {
+  background-color: $mode-bg-dark;
+}
+
+.theme-light {
+  background-color: $mode-bg-light;
+}

@@ -1,0 +1,104 @@
+<div class="settings">
+  <mat-card class="settings-owner">
+    <mat-card-header>
+      <img
+        mat-card-avatar
+        src="../../../assets/inv-logo-simple.png"
+        alt="Your profile photo"
+      />
+      <mat-card-title>Settings</mat-card-title>
+      <mat-card-subtitle>
+        {{ user.userProfile.businessId ? 'BusinessName' : 'No Business Created' }}
+        <br />
+        {{ user.userProfile.firstName + " " + user.userProfile.lastName }} - {{ userRole }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form
+        [formGroup]="userProfileForm"
+        (ngSubmit)="onUserProfileSubmit()"
+        class="user-form"
+      >
+        <p>User Profile</p>
+        <mat-form-field>
+          <mat-label>First Name</mat-label>
+          <input matInput type="text" formControlName="firstName" />
+          <mat-error *ngIf="userProfileForm.get('firstName').invalid"
+            >Please enter your first name.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Last Name</mat-label>
+          <input matInput type="text" formControlName="lastName" />
+          <mat-error *ngIf="userProfileForm.get('lastName').invalid"
+            >Please enter your last name.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Phone Number</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="phoneNumber"
+            pattern="[0-9]{10}"
+          />
+          <mat-error *ngIf="userProfileForm.get('phoneNumber').invalid"
+            >Please enter your phone number (ex. 4048534924).</mat-error
+          >
+        </mat-form-field>
+        <div class="avatar-upload">
+          <button mat-stroked-button type="button" (click)="filePicker.click()">
+            Choose Profile Picture
+          </button>
+          <input
+            #filePicker
+            type="file"
+            accept="image/png, image/jpg, image/jpeg"
+            (change)="onAvatarPicked($event)"
+          />
+        </div>
+        <div
+          class="image-preview"
+          *ngIf="
+            imagePreview !== '' &&
+            imagePreview &&
+            userProfileForm.get('avatar').valid
+          "
+        >
+          <img
+            [src]="imagePreview"
+            [alt]="userProfileForm.value.firstName + '-avatar' | lowercase"
+          />
+        </div>
+      </form>
+
+      <!-- <form [formGroup]="businessProfileForm" (ngSubmit)="onBusinessProfileSubmit()" class="business-form">
+        <p>Business Profile</p>
+        <mat-form-field>
+          <mat-label>Business Name</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="businessName"
+            [value]="userData.businessName"
+          />
+          <mat-error *ngIf="businessProfileForm.get('businessName').invalid"
+            >Please enter your first name.</mat-error
+          >
+        </mat-form-field>
+      </form> -->
+    </mat-card-content>
+    <mat-card-actions align="center">
+      <button mat-raised-button type="button" (click)="onCancelForm()">
+        Reset All
+      </button>
+      <button
+        mat-raised-button
+        type="submit"
+        [disabled]="userProfileForm.invalid"
+      >
+        Save
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

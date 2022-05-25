@@ -1,0 +1,20 @@
+@use "../../sass/styles.scss" as var;
+
+.auth {
+
+  &__btn-box {
+    font-size: 1.2rem;
+    text-align: center;
+    align-items: center;
+  }
+
+  &__btn {
+    padding-inline: 2.3rem;
+    padding-block: 0.12rem;
+  }
+
+  .mode-color {
+    color: var.$mode-txt-dark;
+  }
+
+}

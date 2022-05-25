@@ -1,0 +1,38 @@
+@use "@angular/material" as mat;
+@use "../abstracts/variables" as var;
+@include mat.core();
+
+
+$inv-app-primary: mat.define-palette(var.$inv-brown-pallette, 300, 600, 900);
+$inv-app-accent: mat.define-palette(var.$inv-green-pallette, 800, 500, 200);
+$inv-app-warn: mat.define-palette(mat.$red-palette);
+
+$inv-app-light-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $inv-app-primary,
+      accent: $inv-app-accent,
+      warn: $inv-app-warn,
+    ),
+  )
+);
+
+$inv-app-dark-theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: $inv-app-primary,
+      accent: $inv-app-accent,
+      warn: $inv-app-warn,
+    ),
+  )
+);
+
+.theme-dark {
+  @include mat.all-component-themes($inv-app-dark-theme);
+  @include mat.core-theme($inv-app-dark-theme);
+}
+
+.theme-light {
+  @include mat.all-component-themes($inv-app-light-theme);
+  @include mat.core-theme($inv-app-light-theme);
+}

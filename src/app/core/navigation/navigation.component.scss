@@ -1,0 +1,63 @@
+@use '../../../sass/abstracts/variables' as var;
+
+.sidenav-container {
+  height: 100vh;
+
+  mat-sidenav {
+    padding-left: 1rem;
+    width: 12rem;
+
+    mat-toolbar {
+      background: inherit;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+
+
+    }
+
+    mat-slide-toggle {
+      margin-left: 1rem;
+    }
+
+    mat-nav-list {
+      display: flex;
+      flex-direction: column;
+      width: 10rem;
+
+      .active {
+        background-color: var.$color-green-light;
+        border-radius: 0.3rem;
+      }
+
+      .spacer {
+        margin-top: 48vh;
+      }
+
+      // .settings {
+      // }
+
+      .sidenav-icon {
+        margin-inline-end: 0.3rem;
+      }
+
+      // button[type="button"] {
+      //   // padding-right: -2rem;
+      // }
+
+
+      .user-display {
+        font-size: 0.8rem;
+        margin-block-start: 0.5rem;
+      }
+
+
+
+
+    }
+
+
+  }
+}
+
+

@@ -1,0 +1,91 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    color="primary"
+    [fixedInViewport]="false"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+  >
+    <mat-toolbar>{{
+      user.userProfile.businessId
+        ? "BusinessName"
+        : user.userProfile.firstName + " " + user.userProfile.lastName
+    }}</mat-toolbar>
+    <mat-slide-toggle
+      (change)="onThemeModeSwitched($event)"
+      [checked]="user.userProfile.themePref === 'theme-dark' ? true : false"
+      >Dark Mode</mat-slide-toggle
+    >
+    <mat-nav-list>
+      <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">dashboard</mat-icon>Dashboard
+      </a>
+      <a mat-list-item href="/app/dashboard" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">trending_up</mat-icon>Insights
+      </a>
+      <a mat-list-item href="/app/products" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">sell</mat-icon>Products
+      </a>
+      <a mat-list-item href="/app/inventory" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">addchart</mat-icon>New Inventory
+      </a>
+      <a
+        *ngIf="!isAuthenticated"
+        mat-stroked-button
+        type="button"
+        class="btn"
+        (click)="onOpenAuth('signup')"
+      >
+        Sign Up
+      </a>
+      <span class="spacer"></span>
+      <a mat-list-item [routerLink]="manageRoute" routerLinkActive="active">
+        <mat-icon class="sidenav-icon settings">{{ manageIcon }}</mat-icon
+        >Manage
+      </a>
+      <a mat-list-item routerLink="/app/settings" routerLinkActive="active">
+        <mat-icon class="sidenav-icon settings">settings</mat-icon>Settings
+      </a>
+      <a
+        *ngIf="isAuthenticated"
+        mat-stroked-button
+        type="button"
+        class="btn app-logout"
+        (click)="onLogout()"
+        >Log Out</a
+      >
+      <p *ngIf="isAuthenticated" class="user-display">
+        {{
+          user
+            ? "Logged in as " +
+              user.userProfile.firstName +
+              " " +
+              user.userProfile.lastName
+            : "Logged in as " + user.email
+        }}
+        <br />
+        {{ user ? "(" + user.email + ")" : null }}
+      </p>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" role="heading">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle(); toggleSideNav()"
+        *ngIf="isHandset$"
+      >
+        <mat-icon *ngIf="!sideNavOpen" aria-label="Side nav toggle icon"
+          >menu
+        </mat-icon>
+        <mat-icon *ngIf="sideNavOpen">menu_open</mat-icon>
+      </button>
+      <img src="../../../assets/inv-logo.webp" alt="Inventory App logo" />
+    </mat-toolbar>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

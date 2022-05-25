@@ -1,0 +1,139 @@
+<div class="container d-flex align-items-center mb-2">
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+  <div *ngIf="!isLoading" class="container mt-4 text-center">
+    <img
+      *ngIf="!isLoading"
+      class="mb-4"
+      src="../../../assets/inv-logo-simple.png"
+      alt=""
+      width="72"
+      height="57"
+    />
+    <form (submit)="onSignup(signupForm)" #signupForm="ngForm">
+      <mat-dialog-title>Sign Up!</mat-dialog-title>
+      <mat-form-field appearance="outline">
+        <mat-label>First Name</mat-label>
+        <input
+          ngModel
+          matInput
+          required
+          name="firstName"
+          type="text"
+          placeholder="First Name"
+          #firstName="ngModel"
+        />
+        <mat-error *ngIf="firstName.invalid"
+          >Please enter your first name.</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Last Name</mat-label>
+        <input
+          matInput
+          ngModel
+          required
+          name="lastName"
+          type="text"
+          placeholder="Last Name"
+          #lastName="ngModel"
+        />
+        <mat-error *ngIf="lastName.invalid"
+          >Please enter your last name.</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field
+        matTooltip="This will determine your permissions in the app."
+        appearance="outline"
+      >
+        <mat-label>Account Type</mat-label>
+        <mat-select
+          ngModel
+          #role
+          required
+          name="role"
+          type="number"
+          placeholder="Select your account type"
+        >
+          <mat-option [value]="3"> Owner - top level access, need at least one per business </mat-option>
+          <mat-option [value]="2"> Chef - location MGT, BOH access </mat-option>
+          <mat-option [value]="1">
+            Junior Chef location staff, BOH access
+          </mat-option>
+          <mat-option [value]="2">
+            FOH Manager location MGT, FOH access
+          </mat-option>
+          <mat-option [value]="1">
+            FOH Employee location staff, FOH access
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field class="input-phone" appearance="outline">
+        <mat-label>Phone Number</mat-label>
+        <input
+          matInput
+          ngModel
+          required
+          type="tel"
+          name="phoneNumber"
+          placeholder="Phone Number"
+          #phoneNumber="ngModel"
+          pattern="[0-9]{10}"
+          tel
+        />
+        <mat-error *ngIf="phoneNumber.invalid"
+          >Please enter only your phone number; no dashes or parenthesis (ex.
+          4048535555).</mat-error
+        >
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          ngModel
+          email
+          required
+          name="email"
+          type="email"
+          placeholder="E-Mail"
+          #email="ngModel"
+        />
+        <mat-error *ngIf="email.invalid">Please enter a valid email.</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input
+          ngModel
+          matInput
+          required
+          type="password"
+          name="password"
+          minlength="6"
+          placeholder="Password"
+          #password="ngModel"
+        />
+        <mat-error *ngIf="password.invalid"
+          >Please enter a valid password (6 characters minimum).</mat-error
+        >
+      </mat-form-field>
+      <!-- <mat-form-field>
+        <input
+          type="password"
+          name="confirmPassword"
+          minlength="6"
+          ngModel
+          matInput
+          placeholder="Confirm Password"
+          #confirmPassword="ngModel"
+          required
+        />
+        <mat-error *ngIf=""
+          >Passwords do not match.</mat-error
+        >
+      </mat-form-field> -->
+      <mat-dialog-actions align="center">
+        <button mat-raised-button type="submit">Sign Up</button>
+      </mat-dialog-actions>
+      <mat-error *ngIf="error" class="mt-4">{{ this.error }}</mat-error>
+    </form>
+  </div>
+</div>

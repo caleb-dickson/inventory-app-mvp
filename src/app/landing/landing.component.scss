@@ -1,0 +1,146 @@
+@use "../../sass/styles.scss" as var;
+@use "../../sass/base/utilities" as util;
+
+@media (min-width: 992px) {
+  .rounded-lg-3 {
+    border-radius: 0.3rem;
+  }
+}
+
+.landing {
+  height: 500vh;
+
+  &-hero {
+    display: flex;
+    justify-content: center;
+
+    &-box {
+      height: 30rem;
+      width: 95vw;
+      padding-top: 10vw;
+      background-image: linear-gradient(to right bottom, rgba(rgb(0, 0, 0), 0.4), rgba(#000000, 1)),
+        url(../../assets/landing/cutting-board.webp);
+      background-size: cover;
+      background-position: center;
+
+      @supports (
+        clip-path: polygon(0 0) or
+          (
+            -webkit-clip-path: polygon(0 0),
+          )
+      ) {
+        -webkit-clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);
+        clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);
+
+        @media only screen and (max-width: var.$bp-tablet-lg) {
+          height: 50rem !important;
+          -webkit-clip-path: polygon(0 0, 100% 0, 100% 70vh, 0 100%);
+          clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);
+        }
+
+        @media only screen and (max-width: var.$bp-tablet-sm) {
+          height: 50rem !important;
+          -webkit-clip-path: polygon(0 0, 100% 0, 100% 70vh, 0 100%);
+          clip-path: polygon(0 0, 100% 0, 100% 75%, 0 100%);
+        }
+      }
+    }
+    &-text {
+      color: var.$mode-txt-dark;
+    }
+  }
+
+  &-features-1 {
+    &-title {
+      text-align: center;
+    }
+  }
+
+  &-consult {
+    display: flex;
+    justify-content: center;
+    // align-items: center;
+
+    &-inner {
+
+      &-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-top: -2rem;
+      }
+    }
+
+    mat-card {
+      max-width: 40rem;
+
+      mat-card-header {
+        flex-direction: column;
+
+        .consult-form-logo {
+          background-image: url(../../assets/inv-logo-simple.png);
+          background-size: cover;
+          margin: auto;
+        }
+        // mat-card-title {}
+        // mat-card-subtitle {}
+      }
+      mat-card-content {
+        h6 {
+          font-size: 0.9rem;
+        }
+        form {
+          @media only screen and (min-width: var.$bp-tablet-sm) {
+            // min-width: 30rem;
+            mat-form-field {
+              padding-inline: 1.5rem;
+            }
+          }
+        }
+      }
+      mat-card-actions {
+        padding-bottom: 2rem;
+        button {
+          padding-inline: 2rem;
+          padding-block: 0.5rem;
+        }
+      }
+    }
+
+    // mat-card LIGHT MODE STYLES
+    mat-card.mode-light {
+      background-color: var.$color-grey-dark;
+    }
+  }
+
+  .image--1 {
+    height: 30rem;
+    background-image: url(../../assets/landing/oven.webp);
+    background-size: cover;
+    background-position: center;
+  }
+
+  .image--2 {
+    height: 30rem;
+    margin-block: 5rem;
+    background-image: url(../../assets/landing/grill.webp);
+    background-size: cover;
+    background-position: center;
+  }
+
+  app-auth {
+    align-self: center;
+  }
+
+
+
+}
+
+// UTIL
+.mode-dark {
+  color: var.$mode-txt-dark;
+}
+
+// .mode-light {
+
+// }

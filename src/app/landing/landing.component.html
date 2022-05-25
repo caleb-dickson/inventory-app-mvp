@@ -1,0 +1,282 @@
+<div class="landing">
+  <app-header></app-header>
+
+  <div class="landing-hero">
+    <div class="landing-hero-box col-xxl-8 px-5 py-5 py-lg-5">
+      <div
+        class="row flex-lg-row-reverse justify-content-center align-content-center g-5 py-lg-5"
+      >
+        <div class="col-10 col-sm-8 col-lg-5">
+          <img
+            src="../../assets/inv-logo.webp"
+            class="d-block mx-lg-auto img-fluid"
+            alt="Bootstrap Themes"
+            width="700"
+            height="500"
+            loading="lazy"
+          />
+        </div>
+        <div class="landing-hero-text col-lg-6" [ngClass]="getTheme()">
+          <h1 class="landing-hero-text-title fw-bold lh-1 mb-3">
+            Know where you stand
+          </h1>
+          <p class="lead landing-hero-text-body">
+            Don't let inventory management become an afterthought. With
+            &lt;AppName&gt;, you and your Chefs can easily track inventory
+            counts, usage, and much more. <br />
+            Sign up now and take back control.
+          </p>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <button
+              mat-raised-button
+              color="accent"
+              type="button"
+              class="px-4 me-md-2"
+              (click)="onOpenAuth('signup')"
+            >
+              Sign Up
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              type="button"
+              class="px-4"
+            >
+              Learn More
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="landing-features-1 container px-4 py-5 mt-5"
+    [ngClass]="getTheme()"
+    id="icon-grid"
+  >
+    <h2 class="landing-features-1-title pb-2">App Features</h2>
+
+    <div class="row row-cols-1 row-cols-lg-3 g-4 py-5">
+      <div class="col d-flex align-items-start">
+        <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
+        <div>
+          <h4 class="fw-bold mb-0">Featured title</h4>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+            doloremque facere est eaque optio. Ullam consequatur itaque nobis
+            corrupti officia sapiente harum, neque illo explicabo quia, soluta
+            modi laudantium doloribus!
+          </p>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
+        <div>
+          <h4 class="fw-bold mb-0">Featured title</h4>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+            doloremque facere est eaque optio. Ullam consequatur itaque nobis
+            corrupti officia sapiente harum!
+          </p>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
+        <div>
+          <h4 class="fw-bold mb-0">Featured title</h4>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+            doloremque facere est eaque optio. Ullam consequatur itaque nobis
+            corrupti officia sapiente harum, neque illo explicabo quia, soluta
+            modi laudantium doloribus!
+          </p>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
+        <div>
+          <h4 class="fw-bold mb-0">Featured title</h4>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+            doloremque facere est eaque optio!
+          </p>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
+        <div>
+          <h4 class="fw-bold mb-0">Featured title</h4>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+            doloremque facere est eaque optio. Ullam consequatur itaque!
+          </p>
+        </div>
+      </div>
+      <div class="col d-flex align-items-start">
+        <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
+        <div>
+          <h4 class="fw-bold mb-0">Featured title</h4>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+            doloremque facere est eaque optio. Ullam consequatur itaque nobis
+            corrupti officia sapiente harum, neque illo explicabo quia, soluta
+            modi laudantium doloribus!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <div class="landing-consult">
+    <div class="col-xxl-10 px-5 py-5 py-lg-5">
+      <div
+      class="landing-consult-inner row flex-lg-row justify-content-center align-content-center g-5 py-lg-5"
+      [ngClass]="getTheme()"
+      >
+      <div class="landing-consult-inner-text col-12 col-sm-8 col-lg-5">
+        <h1>Need a custom solution?</h1>
+        <p class="lead">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+          Consequatur odio in pariatur placeat! Quod exercitationem cumque
+          quasi excepturi, nulla neque molestiae, beatae earum aspernatur
+          aperiam consequuntur laborum alias nobis culpa!
+        </p>
+
+
+
+      </div>
+
+      <div class="col-12 col-sm-8 col-lg-6 my-5">
+        <mat-card align="center" [ngClass]="getTheme()">
+          <mat-card-header>
+            <div mat-card-avatar class="consult-form-logo"></div>
+            <mat-card-title>Schedule a Consultation</mat-card-title>
+            <mat-card-subtitle>Create your own custom software</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <h6 class="mt-4">Request an Appointment</h6>
+            <form
+            (submit)="onConsultSubmit(consultationForm)"
+            #consultationForm="ngForm"
+            >
+            <mat-form-field>
+              <input
+              ngModel
+              matInput
+              required
+              name="name"
+              type="text"
+              placeholder="Name"
+              #name="ngModel"
+              />
+              <mat-error *ngIf="name.invalid">Please enter your name.</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+              <input
+              matInput
+              ngModel
+              tel
+              required
+              type="tel"
+              placeholder="Phone Number"
+              name="phoneNumber"
+              #phoneNumber="ngModel"
+              pattern="[0-9]{10}"
+              />
+              <mat-error *ngIf="phoneNumber.invalid"
+              >Please enter your phone number (ex. 4048534924).</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field>
+              <input
+              ngModel
+              matInput
+              email
+              required
+              name="email"
+              type="email"
+              placeholder="Email"
+              #name="ngModel"
+              />
+              <mat-error *ngIf="name.invalid">Please enter a valid email address.</mat-error>
+            </mat-form-field>
+            <mat-form-field>
+              <input
+              ngModel
+              matInput
+              required
+              type="text"
+              placeholder="Business (brand) Name "
+              name="businessName"
+              #businessName="ngModel"
+              />
+              <mat-error *ngIf="name.invalid">Please enter the name of the business.</mat-error>
+            </mat-form-field>
+          </form>
+        </mat-card-content>
+        <mat-card-actions align="center">
+          <button mat-raised-button type="submit">Submit</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="image--1"></div>
+
+
+<div
+class="landing-features-2 container px-4 py-5 mt-5"
+[ngClass]="getTheme()"
+id="icon-grid"
+>
+<div class="row row-cols-1 row-cols-lg-3 g-3 py-5">
+  <div class="col d-flex align-items-start">
+    <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
+    <div>
+      <h4 class="fw-bold mb-0">Featured title</h4>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+        doloremque facere est eaque optio. Ullam consequatur itaque nobis
+        corrupti officia sapiente harum, neque illo explicabo quia, soluta
+        modi laudantium doloribus!
+      </p>
+    </div>
+  </div>
+  <div class="col d-flex align-items-start">
+    <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
+    <div>
+      <h4 class="fw-bold mb-0">Featured title</h4>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+        doloremque facere est eaque optio. Ullam consequatur itaque nobis
+        corrupti officia sapiente harum!
+      </p>
+    </div>
+  </div>
+  <div class="col d-flex align-items-start">
+    <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
+    <div>
+      <h4 class="fw-bold mb-0">Featured title</h4>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
+        doloremque facere est eaque optio. Ullam consequatur itaque nobis
+        corrupti officia sapiente harum, neque illo explicabo quia, soluta
+        modi laudantium doloribus!
+      </p>
+    </div>
+  </div>
+</div>
+</div>
+
+<app-auth *ngIf="!isAuthenticated" id="auth"></app-auth>
+
+<div class="image--2"></div>
+
+<app-footer [ngClass]="getTheme()"></app-footer>
+</div>

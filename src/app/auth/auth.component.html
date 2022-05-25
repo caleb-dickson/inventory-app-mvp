@@ -1,0 +1,23 @@
+<section *ngIf="!isAuthenticated" class="container auth">
+  <div class="auth__btn-box" [ngClass]="themeMode == 'theme-dark' ? 'mode-color' : null">
+    <button
+      mat-raised-button
+      color="accent"
+      type="button"
+      class="auth__btn"
+      (click)="onOpenAuth('signup')"
+    >
+      Sign Up!
+    </button>
+    <p class="my-2">OR</p>
+    <button
+      mat-raised-button
+      color="primary"
+      type="button"
+      class="auth__btn"
+      (click)="onOpenAuth('login')"
+      >
+      Log In
+    </button>
+  </div>
+</section>

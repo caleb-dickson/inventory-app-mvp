@@ -1,0 +1,76 @@
+  // COLORS
+  // $primary: #001427;
+
+  $color-brown-light: #a58455;
+  $color-brown-dark: #74521a;
+
+  $color-green-light: #748e4f;
+  $color-green-dark: #556b3f;
+
+  $color-grey-light: #dedede;
+  $color-grey-dark: #464646;
+
+  $mode-bg-dark: #1c2120;
+  $mode-txt-dark: #d6d6d7;
+
+  $mode-bg-light: #dedede;
+  $mode-txt-light: #3c4642;
+
+  $inv-brown-pallette: (
+  50:  #fde9c3,
+  100:  #e5c8a1,
+  200:  #c7a57c,
+  300:  #a58455,
+  400:  #8d6a38,
+  500:  #74521a,
+  600:  #6a4914,
+  700:  #5c3c0b,
+  800:  #502e03,
+  900:  #422000,
+  contrast: (
+    50:  rgba(#2d3921, 0.87),
+    100:  rgba(#2d3921, 0.87),
+    200:  rgba(#2d3921, 0.87),
+    300:  rgba(black, 0.87),
+    400:  rgba(#495c35, 0.87),
+    500:  rgba(#7a8f4d, 0.87),
+    600:  rgba(#aac76c, 0.87),
+    700:  rgba(#aac76c, 0.87),
+    800:  rgba(#aac76c, 0.87),
+    900:  rgba(#aac76c, 0.87),
+  )
+);
+
+$inv-green-pallette: (
+  50:  #f5f8ec,
+  100:  #e5eed0,
+  200:  #d4e3b3,
+  300:  #c3d897,
+  400:  #b6cf80,
+  500:  #aac76c,
+  600:  #9ab663,
+  700:  #86a258,
+  800:  #748e4f,
+  900:  #556b3f,
+  contrast: (
+    50:  rgba(black, 0.87),
+    100:  rgba(black, 0.87),
+    200:  rgba(black, 0.87),
+    300:  rgba(black, 0.87),
+    400:  rgba(black, 0.87),
+    500:  rgba(black, 0.87),
+    600:  rgba(black, 0.87),
+    700:  rgba(black, 0.87),
+    800:  rgba(black, 0.87),
+    900:  rgba(#422000, 0.87),
+  )
+);
+
+  // FONTS
+  $font-primary: 'Lato', sans-serif;
+
+  // RESPONSIVE BREAKPOINTS
+  $bp-desktop: 75em; // 1200px
+  $bp-tablet-lg: 62.5em; // 1000px
+  $bp-tablet-sm: 50em; // 800px;
+  $bp-mobile: 37.5em; // 600px;
