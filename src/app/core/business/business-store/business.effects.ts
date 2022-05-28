@@ -235,7 +235,7 @@ export class BusinessEffects {
 
               const storedBusiness = {
                 business: {
-                  id: resData.updatedBusiness.id,
+                  _id: resData.updatedBusiness.id,
                   businessName: resData.updatedBusiness.business.businessName,
                   locations: resData.updatedBusiness.business.locations,
                   ownerId: resData.updatedBusiness.business.ownerId,

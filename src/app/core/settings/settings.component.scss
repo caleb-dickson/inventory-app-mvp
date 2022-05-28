@@ -13,6 +13,7 @@ input[type="file"] {
     height: max-content;
     width: calc(100% - 12rem);
     min-width: min-content;
+    margin-block-start: 1rem;
 
     // mat-card-title {}
     // mat-card-subtitle {}

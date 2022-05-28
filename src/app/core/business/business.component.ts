@@ -1,15 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { map, Subscription, take } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
 import * as BusinessActions from '../business/business-store/business.actions';
 
 import { User } from 'src/app/auth/auth-control/user.model';
-import { LocationIds } from './business-control/business.model';
 import { Location } from './business-control/location.model';
 
 @Component({
@@ -18,6 +17,9 @@ import { Location } from './business-control/location.model';
   styleUrls: ['./business.component.scss'],
 })
 export class BusinessComponent implements OnInit {
+  private userAuthSub: Subscription;
+  private businessStoreSub: Subscription;
+
   authState: object;
   businessState: any;
 
@@ -26,7 +28,8 @@ export class BusinessComponent implements OnInit {
   businessName: string;
   businessId: string;
 
-  locationSelector: Location;
+  locationEditSelector: Location;
+  locationAddUserSelector: Location;
   locationName: string;
   locations: any[];
 
@@ -34,10 +37,12 @@ export class BusinessComponent implements OnInit {
   businessSubmitMode: string;
   locationSubmitMode = false;
   locationEditMode = false;
+  addUserToLocationMode = false;
 
   businessForm: FormGroup;
   newLocationForm: FormGroup;
   updateLocationForm: FormGroup;
+  addUserToLocationForm: FormGroup;
 
   user: User;
   userId: string;
@@ -46,13 +51,7 @@ export class BusinessComponent implements OnInit {
   authError: string;
   businessError: string;
 
-  private userAuthSub: Subscription;
-  private businessStoreSub: Subscription;
-
-  constructor(
-    private store: Store<fromAppStore.AppState>,
-    private router: Router
-  ) {}
+  constructor(private store: Store<fromAppStore.AppState>) {}
 
   ngOnInit() {
     this.userAuthSub = this.store
@@ -83,6 +82,7 @@ export class BusinessComponent implements OnInit {
           this.initBusinessForm();
           this.initNewLocationForm();
           this.initUpdateLocationForm();
+          this.initAddUserToLocationForm();
         }
         console.log(bizState);
       });
@@ -129,16 +129,18 @@ export class BusinessComponent implements OnInit {
           },
         })
       );
-    } else if (!storedBusiness && this.user.userProfile.businessId) {
+    } else if (!storedBusiness && this.user.userProfile.business) {
       console.log('||| Fetching business from DB |||');
-      console.log(this.userId)
+      console.log(this.userId);
       this.store.dispatch(
         BusinessActions.GETBusinessStart({
           ownerId: this.userId,
         })
       );
     } else {
-      this.store.dispatch(BusinessActions.GETEntityFail({ errorMessage: 'No business found.'}))
+      this.store.dispatch(
+        BusinessActions.GETEntityFail({ errorMessage: 'No business found.' })
+      );
     }
   }
 
@@ -150,8 +152,8 @@ export class BusinessComponent implements OnInit {
 
   onEditLocation(mode: boolean | null, location?: Location) {
     this.locationEditMode = mode;
-    this.locationSelector = location;
-    console.log(this.locationSelector);
+    this.locationEditSelector = location;
+    console.log(this.locationEditSelector);
     this.initUpdateLocationForm();
   }
 
@@ -160,16 +162,27 @@ export class BusinessComponent implements OnInit {
     this.initNewLocationForm();
   }
 
+  onAddUserToLocation(mode: boolean, location?: Location) {
+    this.addUserToLocationMode = mode;
+    this.locationAddUserSelector = location;
+    this.initAddUserToLocationForm();
+    console.log(this.addUserToLocationMode);
+    console.log(this.locationAddUserSelector);
+  }
+
   onCancelForm(formToCancel: string) {
     if (formToCancel === 'business') {
       this.businessSubmitMode = null;
       this.initBusinessForm();
     } else if (formToCancel === 'location') {
-      this.locationSubmitMode = null;
+      this.locationSubmitMode = false;
       this.initNewLocationForm();
     } else if (formToCancel === 'location-update') {
       this.locationEditMode = false;
       this.initUpdateLocationForm();
+    } else if (formToCancel === 'add-location-user') {
+      this.addUserToLocationMode = false;
+      this.locationAddUserSelector = null;
     }
   }
 
@@ -204,7 +217,6 @@ export class BusinessComponent implements OnInit {
       })
     );
     this.businessSubmitMode = null;
-    this.initBusinessForm();
   }
 
   onUpdateLocationSubmit() {
@@ -212,10 +224,10 @@ export class BusinessComponent implements OnInit {
     this.store.dispatch(
       BusinessActions.PUTLocationStart({
         location: {
-          _id: this.locationSelector._id,
+          _id: this.locationEditSelector._id,
           locationName: this.updateLocationForm.value.locationName,
-          parentBusiness: this.locationSelector.parentBusiness,
-          inventoryData: this.locationSelector.inventoryData,
+          parentBusiness: this.locationEditSelector.parentBusiness,
+          inventoryData: this.locationEditSelector.inventoryData,
         },
       })
     );
@@ -239,6 +251,8 @@ export class BusinessComponent implements OnInit {
     this.locationSubmitMode = null;
     this.initNewLocationForm();
   }
+
+  onAddUserToLocationSubmit() {}
 
   // onAvatarPicked(event: Event) {
   //   const file = (event.target as HTMLInputElement).files[0];
@@ -268,11 +282,36 @@ export class BusinessComponent implements OnInit {
   }
 
   private initUpdateLocationForm() {
-    if (this.locationSelector && this.locationSelector.locationName) {
+    if (this.locationEditSelector && this.locationEditSelector.locationName) {
       this.updateLocationForm = new FormGroup({
-        locationName: new FormControl(this.locationSelector.locationName, {
+        locationName: new FormControl(this.locationEditSelector.locationName, {
           validators: [Validators.required],
         }),
+      });
+    }
+  }
+
+  get newStaffControls() {
+    return (<FormArray>this.addUserToLocationForm.get('newStaff')).controls;
+  }
+
+  onAddNewStaffControl() {
+    (<FormArray>this.addUserToLocationForm.get('newStaff')).push(
+      new FormGroup({
+        newStaff: new FormControl(null, Validators.required),
+      })
+    );
+  }
+
+  private initAddUserToLocationForm() {
+    let emails = new FormArray([]);
+
+    if (
+      this.locationAddUserSelector &&
+      this.locationAddUserSelector.locationName
+    ) {
+      this.addUserToLocationForm = new FormGroup({
+        newStaff: emails,
       });
     }
   }

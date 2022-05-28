@@ -46,7 +46,6 @@ export class AppComponent implements OnInit, OnDestroy {
     if (!this.isAuthenticated) {
       this.themeService.setThemeMode();
       this.themeService.getThemeMode();
-      console.log(this.themeMode)
       if (this.themeMode == 'theme-light') {
         this.themeService.switchThemeMode(false);
         this.renderer.setAttribute(this.document.body, 'class', this.themeMode);

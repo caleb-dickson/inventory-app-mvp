@@ -9,8 +9,8 @@
     [opened]="(isHandset$ | async) === false"
   >
     <mat-toolbar>{{
-      user.userProfile.businessId
-        ? "BusinessName"
+      user.userProfile.business
+        ? businessName
         : user.userProfile.firstName + " " + user.userProfile.lastName
     }}</mat-toolbar>
     <mat-slide-toggle

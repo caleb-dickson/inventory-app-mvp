@@ -6,6 +6,7 @@ const User = require("../models/user");
 // CREATE NEW BUSINESS
 exports.createBusiness = async (req, res, next) => {
   try {
+    // DEFINE THE NEW BUSINESS
     const business = new Business({
       businessName: req.body.businessName,
       ownerId: req.body.ownerId,
@@ -15,19 +16,21 @@ exports.createBusiness = async (req, res, next) => {
     try {
       // CUSTOM "UNIQUE BUSINESS" VALIDATOR. EACH OWNER ACCOUNT ONLY
       // HAS ONE BUSINESS PER ACCOUNT
-      // THE BUSINESS IS THE CONTAINER AND MANAGER FOR ALL APP OPERATIONS
+      // THE BUSINESS IS THE CONTAINER AND MANAGER FOR MOST APP OPERATIONS
       const checkOnlyOwnersBusiness = await Business.findOne({
         ownerId: req.body.ownerId,
       });
       console.log("||| checking business is only owners business |||");
       console.log(checkOnlyOwnersBusiness);
       if (checkOnlyOwnersBusiness) {
+        // IF THE USER ALREADY HAS A BUSINESS, RETURN ERROR 422
         res.status(422).json({
           message:
             "Invalid submit. If you're sure this is an error, please contact tech support via the help section.",
         });
       }
     } catch (error) {
+      // CATCH AND RETURN UNEXPECTED ERRORS
       console.log(error);
       if (!res.headersSent) {
         res.status(500).json({
@@ -36,18 +39,22 @@ exports.createBusiness = async (req, res, next) => {
       }
     }
 
+    // IF NO EXISTING BUSINESS WAS FOUND, SAVE THE DEFINED BUSINESS
     const newBusiness = await business.save();
     console.log("||| newBusiness |||");
     console.log(newBusiness);
 
+    // PULL THE USER (OWNER) DOC FROM DB
     const ownerUser = await User.findById(req.body.ownerId);
     console.log("||| ownerUser |||");
     console.log(ownerUser);
 
+    // ADD THE NEW BUSINESS TO THE USERPROFILE
     const updatedOwner = await ownerUser.ownerAddBusiness(newBusiness);
     console.log("||| updatedOwner |||");
     console.log(updatedOwner);
 
+    // SEND BACK THE DATA TO THE CLIENT
     res.status(201).json({
       message: "Business created successfully",
       business: {
@@ -58,6 +65,7 @@ exports.createBusiness = async (req, res, next) => {
       updatedUserId: updatedOwner._id,
     });
   } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
     if (!res.headersSent) {
       res.status(500).json({
@@ -66,7 +74,8 @@ exports.createBusiness = async (req, res, next) => {
     }
   }
 };
-// CREATE NEW BUSINESS ///
+// CREATE NEW BUSINESS /// END
+
 
 // FETCH OWNER'S BUSINESS AND POPULATE ALL LOCATIONS ASSOCIATED
 exports.getOwnersBusiness = async (req, res, next) => {
@@ -90,13 +99,14 @@ exports.getOwnersBusiness = async (req, res, next) => {
       });
     }
   } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
     res.status(500).json({
       message: error._message,
     });
   }
 };
-// FETCH OWNER'S BUSINESS AND POPULATE ALL LOCATIONS ASSOCIATED ///
+// FETCH OWNER'S BUSINESS AND POPULATE ALL LOCATIONS ASSOCIATED /// END
 
 // EDIT/UPDATE BUSINESS (businessName)
 exports.updateBusiness = async (req, res, next) => {
@@ -117,6 +127,7 @@ exports.updateBusiness = async (req, res, next) => {
       message: "Business name updated successfully",
     });
   } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
     if (!res.headersSent) {
       res.status(500).json({
@@ -125,7 +136,7 @@ exports.updateBusiness = async (req, res, next) => {
     }
   }
 };
-// EDIT/UPDATE BUSINESS (businessName) ///
+// EDIT/UPDATE BUSINESS (businessName) /// END
 
 // CREATE NEW LOCATION
 exports.createLocation = async (req, res, next) => {
@@ -167,13 +178,14 @@ exports.createLocation = async (req, res, next) => {
       },
     });
   } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
     res.status(500).json({
       message: error._message,
     });
   }
 };
-// CREATE NEW LOCATION
+// CREATE NEW LOCATION /// END
 
 // EDIT/UPDATE LOCATION (locationName)
 exports.updateLocation = async (req, res, next) => {
@@ -195,6 +207,7 @@ exports.updateLocation = async (req, res, next) => {
       message: "Location name updated successfully",
     });
   } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
     if (!res.headersSent) {
       res.status(500).json({
@@ -203,13 +216,14 @@ exports.updateLocation = async (req, res, next) => {
     }
   }
 };
-// EDIT/UPDATE LOCATION (locationName) ///
+// EDIT/UPDATE LOCATION (locationName) /// END
 
 
 exports.getLocations = async (req, res, next) => {
   try {
     const parentBiz = req.params.parentId;
   } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
     res.status(500).json({
       message: error._message,
@@ -221,6 +235,7 @@ exports.getProducts = async (req, res, next) => {
   try {
     const businessId = req.params.businessId;
   } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
     res.status(500).json({
       message: error._message,
@@ -232,6 +247,7 @@ exports.getInventories = async (req, res, next) => {
   try {
     const locationId = req.params.locationId;
   } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
     res.status(500).json({
       message: error._message,

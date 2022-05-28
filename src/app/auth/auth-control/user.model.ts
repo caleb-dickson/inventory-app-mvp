@@ -8,7 +8,7 @@ export class User {
     lastName: string;
     phoneNumber: string;
     themePref: string | null;
-    businessId: string | null;
+    business: string | null;
     // ^^^ OWNERS ONLY ^^^
     userLocationId: string | null;
     // ^^^ NOT FOR OWNERS. ^^^ LOCATION DOC ID WHERE THIS USER HAS ACCESS
@@ -24,7 +24,7 @@ export class User {
       lastName: string,
       phoneNumber: string,
       themePref: string | null,
-      businessId: string | null,
+      business: string | null,
       userLocationId: string | null
     },
   ) {

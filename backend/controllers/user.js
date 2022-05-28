@@ -1,10 +1,20 @@
+// REMOVE THIS ON DEPLOYMENT
+const nodemon = require('../../nodemon.json');
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+// const nodemailer = require("nodemailer");
+// const sendGridTransport = require("nodemailer-sendgrid-transport");
+const sendGridMail = require("@sendgrid/mail");
+
+// ON DEPLOYMENT, SWITCH TO "process.env.SENDGRID_API_KEY"
+sendGridMail.setApiKey(nodemon.env.SENDGRID_API_KEY);
 
 const User = require("../models/user");
 
 // CREATE NEW USER
 exports.signup = async (req, res, next) => {
+  // REMOVE THIS CONSOLE.LOG ON DEPLOYMENT
   console.log(req.body);
 
   try {
@@ -31,7 +41,8 @@ exports.signup = async (req, res, next) => {
       console.log(checkEmailUnique);
       if (checkEmailUnique && checkEmailUnique.email) {
         res.status(422).json({
-          message: 'Email already in use. Please sign in or create your account with a different email.'
+          message:
+            "Email already in use. Please sign in or create your account with a different email.",
         });
       }
     } catch (error) {
@@ -43,12 +54,42 @@ exports.signup = async (req, res, next) => {
         });
       }
     }
-    // CUSTOM "UNIQUE EMAIL" VALIDATOR //
+    // CUSTOM "UNIQUE EMAIL" VALIDATOR // END
 
     const newUser = await user.save();
 
+    // transporter.sendMail({
+    //   to: req.body.email,
+    //   from: "info@calebdickson.com",
+    //   subject: "Welcome to Inventory!",
+    //   html: `<h1>You have successfully signed up for "Inventory App"</h1>
+    //   <p>We hope you enjoy your shopping experience!</p>`,
+    // });
+    sendGridMail.send({
+      to: req.body.email,
+      from: "info@calebdickson.com",
+      subject: "Welcome to InventoryApp!",
+      html: `<style>
+      main {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+          Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
+      .title {
+        color: #363636;
+      }
+    </style>
+    <script defer></script>
+    <main>
+      <body>
+        <h1 class="title">You have successfully signed up for "Inventory App"</h1>
+        <p>Welcome!</p>
+        <p>Click <a href="http://localhost:4200">here</a> to confirm your email</p>
+      </body>
+    </main>`
+    });
+
     res.status(201).json({
-      message: "User created!",
+      message: "Please confirm your email to create your account.",
       result: newUser,
     });
   } catch (error) {
@@ -61,7 +102,7 @@ exports.signup = async (req, res, next) => {
     }
   }
 };
-// CREATE NEW USER ///
+// CREATE NEW USER /// END
 
 // USER LOGIN
 exports.login = async (req, res, next) => {
@@ -102,4 +143,4 @@ exports.login = async (req, res, next) => {
     }
   }
 };
-// USER LOGIN ///
+// USER LOGIN /// END

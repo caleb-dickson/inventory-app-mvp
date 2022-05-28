@@ -56,12 +56,13 @@ export class AuthEffects {
               lastName: action.newUser.userProfile.lastName,
               phoneNumber: action.newUser.userProfile.phoneNumber,
               themePref: action.newUser.userProfile.themePref,
-              businessId: action.newUser.userProfile.businessId,
+              business: action.newUser.userProfile.business,
               userLocationId: action.newUser.userProfile.userLocationId,
             },
           })
           .pipe(
-            map(() => {
+            tap((resData) => console.log(resData)),
+            map((resData) => {
               return AuthActions.loginStart({
                 email: action.newUser.email,
                 password: action.newUser.password,
@@ -155,7 +156,7 @@ export class AuthEffects {
           userId: string;
         } = JSON.parse(localStorage.getItem('userAuthData'));
         if (!userAuthData) {
-          console.log('Log in to continue');
+          console.log('||| Log in to continue |||');
           return { type: 'No user logged in.' };
         }
 
@@ -169,7 +170,7 @@ export class AuthEffects {
             lastName: string;
             phoneNumber: string;
             themePref: string | null;
-            businessId: string | null;
+            business: string | null;
             userLocationId: string | null;
           };
         } = JSON.parse(localStorage.getItem('userProfileData'));
