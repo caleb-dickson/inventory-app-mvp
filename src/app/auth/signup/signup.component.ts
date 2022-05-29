@@ -54,9 +54,7 @@ export class SignupComponent implements OnInit, OnDestroy {
             firstName: signupForm.value.firstName,
             lastName: signupForm.value.lastName,
             phoneNumber: signupForm.value.phoneNumber,
-            themePref: themePref,
-            business: '',
-            userLocationId: '',
+            themePref: themePref
           },
         },
       })

@@ -9,7 +9,7 @@
     [opened]="(isHandset$ | async) === false"
   >
     <mat-toolbar>{{
-      user.userProfile.business
+      businessState.business
         ? businessName
         : user.userProfile.firstName + " " + user.userProfile.lastName
     }}</mat-toolbar>
@@ -42,11 +42,14 @@
       </a>
       <span class="spacer"></span>
       <a mat-list-item [routerLink]="manageRoute" routerLinkActive="active">
-        <mat-icon class="sidenav-icon settings">{{ manageIcon }}</mat-icon
+        <mat-icon class="sidenav-icon">{{ manageIcon }}</mat-icon
         >Manage
       </a>
       <a mat-list-item routerLink="/app/settings" routerLinkActive="active">
-        <mat-icon class="sidenav-icon settings">settings</mat-icon>Settings
+        <mat-icon class="sidenav-icon settings">settings</mat-icon>User Settings
+      </a>
+      <a mat-list-item routerLink="/app/support" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">support_agent</mat-icon>Tech Support
       </a>
       <a
         *ngIf="isAuthenticated"

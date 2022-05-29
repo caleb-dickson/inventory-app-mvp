@@ -10,6 +10,7 @@ import * as BusinessActions from '../business/business-store/business.actions';
 
 import { User } from 'src/app/auth/auth-control/user.model';
 import { Location } from './business-control/location.model';
+import { BusinessService } from './business-control/business.service';
 
 @Component({
   selector: 'app-manage',
@@ -30,8 +31,8 @@ export class BusinessComponent implements OnInit {
 
   locationEditSelector: Location;
   locationAddUserSelector: Location;
-  locationName: string;
   locations: any[];
+  locationName: string;
 
   showEditControls = 'hidden';
   businessSubmitMode: string;
@@ -51,7 +52,10 @@ export class BusinessComponent implements OnInit {
   authError: string;
   businessError: string;
 
-  constructor(private store: Store<fromAppStore.AppState>) {}
+  constructor(
+    private store: Store<fromAppStore.AppState>,
+    private businessService: BusinessService
+  ) {}
 
   ngOnInit() {
     this.userAuthSub = this.store
@@ -85,6 +89,7 @@ export class BusinessComponent implements OnInit {
           this.initAddUserToLocationForm();
         }
         console.log(bizState);
+        console.log(this.locations)
       });
 
     switch (this.user.userProfile.role) {
@@ -129,7 +134,7 @@ export class BusinessComponent implements OnInit {
           },
         })
       );
-    } else if (!storedBusiness && this.user.userProfile.business) {
+    } else if (!storedBusiness) {
       console.log('||| Fetching business from DB |||');
       console.log(this.userId);
       this.store.dispatch(
@@ -227,6 +232,8 @@ export class BusinessComponent implements OnInit {
           _id: this.locationEditSelector._id,
           locationName: this.updateLocationForm.value.locationName,
           parentBusiness: this.locationEditSelector.parentBusiness,
+          managers: this.locationEditSelector.managers,
+          staff: this.locationEditSelector.staff,
           inventoryData: this.locationEditSelector.inventoryData,
         },
       })
@@ -244,6 +251,8 @@ export class BusinessComponent implements OnInit {
           _id: null,
           locationName: this.newLocationForm.value.locationName,
           parentBusiness: this.businessId,
+          managers: [],
+          staff: [],
           inventoryData: [],
         },
       })
@@ -252,7 +261,23 @@ export class BusinessComponent implements OnInit {
     this.initNewLocationForm();
   }
 
-  onAddUserToLocationSubmit() {}
+  onAddUserToLocationSubmit() {
+    if (this.addUserToLocationForm.invalid) {
+      return;
+    }
+
+    let emailStringArr = [];
+    for (const emails of this.addUserToLocationForm.value.email) {
+      emailStringArr.push(emails.email);
+    }
+    console.log(emailStringArr);
+
+    console.log(this.addUserToLocationForm.value);
+    this.businessService.addLocationManagers(
+      emailStringArr,
+      this.locationAddUserSelector._id
+    );
+  }
 
   // onAvatarPicked(event: Event) {
   //   const file = (event.target as HTMLInputElement).files[0];
@@ -292,13 +317,13 @@ export class BusinessComponent implements OnInit {
   }
 
   get newStaffControls() {
-    return (<FormArray>this.addUserToLocationForm.get('newStaff')).controls;
+    return (<FormArray>this.addUserToLocationForm.get('email')).controls;
   }
 
   onAddNewStaffControl() {
-    (<FormArray>this.addUserToLocationForm.get('newStaff')).push(
+    (<FormArray>this.addUserToLocationForm.get('email')).push(
       new FormGroup({
-        newStaff: new FormControl(null, Validators.required),
+        email: new FormControl(null, Validators.required),
       })
     );
   }
@@ -311,7 +336,7 @@ export class BusinessComponent implements OnInit {
       this.locationAddUserSelector.locationName
     ) {
       this.addUserToLocationForm = new FormGroup({
-        newStaff: emails,
+        email: emails,
       });
     }
   }

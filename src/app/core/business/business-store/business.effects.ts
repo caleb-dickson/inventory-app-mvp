@@ -10,16 +10,17 @@ import { authSuccess } from '../../../auth/auth-store/auth.actions';
 import {
   switchMap,
   map,
-  withLatestFrom,
   of,
   concatMap,
   catchError,
   tap,
   Subscription,
+  // withLatestFrom,
 } from 'rxjs';
+
 import { environment } from 'src/environments/environment';
 
-import { Business, LocationIds } from '../business-control/business.model';
+import { Business } from '../business-control/business.model';
 import { Location } from '../business-control/location.model';
 import { User } from 'src/app/auth/auth-control/user.model';
 
@@ -151,7 +152,7 @@ export class BusinessEffects {
             updatedBusinessName: action.business.businessName,
           })
           .pipe(
-            tap((resData) => console.log(resData)),
+            tap((resData) => console.log(resData)), // remove?
             map((resData) => {
               const storedBusiness = {
                 business: resData.updatedBusiness,
@@ -184,7 +185,7 @@ export class BusinessEffects {
             BACKEND_URL + '/fetch-business/' + action.ownerId
           )
           .pipe(
-            tap((resData) => console.log(resData)),
+            tap((resData) => console.log(resData)), // remove?
             map((resData) => {
               console.log('||| Here ya go. Business fetched from DB |||');
               const storedBusiness = {
@@ -229,7 +230,7 @@ export class BusinessEffects {
             inventoryData: [],
           })
           .pipe(
-            tap((resData) => console.log(resData)),
+            tap((resData) => console.log(resData)), // remove?
             map((resData) => {
               console.log(resData.location.createdLoc);
 
@@ -269,7 +270,7 @@ export class BusinessEffects {
             locationUpdateData: action.location,
           })
           .pipe(
-            tap((resData) => console.log(resData)),
+            tap((resData) => console.log(resData)), // remove?
             map((resData) => {
               // this.store.dispatch(BusinessActions.PUTLocationSuccess());
               return BusinessActions.GETBusinessStart({

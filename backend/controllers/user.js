@@ -130,7 +130,7 @@ exports.login = async (req, res, next) => {
 
     res.status(200).json({
       token: userToken,
-      expiresIn: 3600,
+      expiresIn: 14400,
       user: user,
       userId: user._id,
     });

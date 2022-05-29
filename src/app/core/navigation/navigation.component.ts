@@ -131,7 +131,7 @@ export class NavigationComponent implements OnInit {
           },
         })
       );
-    } else if (!storedBusiness && this.user.userProfile.business) {
+    } else if (!storedBusiness) {
       console.log('||| Fetching business from DB |||');
       console.log(this.user.userId)
       this.store.dispatch(

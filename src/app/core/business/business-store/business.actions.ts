@@ -1,7 +1,6 @@
 import { createAction, props } from '@ngrx/store';
-import { Inventory } from '../../inventory/inv-control/inventory.model';
 
-import { Business, LocationIds } from '../business-control/business.model';
+import { Business } from '../business-control/business.model';
 import { Location } from '../business-control/location.model';
 
 // BUSINESS ACTIONS

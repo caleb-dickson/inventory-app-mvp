@@ -2,7 +2,6 @@ const Business = require("../models/business");
 const Location = require("../models/location");
 const User = require("../models/user");
 
-
 // CREATE NEW BUSINESS
 exports.createBusiness = async (req, res, next) => {
   try {
@@ -76,13 +75,16 @@ exports.createBusiness = async (req, res, next) => {
 };
 // CREATE NEW BUSINESS /// END
 
-
 // FETCH OWNER'S BUSINESS AND POPULATE ALL LOCATIONS ASSOCIATED
 exports.getOwnersBusiness = async (req, res, next) => {
   try {
     const foundBusiness = await Business.findOne({
       ownerId: req.params.ownerId,
-    }).populate({ path: "locations.location", model: "Location" });
+    }).populate({
+      path: "locations.location",
+      populate: { path: "managers.manager" },
+      model: "Location",
+    });
 
     if (foundBusiness && foundBusiness._id) {
       console.log("||| found and populated? |||");
@@ -192,7 +194,9 @@ exports.updateLocation = async (req, res, next) => {
   console.log("||| req.body |||");
   console.log(req.body);
   try {
-    const foundLocation = await Location.findById(req.body.locationUpdateData._id);
+    const foundLocation = await Location.findById(
+      req.body.locationUpdateData._id
+    );
     console.log("||| found location |||");
     console.log(foundLocation);
 
@@ -218,10 +222,31 @@ exports.updateLocation = async (req, res, next) => {
 };
 // EDIT/UPDATE LOCATION (locationName) /// END
 
+exports.addManagersToLocation = async (req, res, next) => {
+  try {
+    console.log(req.body);
+    console.log("||| ^^^ req.body ^^^ |||");
+    const locationForAdd = await Location.findById(req.body.locationId);
+
+    const updatedLocation = await locationForAdd.addManagers(
+      req.body.managerEmails
+    );
+    console.log("||| updated location here |||");
+    console.log(updatedLocation);
+  } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
+    console.log(error);
+    if (!res.headersSent) {
+      res.status(500).json({
+        message: error._message,
+      });
+    }
+  }
+};
 
 exports.getLocations = async (req, res, next) => {
   try {
-    const parentBiz = req.params.parentId;
+    const parentBiz = req.params.businessId;
   } catch (error) {
     // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);

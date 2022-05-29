@@ -55,9 +55,7 @@ export class AuthEffects {
               firstName: action.newUser.userProfile.firstName,
               lastName: action.newUser.userProfile.lastName,
               phoneNumber: action.newUser.userProfile.phoneNumber,
-              themePref: action.newUser.userProfile.themePref,
-              business: action.newUser.userProfile.business,
-              userLocationId: action.newUser.userProfile.userLocationId,
+              themePref: action.newUser.userProfile.themePref
             },
           })
           .pipe(

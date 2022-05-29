@@ -92,21 +92,6 @@
             <mat-icon class="mat-tag">tag</mat-icon
             >{{ location.location.locationName }}
           </a>
-          <!-- <button
-            *ngIf="
-              !locationEditMode ||
-              (locationEditSelector &&
-                location.location.locationName !==
-                  locationEditSelector.locationName)
-            "
-            mat-icon-button
-            class="business-info-locations-button"
-            (click)="onEditLocation('update', location.location)"
-          >
-            <mat-icon class="business-info-locations-button-icon"
-              >edit</mat-icon
-            >
-          </button> -->
           <mat-spinner
             diameter="30"
             color="accent"
@@ -242,6 +227,9 @@
       <section>
         <p class="location-field-title">Authorized Staff</p>
         <p *ngIf="!businessId">Add your business to create locations.</p>
+        <p *ngFor="let manager of locationAddUserSelector">
+          {{ manager.email }}
+        </p>
         <button *ngIf="businessId" mat-icon-button class="business-info-add">
           <mat-icon
             (click)="
@@ -261,8 +249,8 @@
             {{
               addUserToLocationMode &&
               locationAddUserSelector === location.location
-                ? "Invite"
-                : "Invite Staff"
+                ? "Invite More Managers"
+                : "Invite Managers"
             }}</mat-label
           >
         </button>
@@ -275,10 +263,10 @@
           [formGroup]="addUserToLocationForm"
           (ngSubmit)="onAddUserToLocationSubmit()"
         >
-          <div class="add-user-array" formArrayName="newStaff">
+          <div class="add-user-array" formArrayName="email">
             <mat-hint
-              >Be sure to use the same email they intend to sign up
-              with.</mat-hint
+              >Be sure to use the same email they signed up with, or intend to
+              sign up with.</mat-hint
             >
             <mat-form-field
               class="add-user-field"
@@ -291,19 +279,25 @@
                 type="email"
                 class="add-user-input"
                 spellcheck="false"
-                formControlName="newStaff"
+                formControlName="email"
                 matInput
                 email
               />
-              <mat-error *ngIf="addUserToLocationForm.get('newStaff').invalid"
+              <mat-error *ngIf="addUserToLocationForm.get('email').invalid"
                 >Please enter a valid email for this user.</mat-error
               >
-              <span> </span>
             </mat-form-field>
             <button mat-mini-fab type="button" (click)="onAddNewStaffControl()">
-              <mat-icon>add</mat-icon>
+              <mat-icon>group_add</mat-icon>
             </button>
           </div>
+          <button
+            mat-raised-button
+            type="submit"
+            class="add-manager-submit-btn"
+          >
+            Submit
+          </button>
         </form>
       </section>
     </mat-card-content>
@@ -319,7 +313,6 @@
       >
         Reset
       </button>
-      <button mat-raised-button type="submit">Submit</button>
     </mat-card-actions>
   </mat-card>
 </div>
