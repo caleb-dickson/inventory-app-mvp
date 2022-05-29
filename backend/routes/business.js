@@ -22,7 +22,7 @@ router.post("/create-location", checkAuth, BusinessController.createLocation);
 router.get("/fetch-locations/:parentId", checkAuth, BusinessController.getLocations);
 // Update one location = DONE
 router.put("/update-location", checkAuth, BusinessController.updateLocation);
-// Add managers to location
+// Add managers to location = DONE
 router.put("/add-managers", checkAuth, BusinessController.addManagersToLocation);
 
 
