@@ -9,13 +9,14 @@ import * as AuthActions from './auth.actions';
 import { clearBusinessState } from '../../core/business/business-store/business.actions';
 
 import { of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, concatMap, map, switchMap, tap } from 'rxjs/operators';
 
 import { environment } from 'src/environments/environment';
 
 import { AuthService } from '../auth-control/auth.service';
 
 import { User } from '../auth-control/user.model';
+import { Location } from '../../core/business/business-control/location.model';
 
 import { MatDialog } from '@angular/material/dialog';
 import { ThemeService } from 'src/app/theme.service';
@@ -55,7 +56,7 @@ export class AuthEffects {
               firstName: action.newUser.userProfile.firstName,
               lastName: action.newUser.userProfile.lastName,
               phoneNumber: action.newUser.userProfile.phoneNumber,
-              themePref: action.newUser.userProfile.themePref
+              themePref: action.newUser.userProfile.themePref,
             },
           })
           .pipe(
@@ -143,6 +144,37 @@ export class AuthEffects {
     )
   );
 
+  fetchUserLocations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.GETUserLocationsStart),
+      concatMap((action) => {
+        console.log('||| userId: ===>>>' + action.userId);
+        return this.http
+          .get<{ fetchedLocations: Location[] }>(
+            BACKEND_URL + '/fetch-user-locations/' + action.userId + '/' + action.userRole
+          )
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              let returnedLocations: Location[] = resData.fetchedLocations;
+              if (resData && resData.fetchedLocations) {
+                const locations = resData.fetchedLocations;
+                localStorage.setItem('locations', JSON.stringify(locations));
+
+                return AuthActions.GETUserLocationsSuccess({
+                  locations: returnedLocations,
+                });
+              }
+            })
+          );
+      }),
+      catchError((errorRes) => {
+        console.log(errorRes);
+        return handleError(errorRes);
+      })
+    )
+  );
+
   autoLogin$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.autoLogin),
@@ -173,6 +205,8 @@ export class AuthEffects {
           };
         } = JSON.parse(localStorage.getItem('userProfileData'));
 
+        const locations = JSON.parse(localStorage.getItem('locations'));
+
         const authorizedUser = {
           token: userAuthData.token,
           expiration: new Date(userAuthData.expiration),
@@ -202,6 +236,9 @@ export class AuthEffects {
           return AuthActions.authFail({
             errorMessage: 'Not authenticated! Log in.',
           });
+        }
+
+        if (!locations) {
         }
       })
     )

@@ -233,20 +233,54 @@ exports.addManagersToLocation = async (req, res, next) => {
     );
     console.log("||| updated location here |||");
     console.log(updatedLocation);
+
+    if (updatedLocation === []) {
+      res
+        .status(200)
+        .json({ message: "Manager was found and added to the location." });
+    }
+    if (updatedLocation === 'Not found.') {
+      res.status(404).json({
+        message:
+          'Couldn\'t find one or more of the managers. Please double check the emails are all correct and also make sure they all have already created "Manager" accounts here.',
+      });
+    }
   } catch (error) {
     // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
     if (!res.headersSent) {
       res.status(500).json({
-        message: error._message,
+        message: error,
       });
     }
   }
 };
 
-exports.getLocations = async (req, res, next) => {
+exports.getBusinessLocations = async (req, res, next) => {
   try {
-    const parentBiz = req.params.businessId;
+    console.log(req.params.businessId)
+    console.log('||| ^^^ req.params.businessId ^^^ |||');
+
+    const bizLocations = await Location.find({
+      parentBusiness: req.params.businessId,
+    })
+      .populate({
+        path: "managers.manager",
+        model: "User",
+      })
+      .populate({
+        path: "staff.staffMember",
+        model: "User",
+      });
+    console.log(bizLocations);
+    console.log("||| ^^^ found locations here ^^^ |||");
+
+    if (bizLocations) {
+      res.status(200).json({ fetchedLocations: bizLocations });
+    }
+    if (!bizLocations) {
+      res.status(404).json({ message: "No locations were found" });
+    }
   } catch (error) {
     // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);

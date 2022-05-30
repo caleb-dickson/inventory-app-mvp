@@ -4,8 +4,8 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const userRoutes = require("./routes/user");
-const businessRoutes = require('./routes/business');
-const inventoryRoutes = require('./routes/inventory');
+const businessRoutes = require("./routes/business");
+const inventoryRoutes = require("./routes/inventory");
 
 const app = express();
 
@@ -40,7 +40,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api/user", userRoutes);
-app.use('/api/business', businessRoutes);
-app.use('/api/inventory', inventoryRoutes);
+app.use("/api/business", businessRoutes);
+app.use("/api/inventory", inventoryRoutes);
 
 module.exports = app;

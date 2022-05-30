@@ -1,15 +1,20 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import { User } from '../auth-control/user.model';
+
 import * as AuthActions from './auth.actions';
+
+import { Location } from 'src/app/core/business/business-control/location.model';
+import { User } from '../auth-control/user.model';
 
 export interface AuthState {
   userAuth: User;
+  userLocations: Location[];
   authError: string;
   loading: boolean;
 }
 
 const initialState: AuthState = {
   userAuth: null,
+  userLocations: [],
   authError: null,
   loading: false,
 };
@@ -35,6 +40,20 @@ export function authReducer(authState: AuthState | undefined, authAction: Action
       authError: action.errorMessage,
       loading: false,
     })),
+
+    on(AuthActions.GETUserLocationsStart, (state) => ({
+      ...state,
+      authError: null,
+      loading: true,
+    })),
+    on(AuthActions.GETUserLocationsSuccess, (state, action) => ({
+      ...state,
+      authError: null,
+      loading: false,
+      userLocations: action.locations
+    })),
+
+
     on(AuthActions.logout, (state) => ({
       ...state,
       userAuth: null,

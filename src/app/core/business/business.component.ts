@@ -81,15 +81,16 @@ export class BusinessComponent implements OnInit {
         if (bizState.business && bizState.business._id) {
           this.businessName = bizState.business.businessName;
           this.businessId = bizState.business._id;
-          this.locations = bizState.business.locations;
-          this.locationName = 'test';
+          this.locations = bizState.businessLocations;
+          // this.locationName = 'test';
           this.initBusinessForm();
           this.initNewLocationForm();
           this.initUpdateLocationForm();
           this.initAddUserToLocationForm();
         }
         console.log(bizState);
-        console.log(this.locations)
+        console.log(this.locations);
+        console.log(this.businessError)
       });
 
     switch (this.user.userProfile.role) {
@@ -110,43 +111,67 @@ export class BusinessComponent implements OnInit {
     console.log(this.showEditControls);
   }
 
-  checkBusiness() {
-    const storedBusiness: {
-      business: {
-        _id: string;
-        businessName: string;
-        ownerId: string;
-        locations: any[];
-      };
-    } = JSON.parse(localStorage.getItem('storedBusiness'));
+  checkBusinessLocations() {
+    const locations = JSON.parse(localStorage.getItem('locations'));
 
-    if (storedBusiness) {
-      console.log('||| Business fetched from local storage |||');
-      console.log(storedBusiness.business.locations);
-      // this.setLocations(storedBusiness);
+    if (locations) {
+      console.log(locations);
       this.store.dispatch(
-        BusinessActions.GETBusinessSuccess({
-          business: {
-            _id: storedBusiness.business._id,
-            businessName: storedBusiness.business.businessName,
-            ownerId: storedBusiness.business.ownerId,
-            locations: [...storedBusiness.business.locations],
-          },
+        BusinessActions.GETBusinessLocationsSuccess({
+          locations: locations,
         })
       );
-    } else if (!storedBusiness) {
-      console.log('||| Fetching business from DB |||');
-      console.log(this.userId);
+      console.log('||| locations fetched from local storage |||')
+    } else if (!locations) {
+      console.log('||| No LOCATIONS in local storage |||');
       this.store.dispatch(
-        BusinessActions.GETBusinessStart({
-          ownerId: this.userId,
-        })
-      );
-    } else {
-      this.store.dispatch(
-        BusinessActions.GETEntityFail({ errorMessage: 'No business found.' })
+        BusinessActions.GETEntityFail({ errorMessage: 'No locations found.' })
       );
     }
+  }
+
+  checkBusiness() {
+
+      const storedBusiness: {
+        business: {
+          _id: string;
+          businessName: string;
+          ownerId: string;
+          locations: any[];
+        };
+      } = JSON.parse(localStorage.getItem('storedBusiness'));
+
+      if (storedBusiness) {
+        console.log('||| Business fetched from local storage |||');
+        console.log(storedBusiness.business.locations);
+        // this.setLocations(storedBusiness);
+        this.store.dispatch(
+          BusinessActions.GETBusinessSuccess({
+            business: {
+              _id: storedBusiness.business._id,
+              businessName: storedBusiness.business.businessName,
+              ownerId: storedBusiness.business.ownerId,
+              locations: [...storedBusiness.business.locations],
+            },
+          })
+        );
+        this.checkBusinessLocations()
+      } else if (!storedBusiness) {
+        console.log('||| Fetching business from DB |||');
+        console.log(this.userId);
+        this.store.dispatch(
+          BusinessActions.GETBusinessStart({
+            ownerId: this.userId,
+          })
+        );
+      } else {
+        console.log('||| checkBusiness error |||');
+        this.store.dispatch(
+          BusinessActions.GETEntityFail({ errorMessage: 'No business found.' })
+        );
+      }
+
+
   }
 
   onEditBusiness(mode: string) {
@@ -273,6 +298,7 @@ export class BusinessComponent implements OnInit {
     console.log(emailStringArr);
 
     console.log(this.addUserToLocationForm.value);
+    console.log(this.locationAddUserSelector._id)
     this.businessService.addLocationManagers(
       emailStringArr,
       this.locationAddUserSelector._id

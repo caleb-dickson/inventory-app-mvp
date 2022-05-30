@@ -13,7 +13,7 @@ const locationSchema = mongoose.Schema({
       manager: {
         type: mongoose.Schema.Types.ObjectId,
         required: false,
-        ref: "User"
+        ref: "User",
       },
     },
   ],
@@ -22,7 +22,7 @@ const locationSchema = mongoose.Schema({
       staffMember: {
         type: mongoose.Schema.Types.ObjectId,
         required: false,
-        ref: "User"
+        ref: "User",
       },
     },
   ],
@@ -56,50 +56,67 @@ locationSchema.methods.updateLocation = async function (locationUpdateData) {
   return this.save();
 };
 
-// TO ADD A LIST OF MANAGERS TO A LOCATION BY EMAIL
+// TO ADD A LIST OF AUTHORIZED MANAGERS (User Refs) TO A LOCATION BY EMAIL
 locationSchema.methods.addManagers = async function (managerEmails) {
   let newManagers = [];
 
+  // FIND AND RETURN ANY MANAGER USERS WITH MATCHING EMAILS QUERY
   let foundManagers = await User.find({
     email: { $in: managerEmails },
   });
   console.log(foundManagers);
   console.log("||| found managers here ^^^ |||");
 
-  foundManagers.forEach(manager => {
-    newManagers.push({ manager: manager._id })
-  });
 
-  // NEW ARRAY OF CURRENT MANAGERS
-  let currentManagers = [...this.managers];
+  if (foundManagers[0]) {
+    foundManagers.forEach((manager) => {
+      newManagers.push({ manager: manager._id });
+    });
 
-  let updatedManagers = currentManagers.concat(newManagers);
+    // NEW ARRAY OF CURRENT MANAGERS
+    let currentManagers = [...this.managers];
 
-  this.managers = updatedManagers;
+    let updatedManagers = currentManagers.concat(newManagers);
 
-  // FIND AND RETURN ANY MANAGER USERS WITH MATCHING EMAILS QUERY
+    this.managers = updatedManagers;
 
-  return this.save();
+    return this.save();
+  } else {
+    return 'Not found.'
+  }
 };
 
-locationSchema.methods.addStaff = async function (newStaffList) {
-  let staffList = [...this.staff];
-  let newStaff = staffList.concat(newStaffList);
+// ADD A LIST OF AUTHORIZED JUNIOR STAFF (User Refs) TO A LOCATION BY EMAIL
+locationSchema.methods.addStaff = async function (staffEmails) {
+  let newStaff = [];
 
-  this.staff = newStaff;
+  // FIND AND RETURN ANY STAFF USERS WITH MATCHING EMAILS QUERY
+  let foundStaff = await User.find({
+    email: { $in: staffEmails },
+  });
+  // LOG RESPONSE
+  console.log(foundStaff);
+  console.log("||| ^^^ found staff here ^^^ |||");
+  // ASSIGN THE FOUND STAFF DOC IDs TO staffUser OBJECTS AND
+  // PUSH TO THE NEW ARRAY
+  foundStaff.forEach((staffUser) => {
+    newStaff.push({ staffUser: staffUser._id });
+  });
+  // NEW ARRAY OF CURRENT STAFF
+  let currentManagers = [...this.managers];
+  let updatedStaff = currentManagers.concat(newStaff);
+  this.staff = updatedStaff;
 
   return this.save();
 };
 
 locationSchema.methods.addProductToList = async function (newProduct) {
   this.productList.push({ product: newProduct });
-
   return this.save();
 };
 
 locationSchema.methods.addInventory = async function (newInventory) {
   this.inventoryData.push({ inventory: newInventory });
-
   return this.save();
 };
 

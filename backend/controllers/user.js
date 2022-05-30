@@ -1,5 +1,7 @@
 // REMOVE THIS ON DEPLOYMENT
-const nodemon = require('../../nodemon.json');
+const nodemon = require("../../nodemon.json");
+
+const Location = require("../models/location");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -58,13 +60,6 @@ exports.signup = async (req, res, next) => {
 
     const newUser = await user.save();
 
-    // transporter.sendMail({
-    //   to: req.body.email,
-    //   from: "info@calebdickson.com",
-    //   subject: "Welcome to Inventory!",
-    //   html: `<h1>You have successfully signed up for "Inventory App"</h1>
-    //   <p>We hope you enjoy your shopping experience!</p>`,
-    // });
     sendGridMail.send({
       to: req.body.email,
       from: "info@calebdickson.com",
@@ -85,11 +80,11 @@ exports.signup = async (req, res, next) => {
         <p>Welcome!</p>
         <p>Click <a href="http://localhost:4200">here</a> to confirm your email</p>
       </body>
-    </main>`
+    </main>`,
     });
 
     res.status(201).json({
-      message: "Please confirm your email to create your account.",
+      message: "Signup successful! Check your email.",
       result: newUser,
     });
   } catch (error) {
@@ -144,3 +139,36 @@ exports.login = async (req, res, next) => {
   }
 };
 // USER LOGIN /// END
+
+// ||| Unfinished Unfinished Unfinished Unfinished Unfinished |||
+// FETCH ALL LOCATIONS WHERE USER IS AUTHORIZED
+exports.getUserLocations = async (req, res, next) => {
+  try {
+    if (+req.params.userRole === 2) {
+      const userLocations = await Location.find({ manager: req.params.userId });
+    }
+    if (+req.params.userRole === 1) {
+      const userLocations = await Location.find({
+        staffMember: req.params.userId,
+      });
+    }
+    console.log(userLocations);
+    console.log("||| ^^^ userLocations here ^^^");
+
+    if (userLocations) {
+      res.status(200).json({ fetchedLocations: userLocations });
+    }
+    if (!userLocations) {
+      res
+        .status(404)
+        .json({ message: "No authorized locations were found for this user." });
+    }
+  } catch (error) {
+    // CATCH AND RETURN UNEXPECTED ERRORS
+    console.log(error);
+    res.status(500).json({
+      message: error._message,
+    });
+  }
+};
+// FETCH ALL LOCATIONS WHERE USER IS AUTHORIZED /// END

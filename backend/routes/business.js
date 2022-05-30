@@ -19,12 +19,12 @@ router.get("/fetch-business/:ownerId", checkAuth, BusinessController.getOwnersBu
 // Create new location (owner only) = DONE
 router.post("/create-location", checkAuth, BusinessController.createLocation);
 // Fetch all locations docs for business = WORKING
-router.get("/fetch-locations/:parentId", checkAuth, BusinessController.getLocations);
+router.get("/fetch-business-locations/:businessId", checkAuth, BusinessController.getBusinessLocations);
+
 // Update one location = DONE
 router.put("/update-location", checkAuth, BusinessController.updateLocation);
 // Add managers to location = DONE
 router.put("/add-managers", checkAuth, BusinessController.addManagersToLocation);
-
 
 
 // PRODUCTS

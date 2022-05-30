@@ -1,15 +1,16 @@
+import { User } from "src/app/auth/auth-control/user.model";
 import { Inventory } from "../../inventory/inv-control/inventory.model";
 
 export interface InventoryIds { inventory: string };
-export interface ManagerEmails { managerEmail: string };
-export interface StaffEmails { staffEmail: string };
+export interface Manager { manager: string | User | null };
+export interface Staff { staffMember: string | User | null };
 
 export class Location {
   public _id: string | null;
   public locationName: string;
   public parentBusiness: string;
-  public managers: ManagerEmails[] | null;
-  public staff: StaffEmails[] | null;
+  public managers: Manager[] | null;
+  public staff: Staff[] | null;
   public inventoryData: InventoryIds[] | Inventory[] | null;
   // ^^^ AN ARRAY OF INVENTORY DOC IDS ASSIGNED TO THIS LOCATION
 
@@ -17,8 +18,8 @@ export class Location {
     _id: string | null,
     locationName: string,
     parentBusiness: string,
-    managers: ManagerEmails[] | null,
-    staff: StaffEmails[] | null,
+    managers: Manager[] | null,
+    staff: Staff[] | null,
     inventoryData: InventoryIds[] | Inventory[] | null
   ) {
     this._id = _id,

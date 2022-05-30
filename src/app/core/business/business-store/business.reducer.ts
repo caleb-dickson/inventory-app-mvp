@@ -2,16 +2,17 @@ import { Action, createReducer, on } from '@ngrx/store';
 import * as BusinessActions from './business.actions';
 
 import { Business } from '../business-control/business.model';
+import { Location } from '../business-control/location.model';
 
 export interface BusinessState {
   business: Business;
-  // locations: object[];
+  businessLocations: Location[];
   businessError: string;
   loading: boolean;
 }
 const initialState: BusinessState = {
   business: null,
-  // locations: [],
+  businessLocations: [],
   businessError: null,
   loading: false,
 };
@@ -23,7 +24,7 @@ export function businessReducer(
   return createReducer(
     initialState,
 
-    // BUSINESS ACTIONS
+    // BUSINESS ACTIONS = OWNER
     on(BusinessActions.POSTBusinessStart, (state) => ({
       ...state,
       businessError: null,
@@ -46,27 +47,27 @@ export function businessReducer(
     })),
 
 
-    // LOCATION ACTIONS
+    // LOCATION ACTIONS = OWNER
     on(BusinessActions.POSTLocationStart, (state) => ({
       ...state,
       businessError: null,
       loading: true,
     })),
-    on(BusinessActions.POSTLocationSuccess, (state, action) => ({
+    on(BusinessActions.POSTLocationSuccess, (state) => ({
       ...state,
       loading: false
     })),
-    on(BusinessActions.PUTLocationStart, (state, action) => ({
+    on(BusinessActions.PUTLocationStart, (state) => ({
       ...state,
       loading: true
     })),
-    on(BusinessActions.PUTLocationSuccess, (state, action) => ({
+    on(BusinessActions.PUTLocationSuccess, (state) => ({
       ...state,
       loading: false
     })),
 
 
-    // FETCH ACTIONS
+    // FETCH ACTIONS = OWNER
     on(BusinessActions.GETBusinessStart, (state) => ({
       ...state,
       businessError: null,
@@ -77,7 +78,16 @@ export function businessReducer(
       loading: false,
       business: action.business
     })),
-
+    on(BusinessActions.GETBusinessLocationsStart, (state) => ({
+      ...state,
+      businessError: null,
+      loading: true,
+    })),
+    on(BusinessActions.GETBusinessLocationsSuccess, (state, action) => ({
+      ...state,
+      loading: false,
+      businessLocations: action.locations
+    })),
 
     // ERROR HANDLING
     on(BusinessActions.POSTEntityFail, (state, action) => ({
@@ -90,17 +100,22 @@ export function businessReducer(
       businessError: action.errorMessage,
       loading: false,
     })),
+    on(BusinessActions.APICallFail, (state, action) => ({
+      ...state,
+      businessError: action.errorMessage,
+      loading: false,
+    })),
     on(BusinessActions.clearError, (state) => ({
       ...state,
       businessError: null,
     })),
 
 
-    // CLEAR BUSINESS STATE ON LOGOUT
+    // CLEAR BUSINESS STATE (ON LOGOUT)
     on(BusinessActions.clearBusinessState, (state) => ({
       ...state,
       business: null,
-      locations: [],
+      businessLocations: [],
       businessError: null,
       loading: false,
     }))

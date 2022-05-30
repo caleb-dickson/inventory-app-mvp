@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
@@ -23,10 +23,12 @@ import { environment } from 'src/environments/environment';
 import { Business } from '../business-control/business.model';
 import { Location } from '../business-control/location.model';
 import { User } from 'src/app/auth/auth-control/user.model';
+import { BusinessService } from '../business-control/business.service';
 
 const BACKEND_URL = environment.apiUrl + '/business';
 
 const handleError = (errorRes: HttpErrorResponse) => {
+  console.log(errorRes)
   let errorMessage = errorRes.error.message;
 
   if (!errorRes.error.message) {
@@ -34,27 +36,15 @@ const handleError = (errorRes: HttpErrorResponse) => {
     errorMessage =
       'Error: ' +
       errorRes.status +
-      ' ' +
+      ' - ' +
       errorRes.statusText +
       'An unknown error has occurred.';
-    return of(BusinessActions.POSTEntityFail({ errorMessage }));
-  }
-
-  switch (errorRes.error.message) {
-    case 'Business validation failed':
-      errorMessage = `Business Invalid: Your business name must be unique.
-        Either the name is already in use, or you already have a business here.
-        If you want to manage inventory for another business, you'll need to create
-        a new Owner account with a new email.`;
-      break;
-
-    default:
-      break;
+    return of(BusinessActions.APICallFail({ errorMessage }));
   }
 
   console.log(errorMessage);
-  return of(BusinessActions.POSTEntityFail({ errorMessage }));
-};
+  return of(BusinessActions.APICallFail({ errorMessage }));
+}
 
 @Injectable()
 export class BusinessEffects {
@@ -201,6 +191,12 @@ export class BusinessEffects {
                   'storedBusiness',
                   JSON.stringify(storedBusiness)
                 );
+                console.log('||| fetching locations |||')
+                this.store.dispatch(
+                  BusinessActions.GETBusinessLocationsStart({
+                    businessId: resData.businessId,
+                  })
+                );
                 return BusinessActions.GETBusinessSuccess({
                   business: resData.business,
                 });
@@ -258,6 +254,36 @@ export class BusinessEffects {
     )
   );
 
+  fetchBusinessLocations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(BusinessActions.GETBusinessLocationsStart),
+      concatMap((action) => {
+        console.log('||| businessId: ===>>>' + action.businessId);
+        return this.http
+          .get<{ fetchedLocations: Location[] }>(
+            BACKEND_URL + '/fetch-business-locations/' + action.businessId
+          )
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              if (resData && resData.fetchedLocations) {
+                const locations = resData.fetchedLocations;
+                localStorage.setItem('locations', JSON.stringify(locations));
+
+                return BusinessActions.GETBusinessLocationsSuccess({
+                  locations: resData.fetchedLocations,
+                });
+              }
+            })
+          );
+      }),
+      catchError((errorRes) => {
+        console.log(errorRes);
+        return handleError(errorRes);
+      })
+    )
+  );
+
   updateLocationStart$ = createEffect(() =>
     this.actions$.pipe(
       ofType(BusinessActions.PUTLocationStart),
@@ -289,6 +315,7 @@ export class BusinessEffects {
   constructor(
     private actions$: Actions,
     private http: HttpClient,
+    private businessService: BusinessService,
     private store: Store<fromAppStore.AppState>
   ) {}
 }

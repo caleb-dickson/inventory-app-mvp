@@ -3,8 +3,8 @@ import { createAction, props } from '@ngrx/store';
 import { Business } from '../business-control/business.model';
 import { Location } from '../business-control/location.model';
 
-// BUSINESS ACTIONS
-// BUSINESS ACTIONS
+// BUSINESS ACTIONS = FOR OWNERS
+// BUSINESS ACTIONS = FOR OWNERS
 export const POSTBusinessStart = createAction(
   '[Business] Add Business Start',
   props<{ business: Business }>()
@@ -22,8 +22,8 @@ export const PUTBusinessSuccess = createAction(
   props<{ business: Business }>()
 );
 
-// LOCATION ACTIONS
-// LOCATION ACTIONS
+// LOCATION ACTIONS = FOR OWNERS
+// LOCATION ACTIONS = FOR OWNERS
 export const POSTLocationStart = createAction(
   '[Business] Add Location Start',
   props<{ location: Location }>()
@@ -45,20 +45,8 @@ export const PUTLocationSuccess = createAction(
 // PRODUCT ACTIONS ARE IN THE INVENTORY STORE
 // PRODUCT ACTIONS ARE IN THE INVENTORY STORE
 
-// ERROR HANDLING
-// ERROR HANDLING
-export const POSTEntityFail = createAction(
-  '[Business] Add Entity Fail',
-  props<{ errorMessage: string }>()
-);
-export const GETEntityFail = createAction(
-  '[Business] Fetch Entity Fail',
-  props<{ errorMessage: string }>()
-);
-export const clearError = createAction('[Business] Clear Error');
-
-// FETCH
-// FETCH
+// FETCH = FOR OWNER
+// FETCH = FOR OWNER
 export const GETBusinessStart = createAction(
   '[Business] Fetch Business Start',
   props<{ ownerId: string }>()
@@ -67,9 +55,35 @@ export const GETBusinessSuccess = createAction(
   '[Business] Fetch Business Success',
   props<{ business: Business }>()
 );
+export const GETBusinessLocationsStart = createAction(
+  '[Business] Fetch Business Locations Start',
+  props<{ businessId: string }>()
+);
+export const GETBusinessLocationsSuccess = createAction(
+  '[Business] Fetch Business Locations Success',
+  props<{ locations: Location[] }>()
+);
 
-// CLEAR BUSINESS STATE ON LOGOUT
-// CLEAR BUSINESS STATE ON LOGOUT
+
+
+// ERROR HANDLING = FOR ALL USERS
+// ERROR HANDLING = FOR ALL USERS
+export const POSTEntityFail = createAction(
+  '[Business] Add Entity Fail',
+  props<{ errorMessage: string }>()
+);
+export const GETEntityFail = createAction(
+  '[Business] Fetch Entity Fail',
+  props<{ errorMessage: string }>()
+);
+export const APICallFail = createAction(
+  '[Business] API Call Fail',
+  props<{ errorMessage: string }>()
+);
+export const clearError = createAction('[Business] Clear Error');
+
+// CLEAR BUSINESS STATE ON LOGOUT = FOR ALL USERS
+// CLEAR BUSINESS STATE ON LOGOUT = FOR ALL USERS
 export const clearBusinessState = createAction(
   '[Business] Clear Business State'
 );

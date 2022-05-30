@@ -86,11 +86,10 @@
         </h6>
         <div *ngFor="let location of locations" class="business-info-locations">
           <a
-            [href]="'/app/business#' + location.location._id"
+            [href]="'/app/business#' + location._id"
             class="business-info-locations-list"
           >
-            <mat-icon class="mat-tag">tag</mat-icon
-            >{{ location.location.locationName }}
+            <mat-icon class="mat-tag">tag</mat-icon>{{ location.locationName }}
           </a>
           <mat-spinner
             diameter="30"
@@ -161,9 +160,9 @@
 <div class="locations" *ngFor="let location of locations">
   <mat-card>
     <mat-card-header>
-      <mat-card-title [id]="location.location._id">
+      <mat-card-title [id]="location._id">
         <mat-icon class="store-icon">store</mat-icon>
-        {{ location.location.locationName }}
+        {{ location.locationName }}
       </mat-card-title>
       <mat-card-subtitle>Subtitle</mat-card-subtitle>
     </mat-card-header>
@@ -171,11 +170,11 @@
       <section>
         <p class="location-field-title">Location Name</p>
         <p *ngIf="!locationEditMode">
-          {{ location.location.locationName }}
+          {{ location.locationName }}
           <button
             mat-mini-fab
             color="none"
-            (click)="onEditLocation('update', location.location)"
+            (click)="onEditLocation('update', location)"
             class="location-field-title-btn"
           >
             <mat-icon class="location-field-title-btn-edit">edit</mat-icon>
@@ -184,7 +183,7 @@
         <form
           *ngIf="
             locationEditMode &&
-            location.location.locationName ===
+            location.locationName ===
               locationEditSelector.locationName &&
             !isLoading
           "
@@ -227,28 +226,37 @@
       <section>
         <p class="location-field-title">Authorized Staff</p>
         <p *ngIf="!businessId">Add your business to create locations.</p>
-        <p *ngFor="let manager of locationAddUserSelector">
-          {{ manager.email }}
+        <p *ngFor="let manager of location.managers; let i = index">
+          {{
+            i +
+              1 +
+              ". " +
+              manager.manager.userProfile.firstName +
+              " " +
+              manager.manager.userProfile.lastName +
+              " - " +
+              manager.manager.email
+          }}
         </p>
         <button *ngIf="businessId" mat-icon-button class="business-info-add">
           <mat-icon
             (click)="
-              onAddUserToLocation(!addUserToLocationMode, location.location)
+              onAddUserToLocation(!addUserToLocationMode, location)
             "
             >group_add</mat-icon
           >
           <mat-label
             (click)="
               addUserToLocationMode &&
-              locationAddUserSelector === location.location
+              locationAddUserSelector === location
                 ? onAddNewStaffControl()
-                : onAddUserToLocation(true, location.location) -
+                : onAddUserToLocation(true, location) -
                   onAddNewStaffControl()
             "
           >
             {{
               addUserToLocationMode &&
-              locationAddUserSelector === location.location
+              locationAddUserSelector === location
                 ? "Invite More Managers"
                 : "Invite Managers"
             }}</mat-label
@@ -257,7 +265,7 @@
         <form
           *ngIf="
             addUserToLocationMode &&
-            locationAddUserSelector === location.location
+            locationAddUserSelector === location
           "
           class="add-user"
           [formGroup]="addUserToLocationForm"
@@ -302,11 +310,12 @@
       </section>
     </mat-card-content>
     <mat-card-actions>
+      <mat-error>{{ businessError }}</mat-error>
       <button
         mat-raised-button
         type="button"
         (click)="
-          addUserToLocationMode && locationAddUserSelector === location.location
+          addUserToLocationMode && locationAddUserSelector === location
             ? onCancelForm('add-location-user')
             : null
         "
