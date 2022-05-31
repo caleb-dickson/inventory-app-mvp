@@ -97,7 +97,7 @@ exports.getOwnersBusiness = async (req, res, next) => {
     }
     if (!foundBusiness) {
       res.status(404).json({
-        message: "Owner has no businesses yet.",
+        message: "Owner has no business yet.",
       });
     }
   } catch (error) {
@@ -226,25 +226,43 @@ exports.addManagersToLocation = async (req, res, next) => {
   try {
     console.log(req.body);
     console.log("||| ^^^ req.body ^^^ |||");
-    const locationForAdd = await Location.findById(req.body.locationId);
+    const locationForAdd = await Location.findById(req.body.location);
 
-    const updatedLocation = await locationForAdd.addManagers(
-      req.body.managerEmails
-    );
-    console.log("||| updated location here |||");
-    console.log(updatedLocation);
+    // FOR managers
+    if (req.body.role === 'manager') {
+      const updatedLocation = await locationForAdd.addManagers(
+        req.body.emails
+      );
+      console.log(updatedLocation);
+      console.log("||| ^^^ updated location here ^^^ |||");
+      if (updatedLocation === "Not found.") {
+        res.status(404).json({
+          message: "Error: Couldn't find one or more of the managers.",
+        });
+      } else {
+        res.status(200).json({
+          message: "Manager was found and added to the location."
+        });
+      }
 
-    if (updatedLocation === []) {
-      res
-        .status(200)
-        .json({ message: "Manager was found and added to the location." });
+      // FOR staff
+    } else if (req.body.role === 'staff') {
+      const updatedLocation = await locationForAdd.addStaff(
+        req.body.emails
+      );
+      console.log("||| ^^^ updated location here ^^^ |||");
+      console.log(updatedLocation);
+      if (updatedLocation === "Not found.") {
+        res.status(404).json({
+          message: "Error: Couldn't find one or more of the junior staff members.",
+        });
+      } else {
+        res.status(200).json({
+          message: "Manager was found and added to the location."
+        });
+      }
     }
-    if (updatedLocation === 'Not found.') {
-      res.status(404).json({
-        message:
-          'Couldn\'t find one or more of the managers. Please double check the emails are all correct and also make sure they all have already created "Manager" accounts here.',
-      });
-    }
+
   } catch (error) {
     // CATCH AND RETURN UNEXPECTED ERRORS
     console.log(error);
@@ -258,8 +276,8 @@ exports.addManagersToLocation = async (req, res, next) => {
 
 exports.getBusinessLocations = async (req, res, next) => {
   try {
-    console.log(req.params.businessId)
-    console.log('||| ^^^ req.params.businessId ^^^ |||');
+    console.log(req.params.businessId);
+    console.log("||| ^^^ req.params.businessId ^^^ |||");
 
     const bizLocations = await Location.find({
       parentBusiness: req.params.businessId,

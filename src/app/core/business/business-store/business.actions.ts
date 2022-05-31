@@ -38,6 +38,18 @@ export const PUTLocationStart = createAction(
 export const PUTLocationSuccess = createAction(
   '[Business] Update Location Start'
 );
+export const PUTUserToLocationStart = createAction(
+  '[Business] Add User to Location Authorized managers/staff Start',
+  props<{ emails: string[], role: string, location: Location }>()
+);
+export const PUTUserToLocationSuccess = createAction(
+  '[Business] Add User to Location Authorized managers/staff Start',
+  props<{ location: Location }>()
+);
+export const SelectLocation = createAction(
+  '[Business] Select Location for Action',
+  props<{ location: Location }>()
+)
 
 // INVENTORY ACTIONS ARE IN THE INVENTORY STORE
 // INVENTORY ACTIONS ARE IN THE INVENTORY STORE
@@ -76,8 +88,8 @@ export const GETEntityFail = createAction(
   '[Business] Fetch Entity Fail',
   props<{ errorMessage: string }>()
 );
-export const APICallFail = createAction(
-  '[Business] API Call Fail',
+export const BusinessError = createAction(
+  '[Business] Business Errors',
   props<{ errorMessage: string }>()
 );
 export const clearError = createAction('[Business] Clear Error');

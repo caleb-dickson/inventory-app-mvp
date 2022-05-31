@@ -66,19 +66,16 @@
           {{
             businessName ? businessName : "Add your business to get started."
           }}
-          <button mat-icon-button class="business-info-edit">
-            <mat-icon
-              *ngIf="businessName"
-              (click)="onEditBusiness('update')"
-              class="business-info-name-edit"
+          <button
+            mat-raised-button
+            class="business-info-edit"
+            (click)="onEditBusiness(businessName ? 'update' : 'new')"
+          >
+            <mat-icon *ngIf="businessName" class="business-info-name-edit"
               >edit</mat-icon
             >
-            <mat-icon *ngIf="!businessName" (click)="onEditBusiness('new')"
-              >domain_add</mat-icon
-            >
-            <mat-label *ngIf="!businessName" (click)="onEditBusiness('new')">
-              Add business</mat-label
-            >
+            <mat-icon *ngIf="!businessName">domain_add</mat-icon>
+            <mat-label *ngIf="!businessName"> Add business</mat-label>
           </button>
         </p>
         <h6 class="business-info-subtitle">
@@ -96,8 +93,7 @@
             color="accent"
             *ngIf="
               locationEditMode &&
-              location.location.locationName ===
-                locationEditSelector.locationName &&
+              location.locationName === locationEditSelector.locationName &&
               isLoading
             "
           ></mat-spinner>
@@ -183,8 +179,7 @@
         <form
           *ngIf="
             locationEditMode &&
-            location.locationName ===
-              locationEditSelector.locationName &&
+            location.locationName === locationEditSelector.locationName &&
             !isLoading
           "
           [formGroup]="updateLocationForm"
@@ -226,6 +221,7 @@
       <section>
         <p class="location-field-title">Authorized Staff</p>
         <p *ngIf="!businessId">Add your business to create locations.</p>
+        <p *ngIf="location.managers.length > 0">Managers</p>
         <p *ngFor="let manager of location.managers; let i = index">
           {{
             i +
@@ -238,43 +234,53 @@
               manager.manager.email
           }}
         </p>
-        <button *ngIf="businessId" mat-icon-button class="business-info-add">
+        <p *ngIf="location.staff.length > 0">Staff</p>
+        <p *ngFor="let staff of location.staff; let i = index">
+          {{
+            i +
+              1 +
+              ". " +
+              staff.staff.userProfile.firstName +
+              " " +
+              staff.staff.userProfile.lastName +
+              " - " +
+              staff.staff.email
+          }}
+        </p>
+        <button
+          *ngIf="businessId && addUserToLocationMode !== 'staff'"
+          mat-raised-button
+          type="button"
+          class="business-info-add"
+          (click)="addUserToLocationMode === ''"
+        >
           <mat-icon
-            (click)="
-              onAddUserToLocation(!addUserToLocationMode, location)
-            "
+            (click)="onAddUserToLocation(!addUserToLocationMode, location)"
             >group_add</mat-icon
           >
           <mat-label
             (click)="
-              addUserToLocationMode &&
-              locationAddUserSelector === location
+              addUserToLocationMode && locationAddUserSelector === location
                 ? onAddNewStaffControl()
-                : onAddUserToLocation(true, location) -
-                  onAddNewStaffControl()
+                : onAddUserToLocation('manager', location) - onAddNewStaffControl()
             "
           >
             {{
-              addUserToLocationMode &&
-              locationAddUserSelector === location
+              addUserToLocationMode && locationAddUserSelector === location
                 ? "Invite More Managers"
                 : "Invite Managers"
             }}</mat-label
           >
         </button>
         <form
-          *ngIf="
-            addUserToLocationMode &&
-            locationAddUserSelector === location
-          "
+          *ngIf="addUserToLocationMode && !locationEditMode && locationAddUserSelector === location"
           class="add-user"
           [formGroup]="addUserToLocationForm"
           (ngSubmit)="onAddUserToLocationSubmit()"
         >
           <div class="add-user-array" formArrayName="email">
             <mat-hint
-              >Be sure to use the same email they signed up with, or intend to
-              sign up with.</mat-hint
+              >Be sure to use the same email they signed up with.</mat-hint
             >
             <mat-form-field
               class="add-user-field"
@@ -291,26 +297,41 @@
                 matInput
                 email
               />
+              <button
+                mat-icon-button
+                matSuffix
+                (click)="onRemoveNewStaffControl(i)"
+              >
+                <mat-icon>remove</mat-icon>
+              </button>
               <mat-error *ngIf="addUserToLocationForm.get('email').invalid"
                 >Please enter a valid email for this user.</mat-error
               >
             </mat-form-field>
-            <button mat-mini-fab type="button" (click)="onAddNewStaffControl()">
+            <button
+              mat-mini-fab
+              type="button"
+              color="none"
+              (click)="onAddNewStaffControl()"
+            >
               <mat-icon>group_add</mat-icon>
             </button>
+            <button
+              mat-raised-button
+              type="submit"
+              class="add-manager-submit-btn"
+            >
+              Submit
+            </button>
           </div>
-          <button
-            mat-raised-button
-            type="submit"
-            class="add-manager-submit-btn"
-          >
-            Submit
-          </button>
         </form>
       </section>
     </mat-card-content>
-    <mat-card-actions>
-      <mat-error>{{ businessError }}</mat-error>
+    <mat-error
+      *ngIf="addUserToLocationMode && locationAddUserSelector === location"
+      >{{ businessError }}</mat-error
+    >
+    <mat-card-actions align="end">
       <button
         mat-raised-button
         type="button"

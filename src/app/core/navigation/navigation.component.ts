@@ -13,6 +13,9 @@ import { User } from 'src/app/auth/auth-control/user.model';
 
 import { AuthService } from '../../auth/auth-control/auth.service';
 import { ThemeService } from 'src/app/theme.service';
+import { LocationIds } from '../business/business-control/business.model';
+import { InventoryIds, Manager, Staff } from '../business/business-control/location.model';
+import { Inventory } from '../inventory/inv-control/inventory.model';
 
 @Component({
   selector: 'app-navigation',
@@ -29,6 +32,7 @@ export class NavigationComponent implements OnInit {
 
   isAuthenticated: boolean;
   user: User;
+  userRole: string;
 
   businessState: any;
   businessName: string;
@@ -53,12 +57,26 @@ export class NavigationComponent implements OnInit {
         console.log(user);
         if (this.isAuthenticated) {
           this.user = user;
+          switch (user.userProfile.role) {
+            case 3:
+              this.userRole = 'owner';
+              break;
+            case 2:
+              this.userRole = 'manager';
+              break;
+            case 1:
+              this.userRole = 'staff';
+              break;
+          }
         }
+        console.log(this.userRole);
       });
 
+    if (this.userRole === 'owner') {
       this.checkBusiness();
+    }
 
-      this.businessStoreSub = this.store
+    this.businessStoreSub = this.store
       .select('business')
       .pipe(map((bizState) => bizState))
       .subscribe((bizState) => {
@@ -75,21 +93,17 @@ export class NavigationComponent implements OnInit {
     });
     this.themeService.getThemeMode();
 
-    this.manageIcon = this.user.userProfile.role === 3 ? 'business' : 'store';
+    this.manageIcon = this.userRole === 'owner' ? 'business' : 'store';
     this.manageRoute =
-      this.user.userProfile.role === 3 ? '/app/business' : '/app/location';
+      this.userRole === 'owner' ? '/app/business' : '/app/location';
 
     this.isHandset$.subscribe((state) => {
-        this.sideNavOpen = !state;
-    })
+      this.sideNavOpen = !state;
+    });
   }
 
   toggleSideNav() {
     this.sideNavOpen = !this.sideNavOpen;
-  }
-
-  onOpenAuth(mode: string) {
-    this.authService.openAuthForm(mode);
   }
 
   onLogout() {
@@ -131,21 +145,69 @@ export class NavigationComponent implements OnInit {
           },
         })
       );
+      this.checkBusinessLocations();
     } else if (!storedBusiness) {
       console.log('||| Fetching business from DB |||');
-      console.log(this.user.userId)
       this.store.dispatch(
         BusinessActions.GETBusinessStart({
           ownerId: this.user.userId,
         })
       );
     } else {
-      this.store.dispatch(BusinessActions.GETEntityFail({ errorMessage: 'No business found.'}))
+      console.log('||| checkBusiness error |||');
+      this.store.dispatch(
+        BusinessActions.BusinessError({ errorMessage: 'No business found.' })
+      );
+    }
+  }
+
+  checkBusinessLocations() {
+    const locations: [
+      {
+        _id: string | null;
+        locationName: string;
+        parentBusiness: string;
+        managers: Manager[] | null;
+        staff: Staff[] | null;
+        inventoryData: InventoryIds[] | Inventory[] | null;
+      }
+     ] = JSON.parse(localStorage.getItem('locations'));
+
+    const storedBusiness: {
+      business: {
+        _id: string | null;
+        businessName: string;
+        ownerId: string;
+        locations: Location[] | LocationIds[] | [] | null;
+      };
+    } = JSON.parse(localStorage.getItem('storedBusiness'));
+
+    if (locations) {
+      console.log(locations);
+      this.store.dispatch(
+        BusinessActions.GETBusinessLocationsSuccess({
+          locations: locations,
+        })
+      );
+      console.log('||| locations fetched from local storage |||');
+    } else if (!locations) {
+      console.log('||| getting locations from DB |||');
+      console.log(storedBusiness)
+      this.store.dispatch(
+        BusinessActions.GETBusinessLocationsStart({
+          businessId: storedBusiness.business._id,
+        })
+      );
+    } else {
+      this.store.dispatch(
+        BusinessActions.BusinessError({ errorMessage: 'No locations found.' })
+      );
     }
   }
 
   ngOnDestroy(): void {
     this.userAuthSub.unsubscribe();
+    this.businessStoreSub.unsubscribe();
     this.themeSub.unsubscribe();
   }
 }

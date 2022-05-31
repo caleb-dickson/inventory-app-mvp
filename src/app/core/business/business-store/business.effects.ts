@@ -23,12 +23,11 @@ import { environment } from 'src/environments/environment';
 import { Business } from '../business-control/business.model';
 import { Location } from '../business-control/location.model';
 import { User } from 'src/app/auth/auth-control/user.model';
-import { BusinessService } from '../business-control/business.service';
 
 const BACKEND_URL = environment.apiUrl + '/business';
 
 const handleError = (errorRes: HttpErrorResponse) => {
-  console.log(errorRes)
+  console.log(errorRes);
   let errorMessage = errorRes.error.message;
 
   if (!errorRes.error.message) {
@@ -39,12 +38,12 @@ const handleError = (errorRes: HttpErrorResponse) => {
       ' - ' +
       errorRes.statusText +
       'An unknown error has occurred.';
-    return of(BusinessActions.APICallFail({ errorMessage }));
+    return of(BusinessActions.BusinessError({ errorMessage }));
   }
 
   console.log(errorMessage);
-  return of(BusinessActions.APICallFail({ errorMessage }));
-}
+  return of(BusinessActions.BusinessError({ errorMessage }));
+};
 
 @Injectable()
 export class BusinessEffects {
@@ -58,6 +57,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.POSTBusinessStart),
       concatMap((action) => {
+        console.log('||| addBusinessStart$ effect called |||===');
         return this.http
           .post<{
             message: string;
@@ -132,6 +132,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.PUTBusinessStart),
       concatMap((action) => {
+        console.log('||| updateBusinessStart$ effect called |||===');
         return this.http
           .put<{
             message: string;
@@ -170,6 +171,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.GETBusinessStart),
       switchMap((action) => {
+        console.log('||| fetchBusiness$ effect called |||===');
         return this.http
           .get<{ business: Business; businessId: string; message: string }>(
             BACKEND_URL + '/fetch-business/' + action.ownerId
@@ -191,7 +193,7 @@ export class BusinessEffects {
                   'storedBusiness',
                   JSON.stringify(storedBusiness)
                 );
-                console.log('||| fetching locations |||')
+                console.log('||| fetching locations |||');
                 this.store.dispatch(
                   BusinessActions.GETBusinessLocationsStart({
                     businessId: resData.businessId,
@@ -215,6 +217,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.POSTLocationStart),
       concatMap((action) => {
+        console.log('||| addLocationStart$ effect called |||===');
         return this.http
           .post<{
             message: string;
@@ -245,6 +248,11 @@ export class BusinessEffects {
               );
 
               console.log(storedBusiness);
+              this.store.dispatch(
+                BusinessActions.GETBusinessLocationsStart({
+                  businessId: resData.updatedBusiness.id,
+                })
+              );
               return BusinessActions.GETBusinessSuccess({
                 business: resData.updatedBusiness.business,
               });
@@ -258,6 +266,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.GETBusinessLocationsStart),
       concatMap((action) => {
+        console.log('||| fetchBusinessLocations$ effect called |||===');
         console.log('||| businessId: ===>>>' + action.businessId);
         return this.http
           .get<{ fetchedLocations: Location[] }>(
@@ -288,6 +297,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.PUTLocationStart),
       concatMap((action) => {
+        console.log('||| updateLocationStart$ effect called |||===');
         console.log(action.location);
         return this.http
           .put<{
@@ -312,10 +322,47 @@ export class BusinessEffects {
     )
   );
 
+  addLocationUsers$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(BusinessActions.PUTUserToLocationStart),
+      concatMap((action) => {
+        console.log('||| addLocationUsers$ effect called |||===');
+        console.log(action);
+        return this.http
+          .put<{ message: string }>(BACKEND_URL + '/add-managers', {
+            emails: action.emails,
+            role: action.role,
+            location: action.location._id,
+          })
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              if (
+                resData &&
+                resData.message ===
+                  'Users were found and added to the location.'
+              ) {
+                BusinessActions.GETBusinessLocationsStart({
+                  businessId: action.location.parentBusiness,
+                });
+
+                return BusinessActions.PUTUserToLocationSuccess({
+                  location: action.location,
+                });
+              }
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return handleError(errorRes);
+            })
+          );
+      })
+    )
+  );
+
   constructor(
     private actions$: Actions,
     private http: HttpClient,
-    private businessService: BusinessService,
     private store: Store<fromAppStore.AppState>
   ) {}
 }

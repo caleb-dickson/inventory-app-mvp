@@ -58,6 +58,7 @@ locationSchema.methods.updateLocation = async function (locationUpdateData) {
 
 // TO ADD A LIST OF AUTHORIZED MANAGERS (User Refs) TO A LOCATION BY EMAIL
 locationSchema.methods.addManagers = async function (managerEmails) {
+  const currentManagers = this.managers
   let newManagers = [];
 
   // FIND AND RETURN ANY MANAGER USERS WITH MATCHING EMAILS QUERY
@@ -67,11 +68,12 @@ locationSchema.methods.addManagers = async function (managerEmails) {
   console.log(foundManagers);
   console.log("||| found managers here ^^^ |||");
 
+  foundManagers.forEach((manager) => {
+    newManagers.push({ manager: manager._id });
+  });
 
-  if (foundManagers[0]) {
-    foundManagers.forEach((manager) => {
-      newManagers.push({ manager: manager._id });
-    });
+  // IF NEW MANAGERS WERE FOUND AND ADDED
+  if (newManagers.length > currentManagers.length) {
 
     // NEW ARRAY OF CURRENT MANAGERS
     let currentManagers = [...this.managers];
@@ -81,34 +83,45 @@ locationSchema.methods.addManagers = async function (managerEmails) {
     this.managers = updatedManagers;
 
     return this.save();
-  } else {
+    // IF NO MANAGERS WERE ADDED
+  } else if (newManagers.length <= currentManagers.length) {
     return 'Not found.'
   }
 };
 
 // ADD A LIST OF AUTHORIZED JUNIOR STAFF (User Refs) TO A LOCATION BY EMAIL
-locationSchema.methods.addStaff = async function (staffEmails) {
+locationSchema.methods.addStaff = async function (emails) {
+  const currentStaff = this.staff
   let newStaff = [];
 
-  // FIND AND RETURN ANY STAFF USERS WITH MATCHING EMAILS QUERY
+  // FIND AND RETURN ANY MANAGER USERS WITH MATCHING EMAILS QUERY
   let foundStaff = await User.find({
-    email: { $in: staffEmails },
+    email: { $in: emails },
   });
-  // LOG RESPONSE
   console.log(foundStaff);
-  console.log("||| ^^^ found staff here ^^^ |||");
-  // ASSIGN THE FOUND STAFF DOC IDs TO staffUser OBJECTS AND
-  // PUSH TO THE NEW ARRAY
-  foundStaff.forEach((staffUser) => {
-    newStaff.push({ staffUser: staffUser._id });
-  });
-  // NEW ARRAY OF CURRENT STAFF
-  let currentManagers = [...this.managers];
-  let updatedStaff = currentManagers.concat(newStaff);
-  this.staff = updatedStaff;
+  console.log("||| found staff here ^^^ |||");
 
-  return this.save();
+  foundStaff.forEach((staffUser) => {
+    newStaff.push({ staffMember: staffUser._id });
+  });
+
+  // IF NEW MANAGERS WERE FOUND AND ADDED
+  if (newStaff.length > currentStaff.length) {
+
+    // NEW ARRAY OF CURRENT MANAGERS
+    let currentStaff = [...this.managers];
+
+    let updatedStaff = currentStaff.concat(newStaff);
+
+    this.managers = updatedStaff;
+
+    return this.save();
+    // IF NO STAFF MEMBERS WERE ADDED
+  } else if (newStaff.length <= currentStaff.length) {
+    return 'Not found.'
+  }
 };
+
 
 locationSchema.methods.addProductToList = async function (newProduct) {
   this.productList.push({ product: newProduct });

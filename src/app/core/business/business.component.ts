@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { map, Subscription } from 'rxjs';
@@ -38,7 +37,7 @@ export class BusinessComponent implements OnInit {
   businessSubmitMode: string;
   locationSubmitMode = false;
   locationEditMode = false;
-  addUserToLocationMode = false;
+  addUserToLocationMode: string;
 
   businessForm: FormGroup;
   newLocationForm: FormGroup;
@@ -69,7 +68,7 @@ export class BusinessComponent implements OnInit {
         }
       });
 
-    this.checkBusiness();
+    // this.checkBusiness();
 
     this.businessStoreSub = this.store
       .select('business')
@@ -78,19 +77,21 @@ export class BusinessComponent implements OnInit {
         this.businessState = bizState;
         this.isLoading = bizState.loading;
         this.businessError = bizState.businessError;
+        console.log(bizState);
+        console.log(this.locations);
+        console.log(this.businessError);
         if (bizState.business && bizState.business._id) {
           this.businessName = bizState.business.businessName;
           this.businessId = bizState.business._id;
           this.locations = bizState.businessLocations;
+          this.locationAddUserSelector = bizState.locationSelected;
+          this.locationEditSelector = bizState.locationSelected;
           // this.locationName = 'test';
           this.initBusinessForm();
           this.initNewLocationForm();
           this.initUpdateLocationForm();
           this.initAddUserToLocationForm();
         }
-        console.log(bizState);
-        console.log(this.locations);
-        console.log(this.businessError)
       });
 
     switch (this.user.userProfile.role) {
@@ -106,83 +107,14 @@ export class BusinessComponent implements OnInit {
     }
   }
 
-  onEditControlHover(visibility: string) {
-    this.showEditControls = visibility;
-    console.log(this.showEditControls);
-  }
-
-  checkBusinessLocations() {
-    const locations = JSON.parse(localStorage.getItem('locations'));
-
-    if (locations) {
-      console.log(locations);
-      this.store.dispatch(
-        BusinessActions.GETBusinessLocationsSuccess({
-          locations: locations,
-        })
-      );
-      console.log('||| locations fetched from local storage |||')
-    } else if (!locations) {
-      console.log('||| No LOCATIONS in local storage |||');
-      this.store.dispatch(
-        BusinessActions.GETEntityFail({ errorMessage: 'No locations found.' })
-      );
-    }
-  }
-
-  checkBusiness() {
-
-      const storedBusiness: {
-        business: {
-          _id: string;
-          businessName: string;
-          ownerId: string;
-          locations: any[];
-        };
-      } = JSON.parse(localStorage.getItem('storedBusiness'));
-
-      if (storedBusiness) {
-        console.log('||| Business fetched from local storage |||');
-        console.log(storedBusiness.business.locations);
-        // this.setLocations(storedBusiness);
-        this.store.dispatch(
-          BusinessActions.GETBusinessSuccess({
-            business: {
-              _id: storedBusiness.business._id,
-              businessName: storedBusiness.business.businessName,
-              ownerId: storedBusiness.business.ownerId,
-              locations: [...storedBusiness.business.locations],
-            },
-          })
-        );
-        this.checkBusinessLocations()
-      } else if (!storedBusiness) {
-        console.log('||| Fetching business from DB |||');
-        console.log(this.userId);
-        this.store.dispatch(
-          BusinessActions.GETBusinessStart({
-            ownerId: this.userId,
-          })
-        );
-      } else {
-        console.log('||| checkBusiness error |||');
-        this.store.dispatch(
-          BusinessActions.GETEntityFail({ errorMessage: 'No business found.' })
-        );
-      }
-
-
-  }
-
   onEditBusiness(mode: string) {
     this.businessSubmitMode = mode;
-    console.log(this.businessSubmitMode);
     this.initBusinessForm();
   }
 
   onEditLocation(mode: boolean | null, location?: Location) {
     this.locationEditMode = mode;
-    this.locationEditSelector = location;
+    this.store.dispatch(BusinessActions.SelectLocation({ location: location }));
     console.log(this.locationEditSelector);
     this.initUpdateLocationForm();
   }
@@ -192,12 +124,12 @@ export class BusinessComponent implements OnInit {
     this.initNewLocationForm();
   }
 
-  onAddUserToLocation(mode: boolean, location?: Location) {
+  onAddUserToLocation(mode: string, location?: Location) {
     this.addUserToLocationMode = mode;
-    this.locationAddUserSelector = location;
+
+    this.store.dispatch(BusinessActions.SelectLocation({ location: location }));
+
     this.initAddUserToLocationForm();
-    console.log(this.addUserToLocationMode);
-    console.log(this.locationAddUserSelector);
   }
 
   onCancelForm(formToCancel: string) {
@@ -211,9 +143,10 @@ export class BusinessComponent implements OnInit {
       this.locationEditMode = false;
       this.initUpdateLocationForm();
     } else if (formToCancel === 'add-location-user') {
-      this.addUserToLocationMode = false;
+      this.addUserToLocationMode = null;
       this.locationAddUserSelector = null;
     }
+    this.store.dispatch(BusinessActions.clearError());
   }
 
   onBusinessSubmit() {
@@ -298,10 +231,17 @@ export class BusinessComponent implements OnInit {
     console.log(emailStringArr);
 
     console.log(this.addUserToLocationForm.value);
-    console.log(this.locationAddUserSelector._id)
-    this.businessService.addLocationManagers(
-      emailStringArr,
-      this.locationAddUserSelector._id
+    console.log(this.locationAddUserSelector._id);
+
+    const authRole = this.addUserToLocationMode;
+    console.log(authRole);
+
+    this.store.dispatch(
+      BusinessActions.PUTUserToLocationStart({
+        emails: emailStringArr,
+        role: authRole,
+        location: this.locationAddUserSelector,
+      })
     );
   }
 
@@ -318,7 +258,7 @@ export class BusinessComponent implements OnInit {
 
   private initBusinessForm() {
     this.businessForm = new FormGroup({
-      businessName: new FormControl(this.businessName /* NEED BIZ DATA */, {
+      businessName: new FormControl(this.businessName, {
         validators: [Validators.required],
       }),
     });
@@ -352,6 +292,10 @@ export class BusinessComponent implements OnInit {
         email: new FormControl(null, Validators.required),
       })
     );
+  }
+
+  onRemoveNewStaffControl(index: number) {
+    (<FormArray>this.addUserToLocationForm.get('email')).removeAt(index);
   }
 
   private initAddUserToLocationForm() {

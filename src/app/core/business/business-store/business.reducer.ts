@@ -7,12 +7,14 @@ import { Location } from '../business-control/location.model';
 export interface BusinessState {
   business: Business;
   businessLocations: Location[];
+  locationSelected: Location;
   businessError: string;
   loading: boolean;
 }
 const initialState: BusinessState = {
   business: null,
   businessLocations: [],
+  locationSelected: null,
   businessError: null,
   loading: false,
 };
@@ -65,6 +67,19 @@ export function businessReducer(
       ...state,
       loading: false
     })),
+    on(BusinessActions.PUTUserToLocationStart, (state) => ({
+      ...state,
+      loading: true
+    })),
+    on(BusinessActions.PUTUserToLocationSuccess, (state, action) => ({
+      ...state,
+      loading: false,
+      locationSelected: action.location
+    })),
+    on(BusinessActions.SelectLocation, (state, action) => ({
+      ...state,
+      locationSelected: action.location
+    })),
 
 
     // FETCH ACTIONS = OWNER
@@ -100,7 +115,7 @@ export function businessReducer(
       businessError: action.errorMessage,
       loading: false,
     })),
-    on(BusinessActions.APICallFail, (state, action) => ({
+    on(BusinessActions.BusinessError, (state, action) => ({
       ...state,
       businessError: action.errorMessage,
       loading: false,
