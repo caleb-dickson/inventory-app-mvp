@@ -72,7 +72,6 @@ export class BusinessComponent implements OnInit {
 
     this.businessStoreSub = this.store
       .select('business')
-      .pipe(map((bizState) => bizState))
       .subscribe((bizState) => {
         this.businessState = bizState;
         this.isLoading = bizState.loading;

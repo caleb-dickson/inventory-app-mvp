@@ -1,4 +1,4 @@
-@use '../../../sass/abstracts/variables' as var;
+@use "../../../sass/abstracts/variables" as var;
 
 .sidenav-container {
   height: 100vh;
@@ -13,7 +13,9 @@
       top: 0;
       z-index: 100;
 
-
+      p {
+        overflow-wrap: break-word;
+      }
     }
 
     mat-slide-toggle {
@@ -23,7 +25,9 @@
     mat-nav-list {
       display: flex;
       flex-direction: column;
-      width: 10rem;
+      margin-inline-end: 1rem;
+      align-items: center;
+      gap: 0.3rem;
 
       .active {
         background-color: var.$color-green-light;
@@ -31,7 +35,7 @@
       }
 
       .spacer {
-        margin-top: 43vh;
+        margin-top: 40vh;
       }
 
       // .settings {
@@ -41,23 +45,15 @@
         margin-inline-end: 0.3rem;
       }
 
-      // button[type="button"] {
-      //   // padding-right: -2rem;
-      // }
-
+      .logout {
+        margin-inline-end: 1rem;
+      }
 
       .user-display {
         font-size: 0.8rem;
         margin-block-start: 0.5rem;
+        overflow-wrap: break-word;
       }
-
-
-
-
     }
-
-
   }
 }
-
-

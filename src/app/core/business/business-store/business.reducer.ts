@@ -7,14 +7,14 @@ import { Location } from '../business-control/location.model';
 export interface BusinessState {
   business: Business;
   businessLocations: Location[];
-  locationSelected: Location;
+  locationSelected: Location; //Change to 'activeLocation'
   businessError: string;
   loading: boolean;
 }
 const initialState: BusinessState = {
   business: null,
   businessLocations: [],
-  locationSelected: null,
+  locationSelected: null, //Change to 'activeLocation'
   businessError: null,
   loading: false,
 };
