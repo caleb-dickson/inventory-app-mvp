@@ -7,7 +7,7 @@ import { Location } from '../../business-control/location.model';
 
 export const GETUserLocationsStart = createAction(
   '[Location] Fetch Locations Where User is Authorized START',
-  props<{ userId: string }>()
+  props<{ userId: string, userRole: number }>()
 );
 export const GETUserLocationsSuccess = createAction(
   '[Location] Fetch Locations Where User is Authorized SUCCESS',

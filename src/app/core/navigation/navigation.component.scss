@@ -12,9 +12,11 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      // max-width: 10rem;
 
-      p {
-        overflow-wrap: break-word;
+      .sidenav-name {
+        overflow-wrap: break-word !important;
+        font-size: 1rem;
       }
     }
 
@@ -26,6 +28,7 @@
       display: flex;
       flex-direction: column;
       margin-inline-end: 1rem;
+      // max-width: 10.5rem;
       align-items: center;
       gap: 0.3rem;
 
@@ -35,7 +38,7 @@
       }
 
       .spacer {
-        margin-top: 40vh;
+        margin-top: 28vh;
       }
 
       // .settings {
@@ -43,6 +46,18 @@
 
       .sidenav-icon {
         margin-inline-end: 0.3rem;
+      }
+
+      .no-locations {
+        font-size: 0.8rem;
+      }
+
+      .location-select {
+        max-width: 10rem;
+
+        // &-dropdown {
+        //   max-width: 10rem;
+        // }
       }
 
       .logout {

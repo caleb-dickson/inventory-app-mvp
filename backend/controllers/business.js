@@ -241,7 +241,8 @@ exports.addManagersToLocation = async (req, res, next) => {
         });
       } else {
         res.status(200).json({
-          message: "Manager was found and added to the location."
+          message: "Manager was found and added to the location.",
+          businessId: locationForAdd.parentBusiness
         });
       }
 

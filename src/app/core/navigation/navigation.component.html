@@ -23,38 +23,92 @@
       >Dark Mode</mat-slide-toggle
     >
     <mat-nav-list>
+      <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">dashboard</mat-icon>Dashboard
+      </a>
+      <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">trending_up</mat-icon>Insights
+      </a>
+      <a mat-list-item routerLink="/app/products" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">sell</mat-icon>Products
+      </a>
+      <a mat-list-item routerLink="/app/inventory" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">addchart</mat-icon>New Inventory
+      </a>
+        <mat-form-field
+          *ngIf="
+            userRole === 'owner' && businessState.businessLocations.length > 1
+          "
+          class="location-select"
+          appearance="outline"
+          matTooltip="You have multiple locations to choose from. Select one to work on."
+          >
+          <mat-label>
+            {{
+              activatedLocation
+              ? activatedLocation.locationName + " selected"
+              : "Select Location"
+            }}
+          </mat-label>
+          <mat-select
+          [(ngModel)]="activatedLocation"
+          name="activatedLocation"
+          [selected]="activatedLocation ? activatedLocation : selected"
+          (selectionChange)="onActivateLocation(activatedLocation)"
+          >
+            <mat-option
+              class="location-select-dropdown"
+              #selectedValue
+              *ngFor="let location of multiBizLocations"
+              [value]="location"
+            >
+              {{ location.locationName }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Multiple locations detected.</mat-hint>
+        </mat-form-field>
 
-        <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
-          <mat-icon class="sidenav-icon">dashboard</mat-icon>Dashboard
-        </a>
-        <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
-          <mat-icon class="sidenav-icon">trending_up</mat-icon>Insights
-        </a>
-        <a mat-list-item routerLink="/app/products" routerLinkActive="active">
-          <mat-icon class="sidenav-icon">sell</mat-icon>Products
-        </a>
-        <a mat-list-item routerLink="/app/inventory" routerLinkActive="active">
-          <mat-icon class="sidenav-icon">addchart</mat-icon>New Inventory
-        </a>
-      <!-- <a
-        *ngIf="!isAuthenticated"
-        mat-stroked-button
-        type="button"
-        class="btn"
-        (click)="onOpenAuth('signup')"
-      >
-        Sign Up
-      </a> -->
-      
+
       <span class="spacer"></span>
+
+      <mat-error *ngIf="locationState.locationError" class="no-locations">
+        {{ locationState.locationError }}
+      </mat-error>
+
+      <!-- SHOW 'MANAGE BUSINESS' LINK IF USER IS OWNER -->
       <a
-        *ngIf="userRole !== 'staff'"
+        *ngIf="userRole === 'owner'"
+        mat-list-item
+        routerLink="/app/business"
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">business</mat-icon>Business
+      </a>
+
+      <!-- **OWNER** -->
+      <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **OWNER** BUSINESS ONLY HAS ONE LOCATION -->
+      <a
+        *ngIf="
+          userRole === 'owner' && businessState.businessLocations.length === 1
+        "
+        mat-list-item
+        routerLink="/app/location"
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">store</mat-icon
+        >{{ singleBizLocationName }}
+      </a>
+
+      <!-- **USER* -->
+      <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **USER** ONLY HAS ACCESS TO ONE LOCATION -->
+      <a
+        *ngIf="userRole !== 'staff' && locationState.userLocations.length === 1"
         mat-list-item
         [routerLink]="manageRoute"
         routerLinkActive="active"
       >
         <mat-icon class="sidenav-icon">{{ manageIcon }}</mat-icon
-        >Manage
+        >{{ singleUserLocationName }}
       </a>
       <a mat-list-item routerLink="/app/settings" routerLinkActive="active">
         <mat-icon class="sidenav-icon settings">settings</mat-icon>User Settings

@@ -18,6 +18,7 @@ import {
 } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
+import { Location } from '../../business-control/location.model';
 
 const BACKEND_URL = environment.apiUrl + '/location';
 
@@ -42,12 +43,50 @@ const handleError = (errorRes: HttpErrorResponse) => {
 
 @Injectable()
 export class LocationEffects {
+  fetchUserLocations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(LocationActions.GETUserLocationsStart),
+      switchMap((action) => {
+        console.log('||| fetchUserLocations$ effect called |||===');
+        console.log(action);
+        return this.http
+          .get<{ fetchedLocations: Location[] }>(
+            BACKEND_URL +
+              '/fetch-user-locations/' +
+              action.userId +
+              '/' +
+              action.userRole
+          )
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              if (
+                resData && resData.fetchedLocations
+              ) {
+                const userLocations = resData.fetchedLocations;
+                localStorage.setItem(
+                  'userLocations',
+                  JSON.stringify(userLocations)
+                );
 
-
-
-
-
-  
+                return LocationActions.GETUserLocationsSuccess({
+                  locations: userLocations,
+                });
+              } else {
+                return LocationActions.LocationError({
+                  errorMessage:
+                    'No authorized locations found. Ask the account owner for access.',
+                });
+              }
+            })
+          );
+      }),
+      catchError((errorRes) => {
+        console.log(errorRes);
+        return handleError(errorRes);
+      })
+    )
+  );
 
   constructor(
     private actions$: Actions,

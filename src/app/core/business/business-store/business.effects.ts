@@ -329,11 +329,14 @@ export class BusinessEffects {
         console.log('||| addLocationUsers$ effect called |||===');
         console.log(action);
         return this.http
-          .put<{ message: string }>(BACKEND_URL + '/add-managers', {
-            emails: action.emails,
-            role: action.role,
-            location: action.location._id,
-          })
+          .put<{ message: string; businessId: string }>(
+            BACKEND_URL + '/add-managers',
+            {
+              emails: action.emails,
+              role: action.role,
+              location: action.location._id,
+            }
+          )
           .pipe(
             map((resData) => {
               console.log(resData);
@@ -342,14 +345,16 @@ export class BusinessEffects {
                 resData.message ===
                   'Users were found and added to the location.'
               ) {
-                BusinessActions.GETBusinessLocationsStart({
-                  businessId: action.location.parentBusiness,
-                });
-
                 return BusinessActions.PUTUserToLocationSuccess({
                   location: action.location,
                 });
               }
+
+              this.store.dispatch(
+                BusinessActions.GETBusinessLocationsStart({
+                  businessId: resData.businessId,
+                })
+              );
             }),
             catchError((errorRes) => {
               console.log(errorRes);

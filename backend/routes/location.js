@@ -1,14 +1,22 @@
 const express = require("express");
 
-const InventoryController = require("../controllers/inventory");
+const LocationController = require("../controllers/location");
 
 const checkAuth = require("../middleware/check-auth");
 
 const router = express.Router();
 
+// LOCATIONS
+// Fetch all locations where iser is autorized
+router.get(
+  "/fetch-user-locations/:userId/:userRole",
+  checkAuth,
+  LocationController.fetchUserLocations
+);
+
 // PRODUCTS
 // Create a new product for business
-router.post("/new-product", checkAuth, InventoryController.createProduct);
+router.post("/new-product", checkAuth, LocationController.createProduct);
 // Update product businesswide (parentOrg is the business)
 // ================================ //
 

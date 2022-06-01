@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LayoutModule } from '@angular/cdk/layout';
 
 import { MaterialModule } from '../material.module';
@@ -34,6 +34,7 @@ import { LocationComponent } from './business/location/location.component';
     MaterialModule,
     LayoutModule,
     ReactiveFormsModule,
+    FormsModule
   ],
   exports: [NavigationComponent, DashboardComponent, CoreComponent],
 })
