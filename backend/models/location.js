@@ -64,6 +64,7 @@ locationSchema.methods.addManagers = async function (managerEmails) {
   // FIND AND RETURN ANY MANAGER USERS WITH MATCHING EMAILS QUERY
   let foundManagers = await User.find({
     email: { $in: managerEmails },
+    "userProfile.role": 2
   });
   console.log(foundManagers);
   console.log("||| found managers here ^^^ |||");
@@ -97,6 +98,7 @@ locationSchema.methods.addStaff = async function (emails) {
   // FIND AND RETURN ANY MANAGER USERS WITH MATCHING EMAILS QUERY
   let foundStaff = await User.find({
     email: { $in: emails },
+    "userProfile.role": 1
   });
   console.log(foundStaff);
   console.log("||| found staff here ^^^ |||");
@@ -109,11 +111,11 @@ locationSchema.methods.addStaff = async function (emails) {
   if (newStaff.length > currentStaff.length) {
 
     // NEW ARRAY OF CURRENT MANAGERS
-    let currentStaff = [...this.managers];
+    let currentStaff = [...this.staff];
 
     let updatedStaff = currentStaff.concat(newStaff);
 
-    this.managers = updatedStaff;
+    this.staff = updatedStaff;
 
     return this.save();
     // IF NO STAFF MEMBERS WERE ADDED

@@ -1,8 +1,8 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as LocationActions from './location.actions';
 
-import { Inventory } from 'src/app/core/inventory/inv-control/inventory.model';
-import { Product } from 'src/app/core/inventory/inv-control/product.model';
+import { Inventory } from 'src/app/core/business/business-control/inventory.model';
+import { Product } from 'src/app/core/business/business-control/product.model';
 import { Location } from '../../business-control/location.model';
 
 export interface LocationState {
@@ -95,7 +95,7 @@ export function locationReducer(
 
 
 
-    
+
     on(LocationActions.LocationError, (state, action) => ({
       ...state,
       locationError: action.errorMessage,

@@ -5,19 +5,31 @@
 
   mat-sidenav {
     padding-left: 1rem;
-    width: min-content;
+    width: 13rem;
 
     mat-toolbar {
       background: inherit;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      // position: sticky;
+      // top: 0;
+      // z-index: 100;
       // max-width: 10rem;
 
-      .sidenav-name {
-        overflow-wrap: break-word !important;
+      .sidenav-owner-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
         font-size: 1rem;
       }
+
+      .sidenav-non-owner-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 1.3rem;
+      }
+    }
+
+    .sidenav-user-role {
+      margin-inline-start: 1rem;
+      font-weight: 200;
     }
 
     mat-slide-toggle {
@@ -38,7 +50,7 @@
       }
 
       .spacer {
-        margin-top: 28vh;
+        margin-top: 24vh;
       }
 
       // .settings {

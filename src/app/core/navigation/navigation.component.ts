@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { NgForm } from '@angular/forms';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
@@ -13,7 +12,6 @@ import { map, shareReplay } from 'rxjs/operators';
 
 import { User } from 'src/app/auth/auth-control/user.model';
 
-import { AuthService } from '../../auth/auth-control/auth.service';
 import { ThemeService } from 'src/app/theme.service';
 import {
   Business,
@@ -25,7 +23,7 @@ import {
   Manager,
   Staff,
 } from '../business/business-control/location.model';
-import { Inventory } from '../inventory/inv-control/inventory.model';
+import { Inventory } from '../business/business-control/inventory.model';
 import { Router } from '@angular/router';
 
 @Component({
@@ -64,7 +62,6 @@ export class NavigationComponent implements OnInit {
   constructor(
     private breakpointObserver: BreakpointObserver,
     private router: Router,
-    private authService: AuthService,
     private themeService: ThemeService,
     private store: Store<fromAppStore.AppState>
   ) {}
@@ -76,8 +73,8 @@ export class NavigationComponent implements OnInit {
       .select('auth')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((user) => {
-        this.isAuthenticated = !!user;
         console.log(user);
+        this.isAuthenticated = !!user;
         if (this.isAuthenticated) {
           this.user = user;
           switch (user.userProfile.role) {
@@ -106,20 +103,24 @@ export class NavigationComponent implements OnInit {
       .subscribe((locState) => {
         console.log(locState);
         this.locationState = locState;
-        // this.activatedLocation = locState.activeLocation;
-        if (
-          this.locationState.userLocations &&
+
+        this.multiUserLocations =
+          this.locationState.userLocations.length > 1
+            ? this.locationState.userLocations
+            : null;
+
+        this.singleUserLocationName =
           this.locationState.userLocations.length === 1
-        ) {
-          this.singleUserLocationName =
-            this.locationState.userLocations[0].locationName;
-        }
-        console.log(this.singleUserLocationName);
+            ? this.locationState.userLocations[0].locationName
+            : null;
+
+        console.log(this.locationState.activeLocation);
       });
 
     this.businessStoreSub = this.store
       .select('business')
       .subscribe((bizState) => {
+        console.log(bizState);
         this.businessState = bizState;
         if (bizState.business && bizState.business._id) {
           this.businessName = bizState.business.businessName;
@@ -134,8 +135,6 @@ export class NavigationComponent implements OnInit {
               ? bizState.businessLocations[0].locationName
               : null;
         }
-        console.log(bizState);
-        console.log(bizState.businessLocations);
       });
 
     this.themeSub = this.themeService.themeStatus.subscribe((themeModeData) => {
@@ -143,20 +142,45 @@ export class NavigationComponent implements OnInit {
     });
     this.themeService.getThemeMode();
 
+    if (this.userRole === 'owner') {
+      this.manageRoute = '/app/business';
+    } else if (this.userRole === 'manager') {
+      this.manageRoute = '/app/location';
+    } else {
+      this.manageRoute = null;
+    }
+
     this.manageIcon = this.userRole === 'owner' ? 'business' : 'store';
-    this.manageRoute =
-      this.userRole === 'owner' ? '/app/business' : '/app/location';
 
     this.isHandset$.subscribe((state) => {
       this.sideNavOpen = !state;
     });
 
-    this.getActivatedLocation();
+    if (this.userRole === 'owner') {
+      if (this.multiBizLocations) {
+        this.getActivatedLocation();
+      } else if (this.singleBizLocationName) {
+        this.onActivateLocation(this.businessState.businessLocations[0]);
+      }
+    } else if (this.userRole === 'manager') {
+      // IF MANAGER HAS MULTIPLE AUTHORIZED LOCATIONS CHECK
+      // IN LOCALSTORAGE WHICH IS ACTIVE
+      if (this.locationState.userLocations.length > 1) {
+        this.getActivatedLocation();
+        // IF USER ONLY HAS ONE AUTHORIZED LOCATION, ACTIVATE THAT ONE
+      } else if (this.locationState.userLocations.length === 1) {
+        this.onActivateLocation(this.locationState.userLocations[0]);
+      }
+    }
   }
 
   toggleSideNav() {
     this.sideNavOpen = !this.sideNavOpen;
   }
+
+
+
+
 
   onActivateLocation(activatedLocation: Location) {
     if (!activatedLocation) {
@@ -175,6 +199,11 @@ export class NavigationComponent implements OnInit {
 
     this.router.navigate(['/app/location']);
   }
+
+
+
+
+
 
   onLogout() {
     this.store.dispatch(AuthActions.logout());
@@ -318,7 +347,7 @@ export class NavigationComponent implements OnInit {
     );
 
     if (activatedLocation) {
-      console.log('||| Found active location |||');
+      console.log('||| Found an active location |||');
       this.store.dispatch(
         LocationActions.ActivateLocation({
           location: activatedLocation,
@@ -326,13 +355,14 @@ export class NavigationComponent implements OnInit {
       );
       this.activatedLocation = this.locationState.activeLocation;
     } else {
-      console.log('||| No active location. |||');
+      console.log('||| No active location found. |||');
     }
   }
 
   ngOnDestroy(): void {
     this.userAuthSub.unsubscribe();
     this.businessStoreSub.unsubscribe();
+    this.locationStoreSub.unsubscribe();
     this.themeSub.unsubscribe();
   }
 }

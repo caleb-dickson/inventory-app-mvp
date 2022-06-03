@@ -1,5 +1,5 @@
 import { User } from "src/app/auth/auth-control/user.model";
-import { Inventory } from "../../inventory/inv-control/inventory.model";
+import { Inventory } from "./inventory.model";
 
 export interface InventoryIds { inventory: string };
 export interface Manager { manager: string | User | null };

@@ -86,6 +86,12 @@
   }
 }
 
+.location-spinner {
+  display: flex;
+  justify-content: center;
+  margin-block-start: 5rem;
+}
+
 .locations {
   display: flex;
   flex-direction: column;
@@ -110,7 +116,7 @@
       section {
         margin-block: 2rem;
 
-        .location-field-title {
+        .location-title {
           font-weight: 550;
           margin-block-end: 0;
 
@@ -126,31 +132,45 @@
             }
           }
         }
+
+
+      }
+
+      .location-staff {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .add-user-form {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+
+          .add-user-array {
+            display: flex;
+            flex-direction: column;
+            margin-inline-start: 2rem;
+            align-items: flex-start;
+            &-field {
+              margin-block-end: 2rem;
+              width: 8rem;
+            }
+            // &-input {
+            // }
+
+          }
+          .add-user-submit-btn {
+            transform: translateY(-2.3rem) translateX(3rem);
+            // margin-inline-start: 3rem;
+          }
+        }
+        // .location-add-staff {}
+      }
+
       }
     }
   }
 
-  .add-user {
-
-    &-array {
-      display: flex;
-      flex-direction: column;
-      margin-inline-start: 2rem;
-      align-items: flex-start;
-      &-field {
-        margin-block-end: 2rem;
-        width: 8rem;
-      }
-      // &-input {
-      // }
-
-    }
-    .add-manager-submit-btn {
-      transform: translateY(-2.3rem) translateX(3rem);
-      // margin-inline-start: 3rem;
-    }
-  }
-}
 
 // .business-submit {
 // }

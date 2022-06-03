@@ -60,9 +60,9 @@
         <mat-spinner
           diameter="70"
           strokeWidth="3"
-          *ngIf="isLoading"
+          *ngIf="loading"
         ></mat-spinner>
-        <p *ngIf="!businessSubmitMode && !isLoading" class="business-info-name">
+        <p *ngIf="!businessSubmitMode && !loading" class="business-info-name">
           {{
             businessName ? businessName : "Add your business to get started."
           }}
@@ -153,8 +153,12 @@
   </mat-card>
 </div>
 
+<div *ngIf="loading" class="location-spinner">
+  <mat-spinner diameter="150" strokeWidth="10"></mat-spinner>
+</div>
+
 <div class="locations" *ngFor="let location of locations">
-  <mat-card>
+  <mat-card *ngIf="!loading">
     <mat-card-header>
       <mat-card-title [id]="location._id">
         <mat-icon class="store-icon">store</mat-icon>
@@ -164,16 +168,16 @@
     </mat-card-header>
     <mat-card-content>
       <section>
-        <p class="location-field-title">Location Name</p>
+        <p class="location-title">Location Name</p>
         <p *ngIf="!locationEditMode">
           {{ location.locationName }}
           <button
             mat-mini-fab
             color="none"
             (click)="onEditLocation('update', location)"
-            class="location-field-title-btn"
+            class="location-title-btn"
           >
-            <mat-icon class="location-field-title-btn-edit">edit</mat-icon>
+            <mat-icon class="location-title-btn-edit">edit</mat-icon>
           </button>
         </p>
         <form
@@ -218,11 +222,17 @@
         </form>
       </section>
 
-      <section>
-        <p class="location-field-title">Authorized Staff</p>
+      <section class="location-staff">
+        <p class="location-title">Authorized Staff</p>
         <p *ngIf="!businessId">Add your business to create locations.</p>
-        <p *ngIf="location.managers.length > 0">Managers</p>
-        <p *ngFor="let manager of location.managers; let i = index">
+        <p>Managers</p>
+        <p [ngClass]="location.managers.length === 0 ? 'text-muted' : null">
+          {{ location.managers.length > 0 ? null : "No Managers found." }}
+        </p>
+        <p
+          *ngFor="let manager of location.managers; let i = index"
+          class="border-bottom"
+        >
           {{
             i +
               1 +
@@ -234,37 +244,26 @@
               manager.manager.email
           }}
         </p>
-        <p *ngIf="location.staff.length > 0">Staff</p>
-        <p *ngFor="let staff of location.staff; let i = index">
-          {{
-            i +
-              1 +
-              ". " +
-              staff.staff.userProfile.firstName +
-              " " +
-              staff.staff.userProfile.lastName +
-              " - " +
-              staff.staff.email
-          }}
-        </p>
+
+        <!-- ADD MANAGERS BUTTON -->
         <button
-          *ngIf="businessId && addUserToLocationMode !== 'staff'"
+          *ngIf="
+            (businessId && !addUserToLocationMode) ||
+            addUserToLocationMode === 'manager'
+          "
           mat-raised-button
           type="button"
-          class="business-info-add"
-          (click)="addUserToLocationMode === ''"
+          class="location-add-managers"
+          (click)="
+            addUserToLocationMode && locationAddUserSelector === location
+              ? onAddNewUserControl()
+              : onAddUserToLocation('manager', location) - onAddNewUserControl()
+          "
         >
-          <mat-icon
-            (click)="onAddUserToLocation(!addUserToLocationMode, location)"
+          <mat-icon (click)="onAddUserToLocation('manager', location)"
             >group_add</mat-icon
           >
-          <mat-label
-            (click)="
-              addUserToLocationMode && locationAddUserSelector === location
-                ? onAddNewStaffControl()
-                : onAddUserToLocation('manager', location) - onAddNewStaffControl()
-            "
-          >
+          <mat-label>
             {{
               addUserToLocationMode && locationAddUserSelector === location
                 ? "Invite More Managers"
@@ -272,9 +271,71 @@
             }}</mat-label
           >
         </button>
+        <!-- ADD MANAGERS END === -->
+
+        <br />
+
+        <div *ngIf="addUserToLocationMode !== 'manager'" class="staff-list">
+          <p *ngIf="!location.staff">Junior Staff</p>
+          <p [ngClass]="location.staff.length === 0 ? 'text-muted' : null">
+            {{
+              location.staff.length > 0
+                ? "Junior Staff"
+                : "No junior staff found."
+            }}
+          </p>
+          <p
+            *ngFor="let staff of location.staff; let i = index"
+            class="border-bottom"
+          >
+            {{
+              i +
+                1 +
+                ". " +
+                staff.staffMember.userProfile.firstName +
+                " " +
+                staff.staffMember.userProfile.lastName +
+                " - " +
+                staff.staffMember.email
+            }}
+          </p>
+        </div>
+
+        <!-- ADD STAFF BUTTON -->
+        <button
+          *ngIf="
+            (businessId && !addUserToLocationMode) ||
+            addUserToLocationMode === 'staff'
+          "
+          mat-raised-button
+          type="button"
+          class="location-add-staff"
+          (click)="
+            addUserToLocationMode && locationAddUserSelector === location
+              ? onAddNewUserControl()
+              : onAddUserToLocation('staff', location) - onAddNewUserControl()
+          "
+        >
+          <mat-icon (click)="onAddUserToLocation('staff', location)"
+            >group_add</mat-icon
+          >
+          <mat-label>
+            {{
+              addUserToLocationMode && locationAddUserSelector === location
+                ? "Invite More Staff"
+                : "Invite Junior Staff"
+            }}</mat-label
+          >
+        </button>
+        <!-- ADD STAFF BUTTON END === -->
+
         <form
-          *ngIf="addUserToLocationMode && !locationEditMode && locationAddUserSelector === location"
-          class="add-user"
+          *ngIf="
+            addUserToLocationMode &&
+            !locationEditMode &&
+            locationAddUserSelector === location
+          "
+          class="add-user-form"
           [formGroup]="addUserToLocationForm"
           (ngSubmit)="onAddUserToLocationSubmit()"
         >
@@ -285,7 +346,7 @@
             <mat-form-field
               class="add-user-field"
               appearance="outline"
-              *ngFor="let newStaffCtrl of newStaffControls; let i = index"
+              *ngFor="let newUserCtrl of newUserControls; let i = index"
               [formGroupName]="i"
             >
               <mat-label>Email {{ i + 1 }}</mat-label>
@@ -300,7 +361,7 @@
               <button
                 mat-icon-button
                 matSuffix
-                (click)="onRemoveNewStaffControl(i)"
+                (click)="onRemoveNewUserControl(i)"
               >
                 <mat-icon>remove</mat-icon>
               </button>
@@ -312,15 +373,11 @@
               mat-mini-fab
               type="button"
               color="none"
-              (click)="onAddNewStaffControl()"
+              (click)="onAddNewUserControl()"
             >
               <mat-icon>group_add</mat-icon>
             </button>
-            <button
-              mat-raised-button
-              type="submit"
-              class="add-manager-submit-btn"
-            >
+            <button mat-raised-button type="submit" class="add-user-submit-btn">
               Submit
             </button>
           </div>

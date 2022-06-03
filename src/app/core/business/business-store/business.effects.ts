@@ -330,7 +330,7 @@ export class BusinessEffects {
         console.log(action);
         return this.http
           .put<{ message: string; businessId: string }>(
-            BACKEND_URL + '/add-managers',
+            BACKEND_URL + '/add-location-users',
             {
               emails: action.emails,
               role: action.role,
@@ -350,11 +350,9 @@ export class BusinessEffects {
                 });
               }
 
-              this.store.dispatch(
-                BusinessActions.GETBusinessLocationsStart({
-                  businessId: resData.businessId,
-                })
-              );
+              return BusinessActions.GETBusinessLocationsStart({
+                businessId: resData.businessId,
+              })
             }),
             catchError((errorRes) => {
               console.log(errorRes);

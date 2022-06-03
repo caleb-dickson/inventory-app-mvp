@@ -9,14 +9,19 @@
     [opened]="(isHandset$ | async) === false"
   >
     <mat-toolbar>
-      <p class="sidenav-name">
+      <span *ngIf="userRole === 'owner'" class="sidenav-owner-name">
         {{
           businessState.business
             ? businessName
             : user.userProfile.firstName + " " + user.userProfile.lastName
         }}
-      </p>
+      </span>
+      <span *ngIf="userRole !== 'owner'" class="sidenav-non-owner-name">
+        {{ user.userProfile.firstName + " " + user.userProfile.lastName }}
+      </span>
+      <br />
     </mat-toolbar>
+    <p class="sidenav-user-role">{{ userRole | titlecase }}</p>
     <mat-slide-toggle
       (change)="onThemeModeSwitched($event)"
       [checked]="user.userProfile.themePref === 'theme-dark' ? true : false"
@@ -32,29 +37,42 @@
       <a mat-list-item routerLink="/app/products" routerLinkActive="active">
         <mat-icon class="sidenav-icon">sell</mat-icon>Products
       </a>
-      <a mat-list-item routerLink="/app/inventory" routerLinkActive="active">
-        <mat-icon class="sidenav-icon">addchart</mat-icon>New Inventory
+      <a mat-list-item routerLink="/app/new-inventory" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">addchart</mat-icon>New/Current Inventory
       </a>
+      <a
+        *ngIf="userRole === 'manager' || 'owner'"
+        mat-list-item
+        routerLink="/app/past-inventory"
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">history</mat-icon>Past Inventory
+      </a>
+
+      <!-- LOCATION SELECT - FOR OWNER -->
+      <div
+        *ngIf="
+          userRole === 'owner' && businessState.businessLocations.length > 1
+        "
+        class="owner-location-select"
+      >
         <mat-form-field
-          *ngIf="
-            userRole === 'owner' && businessState.businessLocations.length > 1
-          "
           class="location-select"
           appearance="outline"
           matTooltip="You have multiple locations to choose from. Select one to work on."
-          >
+        >
           <mat-label>
             {{
               activatedLocation
-              ? activatedLocation.locationName + " selected"
-              : "Select Location"
+                ? activatedLocation.locationName + " selected"
+                : "Select Location"
             }}
           </mat-label>
           <mat-select
-          [(ngModel)]="activatedLocation"
-          name="activatedLocation"
-          [selected]="activatedLocation ? activatedLocation : selected"
-          (selectionChange)="onActivateLocation(activatedLocation)"
+            [(ngModel)]="activatedLocation"
+            name="activatedLocation"
+            [selected]="activatedLocation ? activatedLocation : selected"
+            (selectionChange)="onActivateLocation(activatedLocation)"
           >
             <mat-option
               class="location-select-dropdown"
@@ -65,9 +83,45 @@
               {{ location.locationName }}
             </mat-option>
           </mat-select>
+          <mat-hint>(Owner) Multiple locations detected.</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <!-- LOCATION SELECT - MULTI-UNIT MANAGERS/STAFF - NON-OWNER -->
+      <div
+        *ngIf="userRole !== 'owner' && locationState.userLocations.length > 1"
+        class="div staff-location-select"
+      >
+        <mat-form-field
+          class="location-select"
+          appearance="outline"
+          matTooltip="You have multiple locations to choose from. Select one to work on."
+        >
+          <mat-label>
+            {{
+              activatedLocation
+                ? activatedLocation.locationName + " selected"
+                : "Select Location"
+            }}
+          </mat-label>
+          <mat-select
+            [(ngModel)]="activatedLocation"
+            name="activatedLocation"
+            [selected]="activatedLocation ? activatedLocation : selected"
+            (selectionChange)="onActivateLocation(activatedLocation)"
+          >
+            <mat-option
+              class="location-select-dropdown"
+              #selectedValue
+              *ngFor="let location of multiUserLocations"
+              [value]="location"
+            >
+              {{ location.locationName }}
+            </mat-option>
+          </mat-select>
           <mat-hint>Multiple locations detected.</mat-hint>
         </mat-form-field>
-
+      </div>
 
       <span class="spacer"></span>
 
@@ -102,14 +156,16 @@
       <!-- **USER* -->
       <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **USER** ONLY HAS ACCESS TO ONE LOCATION -->
       <a
-        *ngIf="userRole !== 'staff' && locationState.userLocations.length === 1"
+        *ngIf="userRole !== 'owner' && locationState.userLocations.length === 1"
         mat-list-item
         [routerLink]="manageRoute"
         routerLinkActive="active"
+        (click)="onActivateLocation(locationState.userLocations[0])"
       >
         <mat-icon class="sidenav-icon">{{ manageIcon }}</mat-icon
         >{{ singleUserLocationName }}
       </a>
+
       <a mat-list-item routerLink="/app/settings" routerLinkActive="active">
         <mat-icon class="sidenav-icon settings">settings</mat-icon>User Settings
       </a>

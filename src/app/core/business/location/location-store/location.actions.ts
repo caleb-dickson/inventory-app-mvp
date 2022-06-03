@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 
-import { Inventory } from 'src/app/core/inventory/inv-control/inventory.model';
-import { Product } from 'src/app/core/inventory/inv-control/product.model';
+import { Inventory } from 'src/app/core/business/business-control/inventory.model';
+import { Product } from 'src/app/core/business/business-control/product.model';
 import { Location } from '../../business-control/location.model';
 
 
@@ -13,6 +13,8 @@ export const GETUserLocationsSuccess = createAction(
   '[Location] Fetch Locations Where User is Authorized SUCCESS',
   props<{ locations: Location[] }>()
 );
+
+
 export const PUTUpdateManagerLocationStart = createAction(
   '[Location] Fetch Locations Where User is Authorized START',
   props<{ updatedLocation: Location }>()
@@ -27,12 +29,14 @@ export const PUTUpdateManagerLocationSuccess = createAction(
 
 export const POSTCreateProductForLocationStart = createAction(
   '[Location] Save a New Product to Location START',
-  props<{ products: Product[] }>()
+  props<{ product: Product, locationId: string }>()
 );
 export const POSTCreateProductForLocationSuccess = createAction(
   '[Location] Save a New Product to Location SUCCESS',
   props<{ locations: Location[] }>()
 );
+
+
 
 export const POSTCreateInventoryForLocationStart = createAction(
   '[Location] Save a New Inventory to Location START',

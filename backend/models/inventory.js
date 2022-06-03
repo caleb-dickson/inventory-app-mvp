@@ -4,6 +4,7 @@ const inventorySchema = mongoose.Schema({
   dateStart: { type: String, required: true },
   dateEnd: { type: String, required: true },
   type: { type: String, required: true }, // BOH OR FOH or ...
+  isFinal: { type: Boolean, required: true },
   inventory: [
     {
       product: {

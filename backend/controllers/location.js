@@ -17,7 +17,7 @@ exports.fetchUserLocations = async (req, res, next) => {
     if (+req.params.userRole === 2) {
       // LOOK FOR THIS USER'S ID IN ALL LOCATION'S MANAGERS LIST
       userLocations = await Location.find({
-        "managers.manager": req.params.userId
+        "managers.manager": req.params.userId,
       })
         .populate({
           path: "productList.product",
@@ -34,7 +34,7 @@ exports.fetchUserLocations = async (req, res, next) => {
     } else if (+req.params.userRole === 1) {
       // LOOK FOR THIS USER IN ALL LOCATION'S STAFF LIST
       userLocations = await Location.find({
-        "staff.staffMember": req.params.userId
+        "staff.staffMember": req.params.userId,
       })
         .populate({
           path: "productList.product",
@@ -100,24 +100,28 @@ exports.createInventory = async (req, res, next) => {
 exports.createProduct = async (req, res, next) => {
   try {
     const product = new Product({
-      category: req.body.category,
-      name: req.body.name,
-      unitSize: req.body.unitSize,
-      unit: req.body.unit,
-      packSize: req.body.packSize,
-      packPrice: req.body.packPrice,
-      par: req.body.par,
+      category: req.body.product.category,
+      name: req.body.product.name,
+      unitSize: req.body.product.unitSize,
+      unit: req.body.product.unit,
+      packSize: req.body.product.packSize,
+      packPrice: req.body.product.packPrice,
+      par: req.body.product.par,
     });
 
     const newProduct = await product.save();
     console.log(newProduct);
 
+    const locationToUpdate = await Location.findById(req.body.locationId);
+
+    const updatedLocation = await locationToUpdate.addProductToList(newProduct);
+
     res.status(201).json({
-      message: "Product created successfully",
-      product: {
-        ...newProduct._doc,
-        id: newProduct._id,
-      },
+      message:
+        newProduct.name +
+        " successfully created and added to " +
+        updatedLocation.locationName,
+      updatedActiveLocation: updatedLocation
     });
   } catch (error) {
     console.log(error);

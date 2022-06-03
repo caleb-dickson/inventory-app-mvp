@@ -222,7 +222,7 @@ exports.updateLocation = async (req, res, next) => {
 };
 // EDIT/UPDATE LOCATION (locationName) /// END
 
-exports.addManagersToLocation = async (req, res, next) => {
+exports.addUsersToLocation = async (req, res, next) => {
   try {
     console.log(req.body);
     console.log("||| ^^^ req.body ^^^ |||");
@@ -237,7 +237,7 @@ exports.addManagersToLocation = async (req, res, next) => {
       console.log("||| ^^^ updated location here ^^^ |||");
       if (updatedLocation === "Not found.") {
         res.status(404).json({
-          message: "Error: Couldn't find one or more of the managers.",
+          message: "Couldn't find a manager. Are all users signed up as Manager?",
         });
       } else {
         res.status(200).json({
@@ -255,11 +255,12 @@ exports.addManagersToLocation = async (req, res, next) => {
       console.log(updatedLocation);
       if (updatedLocation === "Not found.") {
         res.status(404).json({
-          message: "Error: Couldn't find one or more of the junior staff members.",
+          message: "Couldn't find a staff member. Are all users signed up as Staff?",
         });
       } else {
         res.status(200).json({
-          message: "Manager was found and added to the location."
+          message: "Staff member was found and added to the location.",
+          businessId: locationForAdd.parentBusiness
         });
       }
     }

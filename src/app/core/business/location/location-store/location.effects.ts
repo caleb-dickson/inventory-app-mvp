@@ -43,6 +43,48 @@ const handleError = (errorRes: HttpErrorResponse) => {
 
 @Injectable()
 export class LocationEffects {
+  addProductsToLocation$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(LocationActions.POSTCreateProductForLocationStart),
+      concatMap((action) => {
+        console.log('||| addProductToLocation$ effect called |||===');
+        console.log(action);
+        return this.http
+          .post<{ message: string; updatedActiveLocation: Location }>(
+            BACKEND_URL + '/new-product',
+            {
+              product: action.product,
+              locationId: action.locationId,
+            }
+          )
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+
+              localStorage.setItem(
+                'activatedLocation',
+                JSON.stringify(resData.updatedActiveLocation)
+              );
+
+              return LocationActions.ActivateLocation({
+                location: resData.updatedActiveLocation,
+              });
+            })
+          );
+      })
+    )
+  );
+
+  // activateLocation$ = createEffect(
+  //   () => this.actions$.pipe(
+  //     ofType(LocationActions.ActivateLocation)),
+  //     switchMap(async (action) => {
+  //       return localStorage.setItem(
+  //         'activatedLocation',
+  //         JSON.stringify(action.location)
+  //       );
+  //     })
+
   fetchUserLocations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LocationActions.GETUserLocationsStart),
@@ -60,9 +102,7 @@ export class LocationEffects {
           .pipe(
             map((resData) => {
               console.log(resData);
-              if (
-                resData && resData.fetchedLocations
-              ) {
+              if (resData && resData.fetchedLocations) {
                 const userLocations = resData.fetchedLocations;
                 localStorage.setItem(
                   'userLocations',

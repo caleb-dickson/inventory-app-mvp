@@ -151,7 +151,11 @@ export class AuthEffects {
         console.log('||| userId: ===>>>' + action.userId);
         return this.http
           .get<{ fetchedLocations: Location[] }>(
-            BACKEND_URL + '/fetch-user-locations/' + action.userId + '/' + action.userRole
+            BACKEND_URL +
+              '/fetch-user-locations/' +
+              action.userId +
+              '/' +
+              action.userRole
           )
           .pipe(
             map((resData) => {
@@ -236,9 +240,6 @@ export class AuthEffects {
           return AuthActions.authFail({
             errorMessage: 'Not authenticated! Log in.',
           });
-        }
-
-        if (!locations) {
         }
       })
     )
