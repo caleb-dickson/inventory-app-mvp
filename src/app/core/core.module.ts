@@ -13,10 +13,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { SettingsComponent } from './settings/settings.component';
 import { BusinessComponent } from './business/business.component';
-import { InventoryComponent } from './business/inventory/inventory.component';
-import { ProductsComponent } from './business/inventory/products/products.component';
+import { InventoryComponent } from './business/location/inventory/inventory.component';
+import { ProductsComponent } from './business/location/inventory/products/products.component';
 import { LocationComponent } from './business/location/location.component';
-import { NewInventoryComponent } from './business/inventory/new-inventory/new-inventory.component';
+import { NewInventoryComponent } from './business/location/inventory/new-inventory/new-inventory.component';
 
 @NgModule({
   declarations: [

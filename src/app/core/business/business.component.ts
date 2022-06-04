@@ -9,6 +9,8 @@ import * as BusinessActions from '../business/business-store/business.actions';
 
 import { User } from 'src/app/auth/auth-control/user.model';
 import { Location } from './business-control/location.model';
+import { AuthState } from 'src/app/auth/auth-store/auth.reducer';
+import { BusinessState } from './business-store/business.reducer';
 
 @Component({
   selector: 'app-manage',
@@ -24,14 +26,14 @@ export class BusinessComponent implements OnInit, OnDestroy {
 
   // STATE RELATED VARIABLES
   // Auth State
-  authState: object;
+  authState: AuthState;
   user: User;
   userId: string;
   userRole: string;
   authError: string;
 
   // Business State
-  businessState: any;
+  businessState: BusinessState;
   loading: boolean;
   businessError: string;
 
@@ -186,6 +188,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
           parentBusiness: this.businessId,
           managers: [],
           staff: [],
+          productList: [],
           inventoryData: [],
         },
       })
@@ -205,6 +208,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
           parentBusiness: this.locationEditSelector.parentBusiness,
           managers: this.locationEditSelector.managers,
           staff: this.locationEditSelector.staff,
+          productList: this.locationEditSelector.productList,
           inventoryData: this.locationEditSelector.inventoryData,
         },
       })

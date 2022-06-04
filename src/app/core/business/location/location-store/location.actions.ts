@@ -32,8 +32,14 @@ export const POSTCreateProductForLocationStart = createAction(
   props<{ product: Product, locationId: string }>()
 );
 export const POSTCreateProductForLocationSuccess = createAction(
-  '[Location] Save a New Product to Location SUCCESS',
-  props<{ locations: Location[] }>()
+  '[Location] Save a New Product to Location SUCCESS'
+);
+export const DELETERemoveProductFromLocationStart = createAction(
+  '[Location] Remove Products from Location START',
+  props<{ product: Product[], locationId: string }>()
+);
+export const DELETERemoveProductFromLocationSuccess = createAction(
+  '[Location] Remove Products from Location SUCCESS'
 );
 
 
@@ -55,12 +61,12 @@ export const ActivateLocation = createAction(
   props<{ location: Location }>()
 );
 export const ActivateInventory = createAction(
-  '[Location] Select a Location as Activated',
+  '[Location] Select an Inventory as Activated',
   props<{ inventory: Inventory }>()
 );
-export const ActivateProduct = createAction(
-  '[Location] Select a Location as Activated',
-  props<{ product: Product }>()
+export const ActivateProducts = createAction(
+  '[Location] Select Products as Activated',
+  props<{ products: Product[] }>()
 );
 
 

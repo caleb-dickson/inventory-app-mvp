@@ -8,7 +8,7 @@ import { Location } from '../../business-control/location.model';
 export interface LocationState {
   userLocations: Location[];
   activeLocation: Location;
-  activeProduct: Product;
+  activeProducts: Product[];
   activeInventory: Inventory;
   locationError: string;
   loading: boolean;
@@ -17,7 +17,7 @@ export interface LocationState {
 const initialState: LocationState = {
   userLocations: [],
   activeLocation: null,
-  activeProduct: null,
+  activeProducts: [],
   activeInventory: null,
   locationError: null,
   loading: false,
@@ -30,7 +30,7 @@ export function locationReducer(
   return createReducer(
     initialState,
 
-    on(LocationActions.GETUserLocationsStart, (state, action) => ({
+    on(LocationActions.GETUserLocationsStart, (state) => ({
       ...state,
       loading: true,
     })),
@@ -58,10 +58,9 @@ export function locationReducer(
     })),
     on(
       LocationActions.POSTCreateProductForLocationSuccess,
-      (state, action) => ({
+      (state) => ({
         ...state,
-        loading: false,
-        userLocations: action.locations,
+        loading: false
       })
     ),
     on(LocationActions.POSTCreateInventoryForLocationStart, (state) => ({
@@ -88,9 +87,9 @@ export function locationReducer(
       ...state,
       activeInventory: action.inventory,
     })),
-    on(LocationActions.ActivateProduct, (state, action) => ({
+    on(LocationActions.ActivateProducts, (state, action) => ({
       ...state,
-      activeProduct: action.product,
+      activeProducts: state.activeProducts.concat(...action.products)
     })),
 
 

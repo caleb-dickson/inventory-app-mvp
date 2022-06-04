@@ -2,14 +2,10 @@ const Location = require("../models/location");
 const Inventory = require("../models/inventory");
 const Product = require("../models/product");
 
-// NONE OF THIS IS REAL YET, BOILERPLATE
-// NONE OF THIS IS REAL YET, BOILERPLATE
-// NONE OF THIS IS REAL YET, BOILERPLATE
-
 exports.fetchUserLocations = async (req, res, next) => {
-  // FUTURE DEVELOPMENT???: LOOK FOR USER IN BOTH LISTS
+  // IDEA FOR FUTURE DEVELOPMENT??: LOOK FOR USER IN BOTH LISTS
   // IF USER IS FOUND IN A MANAGER LIST AND THEIR ROLE ISN'T
-  // AS MANAGER, UPDATE USER ROLE TO "2"
+  // AS MANAGER, UPDATE USER ROLE TO MANAGER; "2"
   try {
     let userLocations;
 
@@ -26,6 +22,18 @@ exports.fetchUserLocations = async (req, res, next) => {
         .populate({
           path: "inventoryData.inventory",
           model: "Inventory",
+        })
+        .populate({
+          path: "managers.manager",
+          model: "User",
+        })
+        .populate({
+          path: "staff.staffMember",
+          model: "User",
+        })
+        .populate({
+          path: "parentBusiness",
+          model: "Business",
         });
       console.log(userLocations);
       console.log("||| ^^^ found locations here ^^^ |||");
@@ -100,6 +108,7 @@ exports.createInventory = async (req, res, next) => {
 exports.createProduct = async (req, res, next) => {
   try {
     const product = new Product({
+      parentOrg: req.body.product.parentOrg,
       category: req.body.product.category,
       name: req.body.product.name,
       unitSize: req.body.product.unitSize,
@@ -116,12 +125,24 @@ exports.createProduct = async (req, res, next) => {
 
     const updatedLocation = await locationToUpdate.addProductToList(newProduct);
 
+    const populatedLocation = await Location.findById(req.body.locationId)
+      .populate({
+        path: "productList.product",
+        model: "Product",
+      })
+      .populate({
+        path: "inventoryData.inventory",
+        model: "Inventory",
+      });
+
     res.status(201).json({
       message:
+        "||| " +
         newProduct.name +
         " successfully created and added to " +
-        updatedLocation.locationName,
-      updatedActiveLocation: updatedLocation
+        populatedLocation.locationName +
+        " |||",
+      updatedActiveLocation: populatedLocation,
     });
   } catch (error) {
     console.log(error);

@@ -1,0 +1,237 @@
+<mat-spinner
+  diameter="70"
+  strokeWidth="5"
+  *ngIf="locationState.loading"
+></mat-spinner>
+<div *ngIf="!locationState.loading" class="product">
+  <p *ngIf="!activeLocation" class="no-active-location">
+    Select a location to access products.
+  </p>
+  <h4 *ngIf="activeLocation" class="location-name">
+    {{ activeLocation.locationName }}
+  </h4>
+
+  <mat-expansion-panel *ngIf="activeLocation" class="product-add-new">
+    <mat-expansion-panel-header>
+      <mat-panel-title
+        ><mat-icon>new_label</mat-icon>Create a New Product</mat-panel-title
+      >
+    </mat-expansion-panel-header>
+    <mat-card>
+      <mat-card-title>New Product </mat-card-title>
+
+      <mat-card-content>
+        <form #newProductForm="ngForm" class="product-add-new-form">
+          <div>
+            <mat-form-field appearance="outline">
+              <mat-label>Product Category</mat-label>
+              <mat-select
+                ngModel
+                #category
+                required
+                name="category"
+                type="text"
+              >
+                <!-- <mat-option [value]="null">Select a Category</mat-option> -->
+                <mat-optgroup
+                  *ngFor="let category of productCategories.categories"
+                  [label]="category.name"
+                >
+                  <mat-option
+                    *ngFor="let subCat of category.subCategories"
+                    [value]="subCat"
+                  >
+                    {{ subCat }}
+                  </mat-option>
+                </mat-optgroup>
+              </mat-select>
+              <mat-error>Please enter a category.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="ms-2">
+              <mat-label>Name</mat-label>
+              <input ngModel matInput required type="text" name="name" #name />
+              <mat-error>Please enter a name.</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="units-block">
+            <mat-form-field appearance="outline" class="hint align-end short">
+              <mat-label>Unit Size</mat-label>
+              <input
+                ngModel
+                matInput
+                required
+                type="number"
+                name="unitSize"
+                #unitSize
+              />
+              <!-- <span matSuffix class="unit-suffix"> {{ unit ? unit.value : null }} </span> -->
+              <mat-error>Please enter a valid unit size.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="short">
+              <mat-label>Unit of Measure</mat-label>
+              <mat-select ngModel #unit required name="unit" type="text">
+                <!-- <mat-option [value]="null">Select a Category</mat-option> -->
+                <mat-optgroup
+                  *ngFor="let unitCategory of defaultUnits.categories"
+                  [label]="unitCategory.category"
+                >
+                  <mat-option
+                    *ngFor="let units of unitCategory.units"
+                    [value]="units"
+                  >
+                    {{ units }}
+                  </mat-option>
+                </mat-optgroup>
+              </mat-select>
+              <mat-error>Please enter a valid unit of measure.</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div>
+            <mat-form-field appearance="outline" class="hint">
+              <mat-label>Pack Size</mat-label>
+              <input
+                ngModel
+                matInput
+                required
+                type="number"
+                name="packSize"
+                #packSize
+              />
+              <mat-hint
+                >How many packs per case? If not subdivided just enter
+                1.</mat-hint
+              >
+              <mat-error>Please enter a valid pack size.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="ms-2">
+              <mat-label>Pack Price</mat-label>
+              <span matPrefix>$&nbsp;</span>
+              <input
+                ngModel
+                matInput
+                required
+                type="number"
+                name="packPrice"
+                #packPrice
+              />
+              <mat-error>Please enter a valid pack price.</mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="hint">
+            <mat-label>Par</mat-label>
+            <input ngModel matInput required type="number" name="par" #par />
+            <mat-hint
+              >Expected number of packs used each inventory period, plus buffer
+              stock. You can change this for each inventory.</mat-hint
+            >
+            <mat-error>Please enter a par.</mat-error>
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+
+      <mat-card-actions> </mat-card-actions>
+    </mat-card>
+    <mat-action-row>
+      <button
+        mat-raised-button
+        type="button"
+        (click)="onResetForm(newProductForm)"
+      >
+        Reset
+      </button>
+      <mat-spinner
+        diameter="70"
+        strokeWidth="5"
+        *ngIf="locationState.loading"
+      ></mat-spinner>
+      <button
+        *ngIf="!locationState.loading"
+        mat-raised-button
+        type="submit"
+        [disabled]="newProductForm.invalid"
+        (click)="onNewProductSubmit(newProductForm)"
+      >
+        Submit
+      </button>
+    </mat-action-row>
+  </mat-expansion-panel>
+
+  <h5
+    *ngIf="activeLocation && activeLocation.productList.length > 0"
+    class="text-center"
+  >
+    Product List
+  </h5>
+
+  <div>
+    <button
+      *ngIf="selectedProducts.length > 0 && activeLocation.productList.length > 12"
+      mat-raised-button
+      color="primary"
+      type="button"
+      class="product-delete"
+    >
+      Delete Selected
+    </button>
+  </div>
+
+  <div
+    class="product-list"
+    *ngIf="activeLocation && activeLocation.productList.length > 0"
+  >
+    <mat-card
+      *ngFor="let product of activeLocation.productList; let i = index"
+      class="product-list-cards"
+    >
+      <mat-card-title>
+        <mat-checkbox
+          (change)="onProductSelect($event.checked, product)"
+        ></mat-checkbox>
+        {{ product.product.name }}
+      </mat-card-title>
+      <mat-card-content>
+        <p>{{ product.product.category }}</p>
+        <p>
+          {{
+            product.product.unitSize +
+              " " +
+              product.product.unit +
+              " x " +
+              product.product.packSize
+          }}
+        </p>
+        <p>
+          Unit Price:
+          {{
+            product.product.packPrice /
+              product.product.packSize /
+              product.product.unitSize | currency
+          }}
+          per {{ product.product.unit }}
+        </p>
+        <p>Case price: {{ product.product.packPrice | currency }}</p>
+        <p>Par: {{ product.product.par }} cases</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div>
+    <button
+      *ngIf="selectedProducts.length > 0"
+      mat-raised-button
+      color="primary"
+      type="button"
+      class="product-delete"
+      (click)="onDeleteSelectedProducts()"
+    >
+      Delete Selected
+    </button>
+  </div>
+
+</div>

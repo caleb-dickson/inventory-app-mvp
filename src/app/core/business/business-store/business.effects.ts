@@ -276,8 +276,8 @@ export class BusinessEffects {
             map((resData) => {
               console.log(resData);
               if (resData && resData.fetchedLocations) {
-                const locations = resData.fetchedLocations;
-                localStorage.setItem('locations', JSON.stringify(locations));
+                const businessLocations = resData.fetchedLocations;
+                localStorage.setItem('businessLocations', JSON.stringify(businessLocations));
 
                 return BusinessActions.GETBusinessLocationsSuccess({
                   locations: resData.fetchedLocations,

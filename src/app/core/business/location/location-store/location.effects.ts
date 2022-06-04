@@ -5,6 +5,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../../app-store/app.reducer';
 import * as LocationActions from './location.actions';
+import * as BusinessActions from '../../business-store/business.actions';
 
 import {
   switchMap,
@@ -14,6 +15,7 @@ import {
   catchError,
   tap,
   Subscription,
+  withLatestFrom,
   // withLatestFrom,
 } from 'rxjs';
 
@@ -43,12 +45,16 @@ const handleError = (errorRes: HttpErrorResponse) => {
 
 @Injectable()
 export class LocationEffects {
+  private userAuthSub: Subscription;
+
   addProductsToLocation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LocationActions.POSTCreateProductForLocationStart),
-      concatMap((action) => {
+      withLatestFrom(this.store.select('auth')),
+      concatMap(([action, authState]) => {
         console.log('||| addProductToLocation$ effect called |||===');
         console.log(action);
+        console.log(authState.userAuth.userId);
         return this.http
           .post<{ message: string; updatedActiveLocation: Location }>(
             BACKEND_URL + '/new-product',
@@ -60,17 +66,34 @@ export class LocationEffects {
           .pipe(
             map((resData) => {
               console.log(resData);
+              console.log(resData.message);
 
-              localStorage.setItem(
-                'activatedLocation',
-                JSON.stringify(resData.updatedActiveLocation)
-              );
+              if (resData && resData.updatedActiveLocation) {
+                localStorage.setItem(
+                  'activatedLocation',
+                  JSON.stringify(resData.updatedActiveLocation)
+                );
 
-              return LocationActions.ActivateLocation({
-                location: resData.updatedActiveLocation,
+                this.store.dispatch(
+                  LocationActions.ActivateLocation({
+                    location: resData.updatedActiveLocation,
+                  })
+                );
+                this.store.dispatch(
+                  LocationActions.POSTCreateProductForLocationSuccess()
+                );
+              }
+
+              return LocationActions.GETUserLocationsStart({
+                userId: authState.userAuth.userId,
+                userRole: authState.userAuth.userProfile.role,
               });
             })
           );
+      }),
+      catchError((errorRes) => {
+        console.log(errorRes);
+        return handleError(errorRes);
       })
     )
   );

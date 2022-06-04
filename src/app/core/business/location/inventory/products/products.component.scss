@@ -1,0 +1,70 @@
+.product {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  .no-active-location {
+    margin: 2rem;
+  }
+
+  .location-name {
+    margin-inline-start: 2rem;
+    margin-block-start: 2rem;
+  }
+
+  &-add-new {
+    width: max-content;
+    margin: 2rem;
+    margin-inline-start: 5rem;
+    &-form {
+      display: flex;
+      flex-direction: column;
+
+      mat-form-field {
+        width: 20rem;
+      }
+      .units-block {
+        display: flex;
+        justify-content: center;
+      }
+      .short {
+        width: 10rem;
+      }
+      .unit-suffix {
+        transform: translateY(-0.5rem);
+      }
+      .align-end {
+        text-align: right;
+      }
+      .hint {
+        margin-block-end: 2rem;
+      }
+      .underline {
+        text-decoration: underline;
+      }
+      .bold {
+        font-weight: 500;
+      }
+    }
+  }
+
+  &-list {
+    display: flex;
+    // flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+
+    &-cards {
+      width: max-content;
+      margin: 1rem;
+    }
+  }
+
+  &-delete {
+    margin-inline-start: 2rem;
+  }
+  &-clear {
+    margin-inline-start: 1rem;
+  }
+
+}

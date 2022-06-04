@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Subject } from 'rxjs';
+import { AuthState } from './auth/auth-store/auth.reducer';
 
 @Injectable({
   providedIn: 'root',
@@ -10,27 +11,26 @@ export class ThemeService {
 
   constructor() {}
 
-
   setThemeMode() {
-    const guestUserData: {
-      themePref: string;
-    } = JSON.parse(localStorage.getItem('guestUserData'));
-    if (!guestUserData) {
-      const guestUserData = {
-        themePref: 'theme-dark',
-      };
-      localStorage.setItem('guestUserData', JSON.stringify(guestUserData));
-    }
+    const guestUserData = { themePref: 'theme-dark' };
+    localStorage.setItem('guestUserData', JSON.stringify(guestUserData));
   }
 
   getThemeMode() {
     const guestUserData: {
       themePref: string;
     } = JSON.parse(localStorage.getItem('guestUserData'));
+
+    const userProfileData = JSON.parse(localStorage.getItem('userProfileData'));
+
     if (guestUserData) {
       this.themeStatus.next(guestUserData.themePref);
+      console.log('||| Theme data found in guestUserData |||');
+    } else if (userProfileData) {
+      this.themeStatus.next(userProfileData.userProfile.themePref)
+      console.log('||| Theme data found in userProfileData |||');
     } else {
-      return;
+      console.log('||| No theme data found in localstorage |||');
     }
   }
 
