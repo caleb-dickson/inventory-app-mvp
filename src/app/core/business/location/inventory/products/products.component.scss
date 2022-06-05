@@ -48,15 +48,26 @@
     }
   }
 
+  .spinner  {
+    display: flex;
+    justify-content: center;
+  }
+
   &-list {
     display: flex;
-    // flex-direction: column;
     align-items: center;
     flex-wrap: wrap;
 
     &-cards {
-      width: max-content;
+      min-width: 15rem;
       margin: 1rem;
+
+      mat-card-content {
+        display: flex;
+        flex-direction: column;
+        margin-inline-start: 2rem;
+
+      }
     }
   }
 

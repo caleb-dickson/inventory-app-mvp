@@ -49,20 +49,14 @@ export function locationReducer(
       userLocations: action.locations,
     })),
 
-
-
-
     on(LocationActions.POSTCreateProductForLocationStart, (state) => ({
       ...state,
       loading: true,
     })),
-    on(
-      LocationActions.POSTCreateProductForLocationSuccess,
-      (state) => ({
-        ...state,
-        loading: false
-      })
-    ),
+    on(LocationActions.POSTCreateProductForLocationSuccess, (state) => ({
+      ...state,
+      loading: false,
+    })),
     on(LocationActions.POSTCreateInventoryForLocationStart, (state) => ({
       ...state,
       loading: true,
@@ -76,9 +70,6 @@ export function locationReducer(
       })
     ),
 
-
-
-
     on(LocationActions.ActivateLocation, (state, action) => ({
       ...state,
       activeLocation: action.location,
@@ -89,19 +80,13 @@ export function locationReducer(
     })),
     on(LocationActions.ActivateProducts, (state, action) => ({
       ...state,
-      activeProducts: state.activeProducts.concat(...action.products)
+      activeProducts: action.products,
     })),
-
-
-
 
     on(LocationActions.LocationError, (state, action) => ({
       ...state,
       locationError: action.errorMessage,
       loading: false,
     }))
-
-
-
   )(locationState, locationAction);
 }

@@ -1,1 +1,66 @@
-<p>new-inventory works!</p>
+<div class="location">
+  <h4>{{ activeLocation.locationName }}</h4>
+  <p>New Inventory</p>
+</div>
+
+<div class="inventory">
+  <mat-card class="inventory-card">
+    <mat-card-title> </mat-card-title>
+    <mat-card-content>
+      <p *ngIf="locationProducts.length === 0">
+        Add products in the Products tab to start a new inventory.
+      </p>
+      <div [formGroup]="inventoryForm">
+        <mat-card
+          class="inventory-product"
+          formArrayName="inventory"
+          *ngFor="
+            let control of inventoryControls;
+            let product;
+            of: locationProducts
+          "
+        >
+          <mat-card-content>
+            <div *ngIf="locationProducts.length > 0">
+              <p>{{ i + 1 + " " }} {{ product.product.name }}</p>
+            </div>
+
+            <form (submit)="onInventorySubmit()" formControlName="inventory">
+              <mat-form-field>
+                <mat-label> {{ product.name }} </mat-label>
+                <input
+                  matInput
+                  required
+                  formControlName="locProduct"
+                  spellcheck="false"
+                  type="text"
+                  [value]="product._id"
+                />
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label></mat-label>
+                <input
+                  matInput
+                  required
+                  formControlName="quantity"
+                  type="number"
+                />
+              </mat-form-field>
+            </form>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-card-content>
+    <mat-card-actions align="center" *ngIf="locationProducts.length > 0">
+      <button mat-raised-button type="submit" color="">
+        {{
+          userRole === "manager" || "owner" ? "Finalize" : "Submit for Approval"
+        }}
+      </button>
+      <br />
+      <br />
+      <button mat-raised-button type="button" color="primary">Reset</button>
+      <button mat-raised-button type="button" color="accent">Save Draft</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

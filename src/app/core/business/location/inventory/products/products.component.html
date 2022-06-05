@@ -1,8 +1,3 @@
-<mat-spinner
-  diameter="70"
-  strokeWidth="5"
-  *ngIf="locationState.loading"
-></mat-spinner>
 <div *ngIf="!locationState.loading" class="product">
   <p *ngIf="!activeLocation" class="no-active-location">
     Select a location to access products.
@@ -82,7 +77,7 @@
                     *ngFor="let units of unitCategory.units"
                     [value]="units"
                   >
-                    {{ units }}
+                    {{ units.plural }}
                   </mat-option>
                 </mat-optgroup>
               </mat-select>
@@ -92,7 +87,7 @@
 
           <div>
             <mat-form-field appearance="outline" class="hint">
-              <mat-label>Pack Size</mat-label>
+              <mat-label>Units per Case</mat-label>
               <input
                 ngModel
                 matInput
@@ -109,7 +104,7 @@
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="ms-2">
-              <mat-label>Pack Price</mat-label>
+              <mat-label>Case Price</mat-label>
               <span matPrefix>$&nbsp;</span>
               <input
                 ngModel
@@ -162,6 +157,14 @@
     </mat-action-row>
   </mat-expansion-panel>
 
+  <div class="spinner">
+    <mat-spinner
+      diameter="70"
+      strokeWidth="5"
+      *ngIf="locationState.loading || bizLoading"
+    ></mat-spinner>
+  </div>
+
   <h5
     *ngIf="activeLocation && activeLocation.productList.length > 0"
     class="text-center"
@@ -171,7 +174,9 @@
 
   <div>
     <button
-      *ngIf="selectedProducts.length > 0 && activeLocation.productList.length > 12"
+      *ngIf="
+        activeProducts.length > 0 && activeLocation.productList.length > 12
+      "
       mat-raised-button
       color="primary"
       type="button"
@@ -199,31 +204,36 @@
         <p>{{ product.product.category }}</p>
         <p>
           {{
-            product.product.unitSize +
-              " " +
-              product.product.unit +
-              " x " +
-              product.product.packSize
-          }}
-        </p>
-        <p>
-          Unit Price:
-          {{
             product.product.packPrice /
               product.product.packSize /
               product.product.unitSize | currency
           }}
-          per {{ product.product.unit }}
+          per {{ product.product.unit.singular }}
+        </p>
+        <p>
+          {{
+            "Unit Size: " +
+              product.product.unitSize +
+              " " +
+              product.product.unit.plural
+          }}
+        </p>
+        <p>
+          {{
+            (product.product.unit.plural | titlecase) +
+              " per case: " +
+              product.product.unitSize * product.product.packSize
+          }}
         </p>
         <p>Case price: {{ product.product.packPrice | currency }}</p>
-        <p>Par: {{ product.product.par }} cases</p>
+        <p>Par: {{ product.product.par }} {{ product.product.par > 1 ? 'packs' : 'pack' }}</p>
       </mat-card-content>
     </mat-card>
   </div>
 
   <div>
     <button
-      *ngIf="selectedProducts.length > 0"
+      *ngIf="activeProducts && activeProducts.length > 0"
       mat-raised-button
       color="primary"
       type="button"
@@ -233,5 +243,4 @@
       Delete Selected
     </button>
   </div>
-
 </div>

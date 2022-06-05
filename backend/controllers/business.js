@@ -291,7 +291,15 @@ exports.getBusinessLocations = async (req, res, next) => {
       .populate({
         path: "staff.staffMember",
         model: "User",
-      });
+      })
+      .populate({
+        path: "productList.product",
+        model: "Product",
+      })
+      .populate({
+        path: "inventoryData.inventory",
+        model: "Inventory",
+      })
     console.log(bizLocations);
     console.log("||| ^^^ found locations here ^^^ |||");
 

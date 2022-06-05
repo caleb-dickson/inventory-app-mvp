@@ -1,0 +1,26 @@
+@use '../../../../../../sass/abstracts/variables' as inv;
+
+.location {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem;
+}
+
+.inventory {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem;
+
+  &-card {
+    width: 65vw;
+  }
+
+  &-product {
+    background-color: inv.$color-green-light;
+    margin-block: 1rem;
+  }
+
+
+}
