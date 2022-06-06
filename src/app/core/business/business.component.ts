@@ -82,12 +82,18 @@ export class BusinessComponent implements OnInit, OnDestroy {
           this.locations = bizState.businessLocations;
           this.locationAddUserSelector = bizState.locationSelected;
           this.locationEditSelector = bizState.locationSelected;
-          console.log(this.locations)
+          console.log(this.locations);
 
           this.initBusinessForm();
           this.initNewLocationForm();
           this.initUpdateLocationForm();
-          this.initAddUserToLocationForm();
+
+          if (
+            this.locationAddUserSelector &&
+            this.locationAddUserSelector.locationName
+          ) {
+            this.initAddUserToLocationForm();
+          }
         }
       });
 
@@ -295,14 +301,9 @@ export class BusinessComponent implements OnInit, OnDestroy {
   private initAddUserToLocationForm() {
     let emails = new FormArray([]);
 
-    if (
-      this.locationAddUserSelector &&
-      this.locationAddUserSelector.locationName
-    ) {
-      this.addUserToLocationForm = new FormGroup({
-        email: emails,
-      });
-    }
+    this.addUserToLocationForm = new FormGroup({
+      email: emails,
+    });
   }
 
   // GETS AND HOLDS THE LIST OF addUserToLocationForm CONTROLS

@@ -14,9 +14,8 @@ export const defaultUnits: UnitsCategories = {
     {
       category: 'Per, unmeasured',
       units: [
-        { singular: 'each', plural: 'each' },
-        { singular: 'bunch', plural: 'bunches' },
         { singular: 'peice', plural: 'peices' },
+        { singular: 'bunch', plural: 'bunches' },
       ],
     },
     {

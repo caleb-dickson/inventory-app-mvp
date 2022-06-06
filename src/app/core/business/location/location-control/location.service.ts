@@ -149,7 +149,6 @@ export class LocationService {
     } else {
       console.log('||| No active location found. |||');
     }
-    console.log(this.locationState.activeLocation)
   }
 
   selectProducts(checked: boolean, activeProducts: Product[], product: Product) {

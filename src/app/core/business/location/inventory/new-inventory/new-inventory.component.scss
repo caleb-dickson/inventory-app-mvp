@@ -7,6 +7,11 @@
   margin: 2rem;
 }
 
+.spinner  {
+  display: flex;
+  justify-content: center;
+}
+
 .inventory {
   display: flex;
   flex-direction: column;
@@ -14,12 +19,26 @@
   margin: 2rem;
 
   &-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 65vw;
   }
 
-  &-product {
-    background-color: inv.$color-green-light;
+  &-products {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: inv.$color-grey-light;
     margin-block: 1rem;
+    width: 45vw;
+
+    &-input {
+      display: flex;
+      flex-direction: column;
+      width: 10rem;
+
+    }
   }
 
 

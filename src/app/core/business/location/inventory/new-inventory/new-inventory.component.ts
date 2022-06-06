@@ -34,12 +34,15 @@ export class NewInventoryComponent implements OnInit {
   locationState: LocationState;
   activeLocation: Location;
 
+  loading: boolean;
+
   locationProducts: Product[];
 
   selectedProducts: Product[] = [];
   activeProducts: Product[] = [];
 
   inventoryForm: FormGroup;
+  inventoryValue: number;
 
   ngOnInit() {
     this.userAuthSub = this.store
@@ -48,16 +51,18 @@ export class NewInventoryComponent implements OnInit {
       .subscribe((user) => {
         console.log(user);
         this.user = user;
-        switch (user.userProfile.role) {
-          case 3:
-            this.userRole = 'owner';
-            break;
-          case 2:
-            this.userRole = 'manager';
-            break;
-          case 1:
-            this.userRole = 'staff';
-            break;
+        if (user) {
+          switch (user.userProfile.role) {
+            case 3:
+              this.userRole = 'owner';
+              break;
+            case 2:
+              this.userRole = 'manager';
+              break;
+            case 1:
+              this.userRole = 'staff';
+              break;
+          }
         }
       });
 
@@ -66,12 +71,22 @@ export class NewInventoryComponent implements OnInit {
       .subscribe((locState) => {
         console.log(locState);
         this.locationState = locState;
+        this.loading = locState.loading;
         this.activeLocation = locState.activeLocation;
         this.activeProducts = locState.activeProducts;
         this.locationProducts = locState.activeLocation.productList;
-        console.log(this.locationProducts)
+        if (
+          this.activeLocation &&
+          this.locationProducts &&
+          this.locationProducts.length > 0
+        ) {
+          this.initInventoryForm();
+          console.log(this.locationProducts);
+          console.log(this.inventoryControls);
+          console.log(this.activeLocation);
+          console.log(this.locationProducts)
+        }
       });
-      this.initInventoryForm();
   }
 
   // onProductSelect(checked: boolean, product: Product) {
@@ -85,7 +100,7 @@ export class NewInventoryComponent implements OnInit {
   //   console.log(this.locationState.activeProducts); // STORE DATA
   // }
 
-  onProductSelect() {}
+  // onProductSelect() {}
 
   onInventorySubmit() {
     if (this.inventoryForm.invalid) {
@@ -97,26 +112,29 @@ export class NewInventoryComponent implements OnInit {
     console.log(this.inventoryForm.value);
   }
 
-  // GETS AND HOLDS THE LIST OF addUserToLocationForm CONTROLS
-  get inventoryControls() {
-    return (<FormArray>this.inventoryForm.get('inventory')).controls;
-  }
+  // GETS AND HOLDS THE LIST OF inventoryForm CONTROLS
 
   private initInventoryForm() {
-    let products = new FormArray([]);
+    let items = new FormArray([]);
 
     // THIS LOOP MAY NEED TO HAPPEN IN THE TEMPLATE
     for (const product of this.locationProducts) {
-      (<FormArray>this.inventoryForm.get('inventory')).push(
+      let productId = product._id;
+      let quantity: number;
+
+      items.push(
         new FormGroup({
-          locProduct: new FormControl(null, Validators.required),
-          quantity: new FormControl(null, Validators.required),
+          locProduct: new FormControl(productId, Validators.required),
+          quantity: new FormControl(quantity, Validators.required),
         })
       );
     }
-
     this.inventoryForm = new FormGroup({
-      inventory: products,
+      inventory: items,
     });
+  }
+
+  get inventoryControls() {
+    return (<FormArray>this.inventoryForm.get('inventory')).controls;
   }
 }
