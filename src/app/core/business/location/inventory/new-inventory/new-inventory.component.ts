@@ -1,5 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injectable, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { DateAdapter } from '@angular/material/core';
+import {
+  MatDateRangeSelectionStrategy,
+  DateRange,
+  MAT_DATE_RANGE_SELECTION_STRATEGY,
+} from '@angular/material/datepicker';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../../../app-store/app.reducer';
@@ -14,15 +20,52 @@ import { Product } from '../../../business-control/product.model';
 import { LocationService } from '../../location-control/location.service';
 import { User } from 'src/app/auth/auth-control/user.model';
 
+// THIS WILL BE SET BY THE BUSINESS OWNER IN THE FUTURE, FOR ALL LOCATIONS
+// Example: a two-week inventory period
+const businessInventoryPeriod = 14;
+
+@Injectable()
+export class RangeSelectionStrategy<D>
+  implements MatDateRangeSelectionStrategy<D>
+{
+  inventoryPeriod = businessInventoryPeriod - 1;
+
+  constructor(private _dateAdapter: DateAdapter<D>) {}
+
+  selectionFinished(date: D | null): DateRange<D> {
+    return this._createDateRange(date);
+  }
+
+  createPreview(activeDate: D | null): DateRange<D> {
+    return this._createDateRange(activeDate);
+  }
+
+  private _createDateRange(date: D | null): DateRange<D> {
+    if (date) {
+      const start = this._dateAdapter.addCalendarDays(date, 0);
+      const end = this._dateAdapter.addCalendarDays(date, this.inventoryPeriod);
+      return new DateRange<D>(start, end);
+    }
+
+    return new DateRange<D>(null, null);
+  }
+}
+
 @Component({
   selector: 'app-new-inventory',
   templateUrl: './new-inventory.component.html',
   styleUrls: ['./new-inventory.component.scss'],
+  providers: [
+    {
+      provide: MAT_DATE_RANGE_SELECTION_STRATEGY,
+      useClass: RangeSelectionStrategy,
+    },
+  ],
 })
 export class NewInventoryComponent implements OnInit {
   constructor(
-    private store: Store<fromAppStore.AppState>,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private store: Store<fromAppStore.AppState>
   ) {}
 
   private userAuthSub: Subscription;
@@ -36,13 +79,15 @@ export class NewInventoryComponent implements OnInit {
 
   loading: boolean;
 
-  locationProducts: Product[];
+  locationProducts: any[];
 
   selectedProducts: Product[] = [];
   activeProducts: Product[] = [];
 
   inventoryForm: FormGroup;
   inventoryValue: number;
+
+  inventoryPeriod = businessInventoryPeriod;
 
   ngOnInit() {
     this.userAuthSub = this.store
@@ -64,6 +109,7 @@ export class NewInventoryComponent implements OnInit {
               break;
           }
         }
+        console.log(this.userRole);
       });
 
     this.locationStoreSub = this.store
@@ -72,21 +118,21 @@ export class NewInventoryComponent implements OnInit {
         console.log(locState);
         this.locationState = locState;
         this.loading = locState.loading;
-        this.activeLocation = locState.activeLocation;
         this.activeProducts = locState.activeProducts;
-        this.locationProducts = locState.activeLocation.productList;
+        this.activeLocation = locState.activeLocation;
         if (
-          this.activeLocation &&
-          this.locationProducts &&
-          this.locationProducts.length > 0
-        ) {
+          locState.activeLocation &&
+          locState.activeLocation.productList &&
+          locState.activeLocation.productList.length > 0
+          ) {
+          this.locationProducts = locState.activeLocation.productList;
           this.initInventoryForm();
           console.log(this.locationProducts);
           console.log(this.inventoryControls);
           console.log(this.activeLocation);
-          console.log(this.locationProducts)
         }
       });
+      console.log(this.userRole);
   }
 
   // onProductSelect(checked: boolean, product: Product) {
@@ -102,7 +148,17 @@ export class NewInventoryComponent implements OnInit {
 
   // onProductSelect() {}
 
-  onInventorySubmit() {
+  onInventorySubmitDraft() {
+    if (this.inventoryForm.invalid) {
+      this.store.dispatch(
+        LocationActions.LocationError({ errorMessage: 'Form Invalid' })
+      );
+    }
+
+    console.log(this.inventoryForm.value);
+  }
+
+  onInventorySubmitFinal() {
     if (this.inventoryForm.invalid) {
       this.store.dispatch(
         LocationActions.LocationError({ errorMessage: 'Form Invalid' })
@@ -119,19 +175,25 @@ export class NewInventoryComponent implements OnInit {
 
     // THIS LOOP MAY NEED TO HAPPEN IN THE TEMPLATE
     for (const product of this.locationProducts) {
-      let productId = product._id;
+      let productId = product.product._id;
       let quantity: number;
 
       items.push(
         new FormGroup({
-          locProduct: new FormControl(productId, Validators.required),
+          product: new FormControl(productId, Validators.required),
           quantity: new FormControl(quantity, Validators.required),
         })
       );
+      console.log(items);
     }
     this.inventoryForm = new FormGroup({
+      dateStart: new FormControl(null, Validators.required),
+      dateEnd: new FormControl(null, Validators.required),
+      department: new FormControl(null, Validators.required),
+      isFinal: new FormControl(false, Validators.required),
       inventory: items,
     });
+    console.log(this.inventoryForm.value);
   }
 
   get inventoryControls() {

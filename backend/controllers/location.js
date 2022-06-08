@@ -44,14 +44,26 @@ exports.fetchUserLocations = async (req, res, next) => {
       userLocations = await Location.find({
         "staff.staffMember": req.params.userId,
       })
-        .populate({
-          path: "productList.product",
-          model: "Product",
-        })
-        .populate({
-          path: "inventoryData.inventory",
-          model: "Inventory",
-        });
+      .populate({
+        path: "productList.product",
+        model: "Product",
+      })
+      .populate({
+        path: "inventoryData.inventory",
+        model: "Inventory",
+      })
+      .populate({
+        path: "managers.manager",
+        model: "User",
+      })
+      .populate({
+        path: "staff.staffMember",
+        model: "User",
+      })
+      .populate({
+        path: "parentBusiness",
+        model: "Business",
+      });
       console.log(userLocations);
       console.log("||| ^^^ found locations here ^^^ |||");
     }

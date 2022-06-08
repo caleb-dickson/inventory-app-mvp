@@ -152,7 +152,7 @@ export class NavigationComponent implements OnInit {
       } else if (this.singleBizLocationName) {
         this.onActivateLocation(this.businessState.businessLocations[0]);
       }
-    } else if (this.userRole === 'manager') {
+    } else {
       // IF MANAGER HAS MULTIPLE AUTHORIZED LOCATIONS CHECK
       // IN LOCALSTORAGE WHICH IS ACTIVE
       if (this.locationState.userLocations.length > 1) {

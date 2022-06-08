@@ -87,6 +87,15 @@ export function locationReducer(
       ...state,
       locationError: action.errorMessage,
       loading: false,
+    })),
+
+    on(LocationActions.clearLocationState, (state) => ({
+      userLocations: [],
+      activeLocation: null,
+      activeProducts: [],
+      activeInventory: null,
+      locationError: null,
+      loading: false,
     }))
   )(locationState, locationAction);
 }

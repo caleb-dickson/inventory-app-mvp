@@ -1,7 +1,7 @@
 <div *ngIf="!locationState.loading" class="product">
-  <p *ngIf="!activeLocation" class="no-active-location">
+  <h4 *ngIf="!activeLocation" class="no-active-location">
     Select a location to access products.
-  </p>
+  </h4>
   <h4 *ngIf="activeLocation" class="location-name">
     {{ activeLocation.locationName }}
   </h4>

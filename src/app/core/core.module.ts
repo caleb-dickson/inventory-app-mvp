@@ -38,6 +38,9 @@ import { NewInventoryComponent } from './business/location/inventory/new-invento
     ReactiveFormsModule,
     FormsModule
   ],
-  exports: [NavigationComponent, DashboardComponent, CoreComponent],
+  exports: [NavigationComponent,
+    DashboardComponent,
+    CoreComponent
+  ],
 })
 export class AppCoreModule {}

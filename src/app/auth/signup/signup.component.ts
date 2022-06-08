@@ -3,7 +3,6 @@ import { NgForm } from '@angular/forms';
 
 import { Subscription } from 'rxjs';
 
-import { MatDialog } from '@angular/material/dialog';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
@@ -22,7 +21,6 @@ export class SignupComponent implements OnInit, OnDestroy {
 
   constructor(
     public authService: AuthService,
-    private dialog: MatDialog,
     private store: Store<fromAppStore.AppState>
   ) {}
 
@@ -51,6 +49,7 @@ export class SignupComponent implements OnInit, OnDestroy {
           password: signupForm.value.password,
           userProfile: {
             role: signupForm.value.role,
+            department: signupForm.value.role,
             firstName: signupForm.value.firstName,
             lastName: signupForm.value.lastName,
             phoneNumber: signupForm.value.phoneNumber,
@@ -65,7 +64,6 @@ export class SignupComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.storeSub) {
       this.storeSub.unsubscribe();
-      this.error = null;
     }
   }
 }

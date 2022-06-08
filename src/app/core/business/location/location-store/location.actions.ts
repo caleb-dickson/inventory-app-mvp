@@ -4,11 +4,12 @@ import { Inventory } from 'src/app/core/business/business-control/inventory.mode
 import { Product } from 'src/app/core/business/business-control/product.model';
 import { Location } from '../../business-control/location.model';
 
-
+// DONE
 export const GETUserLocationsStart = createAction(
   '[Location] Fetch Locations Where User is Authorized START',
   props<{ userId: string, userRole: number }>()
 );
+// DONE
 export const GETUserLocationsSuccess = createAction(
   '[Location] Fetch Locations Where User is Authorized SUCCESS',
   props<{ locations: Location[] }>()
@@ -26,19 +27,20 @@ export const PUTUpdateManagerLocationSuccess = createAction(
 
 
 
-
+// DONE
 export const POSTCreateProductForLocationStart = createAction(
   '[Location] Save a New Product to Location START',
   props<{ product: Product, locationId: string }>()
 );
+// DONE
 export const POSTCreateProductForLocationSuccess = createAction(
   '[Location] Save a New Product to Location SUCCESS'
 );
-export const DELETERemoveProductFromLocationStart = createAction(
+export const DELETEProductFromLocationStart = createAction(
   '[Location] Remove Products from Location START',
   props<{ product: Product[], locationId: string }>()
 );
-export const DELETERemoveProductFromLocationSuccess = createAction(
+export const DELETEFromLocationSuccess = createAction(
   '[Location] Remove Products from Location SUCCESS'
 );
 
@@ -75,4 +77,8 @@ export const ActivateProducts = createAction(
 export const LocationError = createAction(
   '[Location] Location Errors',
   props<{ errorMessage: string }>()
+);
+
+export const clearLocationState = createAction(
+  '[Location] Clear Location State'
 );

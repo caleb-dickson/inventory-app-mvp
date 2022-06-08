@@ -4,6 +4,7 @@ export class User {
   password: string;
   userProfile: {
     role: number;
+    department: string;
     firstName: string;
     lastName: string;
     phoneNumber: string;
@@ -16,6 +17,7 @@ export class User {
     password: string,
     userProfile: {
       role: number,
+      department: string,
       firstName: string,
       lastName: string,
       phoneNumber: string,

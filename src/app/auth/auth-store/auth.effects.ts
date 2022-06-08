@@ -7,6 +7,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as fromAppStore from '../../app-store/app.reducer';
 import * as AuthActions from './auth.actions';
 import { clearBusinessState } from '../../core/business/business-store/business.actions';
+import { clearLocationState } from 'src/app/core/business/location/location-store/location.actions';
 
 import { of } from 'rxjs';
 import { catchError, concatMap, map, switchMap, tap } from 'rxjs/operators';
@@ -200,6 +201,7 @@ export class AuthEffects {
           email: string;
           userProfile: {
             role: number;
+            department: string;
             firstName: string;
             lastName: string;
             phoneNumber: string;
@@ -253,6 +255,7 @@ export class AuthEffects {
           this.authService.clearLogoutTimer();
           localStorage.clear();
           this.store.dispatch(clearBusinessState());
+          this.store.dispatch(clearLocationState());
           const guestUserData = { themePref: 'theme-dark' };
           localStorage.setItem('guestUserData', JSON.stringify(guestUserData));
           this.router.navigate(['/']);
