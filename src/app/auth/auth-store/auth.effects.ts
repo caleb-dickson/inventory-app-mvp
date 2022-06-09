@@ -54,6 +54,7 @@ export class AuthEffects {
             password: action.newUser.password,
             userProfile: {
               role: action.newUser.userProfile.role,
+              department: action.newUser.userProfile.department,
               firstName: action.newUser.userProfile.firstName,
               lastName: action.newUser.userProfile.lastName,
               phoneNumber: action.newUser.userProfile.phoneNumber,

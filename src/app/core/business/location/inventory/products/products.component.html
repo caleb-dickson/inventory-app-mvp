@@ -14,6 +14,11 @@
     </mat-expansion-panel-header>
     <mat-card>
       <mat-card-title>New Product </mat-card-title>
+      <mat-card-subtitle
+        matTooltip="Except for Owners and Admins, users can only create or update products in their own department."
+      >
+        {{ user.userProfile.department | uppercase }}
+      </mat-card-subtitle>
 
       <mat-card-content>
         <form #newProductForm="ngForm" class="product-add-new-form">
@@ -45,14 +50,33 @@
 
             <mat-form-field appearance="outline" class="ms-2">
               <mat-label>Name</mat-label>
-              <input ngModel matInput required type="text" name="name" #name />
+              <input
+                ngModel
+                matInput
+                required
+                type="text"
+                name="name"
+                #name
+                (focusout)="onProductNameInput(newProductForm.value.name)"
+              />
               <mat-error>Please enter a name.</mat-error>
             </mat-form-field>
           </div>
 
+          <p *ngIf="!productName" class="text-center">
+            Individual Item Info
+            <mat-icon
+              matTooltip="Enter the amount and unit of measure of each individual item."
+              >help_outline</mat-icon
+            >
+          </p>
+          <p *ngIf="productName" class="text-center">
+            Individual {{ productName }} Size
+          </p>
+
           <div class="units-block">
             <mat-form-field appearance="outline" class="hint align-end short">
-              <mat-label>Unit Size</mat-label>
+              <mat-label>Item Size</mat-label>
               <input
                 ngModel
                 matInput
@@ -85,20 +109,73 @@
             </mat-form-field>
           </div>
 
-          <div>
-            <mat-form-field appearance="outline" class="hint">
-              <mat-label>Units per Case</mat-label>
+          <p *ngIf="!productName" class="text-center">
+            Pack Info
+            <mat-icon
+              matTooltip="If each case is subdivided into smaller packs,
+              enter how many individual items per pack. If not multiple
+              packs just enter 1 here and enter the total items per case in the 'Case' field."
+              >help_outline</mat-icon
+            >
+          </p>
+          <p *ngIf="productName" class="text-center">
+            How many {{ productName }} per pack?
+          </p>
+
+          <div class="pack-block">
+            <mat-form-field appearance="outline">
+              <mat-label>Pack Size</mat-label>
               <input
                 ngModel
                 matInput
                 required
                 type="number"
-                name="packSize"
-                #packSize
+                name="unitsPerPack"
+                #unitsPerPack
               />
-              <mat-hint
-                >How many packs per case? If not subdivided just enter
-                1.</mat-hint
+              <mat-error>Please enter a valid unit size.</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="par-block">
+            <mat-form-field appearance="outline" class="hint">
+              <mat-label>Packs PAR</mat-label>
+              <input ngModel matInput required type="number" name="par" #par />
+              <mat-icon
+                matSuffix
+                matTooltip="Periodic Automatic Replacement (PAR).
+                This is weekly usage, PLUS buffer stock DIVIDED by deliveries each inventory period.
+                If not divided into packs just enter number of cases.
+                (You can update this number for each inventory)"
+                >help_outline</mat-icon
+              >
+              <mat-error>Please enter a par.</mat-error>
+            </mat-form-field>
+          </div>
+
+          <p *ngIf="newProductForm.value.unitsPerPack <= 1" class="text-center">
+            Case Info
+          </p>
+          <p *ngIf="newProductForm.value.unitsPerPack > 1" class="text-center">
+            How many packs per case?
+          </p>
+
+          <div>
+            <mat-form-field appearance="outline" class="hint">
+              <mat-label>Case Size</mat-label>
+              <input
+                ngModel
+                matInput
+                required
+                type="number"
+                name="packsPerCase"
+                #packsPerCase
+              />
+              <mat-icon
+                matSuffix
+                matTooltip="If not subdivided into multiple packs, just enter how many
+                individual items overall in the case."
+                >help_outline</mat-icon
               >
               <mat-error>Please enter a valid pack size.</mat-error>
             </mat-form-field>
@@ -111,22 +188,12 @@
                 matInput
                 required
                 type="number"
-                name="packPrice"
-                #packPrice
+                name="casePrice"
+                #casePrice
               />
               <mat-error>Please enter a valid pack price.</mat-error>
             </mat-form-field>
           </div>
-
-          <mat-form-field appearance="outline" class="hint">
-            <mat-label>Par</mat-label>
-            <input ngModel matInput required type="number" name="par" #par />
-            <mat-hint
-              >Expected number of packs used each inventory period, plus buffer
-              stock. You can change this for each inventory.</mat-hint
-            >
-            <mat-error>Please enter a par.</mat-error>
-          </mat-form-field>
         </form>
       </mat-card-content>
 
@@ -201,32 +268,40 @@
         {{ product.product.name }}
       </mat-card-title>
       <mat-card-content>
+        <p>{{ product.product.department | uppercase }}</p>
         <p>{{ product.product.category }}</p>
         <p>
           {{
-            product.product.packPrice /
-              product.product.packSize /
-              product.product.unitSize | currency
+            product.product.casePrice /
+              (product.product.unitSize *
+                product.product.unitsPerPack *
+                product.product.packsPerCase) | currency
           }}
-          per {{ product.product.unit.singular }}
+          per {{ product.product.unitMeasure.singular }}
         </p>
         <p>
           {{
-            "Unit Size: " +
+            "Individual Item Size: " +
               product.product.unitSize +
               " " +
-              product.product.unit.plural
+              (product.product.unitSize > 1
+                ? product.product.unitMeasure.plural
+                : product.product.unitMeasure.singular)
           }}
         </p>
         <p>
           {{
-            (product.product.unit.plural | titlecase) +
+            (product.product.name | titlecase) +
               " per case: " +
-              product.product.unitSize * product.product.packSize
+                product.product.unitsPerPack *
+                product.product.packsPerCase
           }}
         </p>
-        <p>Case price: {{ product.product.packPrice | currency }}</p>
-        <p>Par: {{ product.product.par }} {{ product.product.par > 1 ? 'packs' : 'pack' }}</p>
+        <p>Case price: {{ product.product.casePrice | currency }}</p>
+        <p>
+          Par: {{ product.product.par }}
+          {{ product.product.par > 1 ? "packs" : "pack" }}
+        </p>
       </mat-card-content>
     </mat-card>
   </div>

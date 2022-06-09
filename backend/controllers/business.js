@@ -25,7 +25,7 @@ exports.createBusiness = async (req, res, next) => {
         // IF THE USER ALREADY HAS A BUSINESS, RETURN ERROR 422
         res.status(422).json({
           message:
-            "Invalid submit. If you're sure this is an error, please contact tech support via the help section.",
+            "Invalid submit. If you're sure this is an error, please contact tech support via the navigation panel.",
         });
       }
     } catch (error) {
@@ -40,18 +40,18 @@ exports.createBusiness = async (req, res, next) => {
 
     // IF NO EXISTING BUSINESS WAS FOUND, SAVE THE DEFINED BUSINESS
     const newBusiness = await business.save();
-    console.log("||| newBusiness |||");
     console.log(newBusiness);
+    console.log("||| ^^^ newBusiness ^^^ |||");
 
     // PULL THE USER (OWNER) DOC FROM DB
     const ownerUser = await User.findById(req.body.ownerId);
-    console.log("||| ownerUser |||");
     console.log(ownerUser);
+    console.log("||| ^^^ ownerUser ^^^ |||");
 
     // ADD THE NEW BUSINESS TO THE USERPROFILE
     const updatedOwner = await ownerUser.ownerAddBusiness(newBusiness);
-    console.log("||| updatedOwner |||");
     console.log(updatedOwner);
+    console.log("||| ^^^ updatedOwner ^^^ |||");
 
     // SEND BACK THE DATA TO THE CLIENT
     res.status(201).json({
@@ -166,7 +166,6 @@ exports.createLocation = async (req, res, next) => {
       path: "locations.location",
       model: "Location",
     });
-    console.log(updatedBusiness.locations);
 
     res.status(201).json({
       message: "Location created successfully",
@@ -318,26 +317,26 @@ exports.getBusinessLocations = async (req, res, next) => {
   }
 };
 
-exports.getProducts = async (req, res, next) => {
-  try {
-    const businessId = req.params.businessId;
-  } catch (error) {
-    // CATCH AND RETURN UNEXPECTED ERRORS
-    console.log(error);
-    res.status(500).json({
-      message: error._message,
-    });
-  }
-};
+// exports.getProducts = async (req, res, next) => {
+//   try {
+//     const businessId = req.params.businessId;
+//   } catch (error) {
+//     // CATCH AND RETURN UNEXPECTED ERRORS
+//     console.log(error);
+//     res.status(500).json({
+//       message: error._message,
+//     });
+//   }
+// };
 
-exports.getInventories = async (req, res, next) => {
-  try {
-    const locationId = req.params.locationId;
-  } catch (error) {
-    // CATCH AND RETURN UNEXPECTED ERRORS
-    console.log(error);
-    res.status(500).json({
-      message: error._message,
-    });
-  }
-};
+// exports.getInventories = async (req, res, next) => {
+//   try {
+//     const locationId = req.params.locationId;
+//   } catch (error) {
+//     // CATCH AND RETURN UNEXPECTED ERRORS
+//     console.log(error);
+//     res.status(500).json({
+//       message: error._message,
+//     });
+//   }
+// };

@@ -17,6 +17,7 @@ import { defaultUnits, UnitsCategories } from './models/units-list.model';
 import { Product } from '../../../business-control/product.model';
 
 import { LocationService } from '../../location-control/location.service';
+import { User } from 'src/app/auth/auth-control/user.model';
 
 @Component({
   selector: 'app-products',
@@ -33,21 +34,46 @@ export class ProductsComponent implements OnInit {
   private locationStoreSub: Subscription;
   private businessStoreLoadingSub: Subscription;
 
+  user: User;
   userRole: string;
+
+  bizLoading: boolean;
 
   locationState: LocationState;
   activeLocation: Location;
-
-  bizLoading: boolean;
+  activeProducts: Product[] = [];
 
   productCategories: ProductCategories;
   defaultUnits: UnitsCategories;
 
-  activeProducts: Product[] = [];
+  productName: string = null;
+
 
   ngOnInit() {
     this.productCategories = defaultCategories;
     this.defaultUnits = defaultUnits;
+
+    this.userAuthSub = this.store
+    .select('auth')
+    .pipe(map((authState) => authState.userAuth))
+    .subscribe((user) => {
+      console.log(user);
+        this.user = user;
+        if (!!user) {
+          switch (user.userProfile.role) {
+            case 3:
+              this.userRole = 'owner';
+              break;
+            case 2:
+              this.userRole = 'manager';
+              break;
+            case 1:
+              this.userRole = 'staff';
+              break;
+          }
+        }
+      });
+
 
     this.locationStoreSub = this.store
       .select('location')
@@ -65,11 +91,17 @@ export class ProductsComponent implements OnInit {
 
   }
 
+  onProductNameInput(name: string) {
+    console.log(name);
+    this.productName = name;
+  }
+
   onResetForm(form: NgForm) {
     form.reset();
   }
 
   onNewProductSubmit(newProductForm: NgForm) {
+    console.log(newProductForm);
     console.log(newProductForm.value);
 
     if (!newProductForm.valid) {
@@ -81,12 +113,14 @@ export class ProductsComponent implements OnInit {
         product: {
           _id: null,
           parentOrg: this.activeLocation._id,
+          department: this.user.userProfile.department,
           category: newProductForm.value.category,
           name: newProductForm.value.name,
           unitSize: newProductForm.value.unitSize,
-          unit: newProductForm.value.unit,
-          packSize: newProductForm.value.packSize,
-          packPrice: newProductForm.value.packPrice,
+          unitMeasure: newProductForm.value.unit,
+          unitsPerPack: newProductForm.value.unitsPerPack,
+          packsPerCase: newProductForm.value.packsPerCase,
+          casePrice: newProductForm.value.casePrice,
           par: newProductForm.value.par,
         },
         locationId: this.activeLocation._id,

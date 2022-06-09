@@ -41,10 +41,7 @@
           >Please enter your last name.</mat-error
         >
       </mat-form-field>
-      <mat-form-field
-        matTooltip="This will determine your permissions in the app."
-        appearance="outline"
-      >
+      <mat-form-field appearance="outline">
         <mat-label>Account Type</mat-label>
         <mat-select
           ngModel
@@ -54,11 +51,23 @@
           type="number"
           placeholder="Select your account type"
         >
-          <mat-option [value]="3"> Owner, Business / All-Units Management </mat-option>
-          <mat-option [value]="2"> Manager,  </mat-option>
-          <mat-option [value]="1">
-            Staff, Supervisory/Non-Management
-          </mat-option>
+          <mat-option [value]="3"> Business Owner </mat-option>
+          <mat-option [value]="2"> Manager </mat-option>
+          <mat-option [value]="1"> Supervisor / Junior Staff </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline" *ngIf="signupForm.value.role && signupForm.value.role !== 3">
+        <mat-label>Department</mat-label>
+        <mat-select
+          ngModel
+          #department
+          name="department"
+          type="text"
+          placeholder="Select your department."
+        >
+          <mat-option value="boh"> Back of House (BOH) </mat-option>
+          <mat-option value="foh"> Front of House (FOH) </mat-option>
+          <mat-option value="admin"> Administrative / Access to All </mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field class="input-phone" appearance="outline">

@@ -4,18 +4,20 @@ const productSchema = mongoose.Schema({
   parentOrg: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    // ref: "Business", REMOVED, MAY CAUSE BUGS, MAYBE NOT?
+    // ref: "Business", REMOVED, MAY CAUSE BUGS?
   },
-  category: { type: String, required: true, default: "Uncategorized" },
+  department: { type: String, required: true },
+  category: { type: String, required: true },
   name: { type: String, required: true },
   unitSize: { type: Number, required: true },
-  unit: {
+  unitMeasure: {
     singular: { type: String, required: true },
     plural: { type: String, required: true },
   },
-  packSize: { type: Number, required: true },
-  packPrice: { type: Number, required: true, default: 0 },
-  par: { type: Number, required: true, default: 0 },
+  unitsPerPack: { type: Number, required: true },
+  packsPerCase: { type: Number, required: true },
+  casePrice: { type: Number, required: true },
+  par: { type: Number, required: true },
 });
 
 module.exports = mongoose.model("Product", productSchema);

@@ -68,7 +68,7 @@ exports.fetchUserLocations = async (req, res, next) => {
       console.log("||| ^^^ found locations here ^^^ |||");
     }
 
-    // IF USER WAS FOUND IN ANY LOCATION
+    // IF USER WAS FOUND IN ANY LOCATION'S STAFF LIST
     if (userLocations) {
       // RESPOND WITH ALL LOCATIONS (with populated product and inventory lists)
       // WHERE USER WAS FOUND
@@ -90,6 +90,7 @@ exports.fetchUserLocations = async (req, res, next) => {
   }
 };
 
+// UNFINISHED - WORKING
 exports.createInventory = async (req, res, next) => {
   try {
     const inventory = new Inventory({
@@ -121,21 +122,24 @@ exports.createProduct = async (req, res, next) => {
   try {
     const product = new Product({
       parentOrg: req.body.product.parentOrg,
+      department: req.body.product.department,
       category: req.body.product.category,
       name: req.body.product.name,
       unitSize: req.body.product.unitSize,
-      unit: req.body.product.unit,
-      packSize: req.body.product.packSize,
-      packPrice: req.body.product.packPrice,
+      unitMeasure: req.body.product.unitMeasure,
+      unitsPerPack: req.body.product.unitsPerPack,
+      packsPerCase: req.body.product.packsPerCase,
+      casePrice: req.body.product.casePrice,
       par: req.body.product.par,
     });
 
     const newProduct = await product.save();
     console.log(newProduct);
+    console.log("||| ^^^ new saved product here ^^^ |||");
 
     const locationToUpdate = await Location.findById(req.body.locationId);
 
-    const updatedLocation = await locationToUpdate.addProductToList(newProduct);
+    await locationToUpdate.addProductToList(newProduct);
 
     const populatedLocation = await Location.findById(req.body.locationId)
       .populate({

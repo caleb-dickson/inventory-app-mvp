@@ -27,6 +27,7 @@ exports.signup = async (req, res, next) => {
       password: hash,
       userProfile: {
         role: req.body.userProfile.role,
+        department: req.body.userProfile.department,
         firstName: req.body.userProfile.firstName,
         lastName: req.body.userProfile.lastName,
         phoneNumber: req.body.userProfile.phoneNumber,

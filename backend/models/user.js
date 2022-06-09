@@ -14,13 +14,9 @@ const userSchema = mongoose.Schema({
 });
 
 userSchema.methods.ownerAddBusiness = function (newBusiness) {
-  console.log("||| newBusiness |||");
-  console.log(newBusiness);
 
   this.userProfile.business = newBusiness._id;
 
-  console.log("||| this |||");
-  console.log(this);
   return this.save();
 };
 

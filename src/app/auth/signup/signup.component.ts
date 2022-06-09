@@ -37,6 +37,12 @@ export class SignupComponent implements OnInit, OnDestroy {
     }
     console.log(signupForm);
 
+    let department = 'admin';
+
+    if (signupForm.value.department) {
+      department = signupForm.value.department;
+    }
+
     let themePref = !signupForm.value.themePref
       ? undefined
       : signupForm.value.themePref;
@@ -49,7 +55,7 @@ export class SignupComponent implements OnInit, OnDestroy {
           password: signupForm.value.password,
           userProfile: {
             role: signupForm.value.role,
-            department: signupForm.value.role,
+            department: department,
             firstName: signupForm.value.firstName,
             lastName: signupForm.value.lastName,
             phoneNumber: signupForm.value.phoneNumber,

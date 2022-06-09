@@ -125,7 +125,11 @@ export class LocationEffects {
           .pipe(
             map((resData) => {
               console.log(resData);
-              if (resData && resData.fetchedLocations) {
+              if (
+                resData &&
+                resData.fetchedLocations &&
+                resData.fetchedLocations.length > 0
+              ) {
                 const userLocations = resData.fetchedLocations;
                 localStorage.setItem(
                   'userLocations',

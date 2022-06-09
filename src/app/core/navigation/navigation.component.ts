@@ -46,6 +46,7 @@ export class NavigationComponent implements OnInit {
   isAuthenticated: boolean;
   user: User;
   userRole: string;
+  userDept: string;
 
   businessState: BusinessState;
   businessName: string;
@@ -70,6 +71,7 @@ export class NavigationComponent implements OnInit {
         this.isAuthenticated = !!user;
         if (this.isAuthenticated) {
           this.user = user;
+          this.userDept = user.userProfile.department ? user.userProfile.department : null;
           switch (user.userProfile.role) {
             case 3:
               this.userRole = 'owner';

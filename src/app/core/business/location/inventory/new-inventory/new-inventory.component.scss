@@ -30,6 +30,11 @@
       align-items: center;
     }
 
+    &-submit-status {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
   }
 
   &-products {

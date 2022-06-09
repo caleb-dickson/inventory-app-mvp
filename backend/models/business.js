@@ -8,7 +8,6 @@ const businessSchema = mongoose.Schema({
     ref: "User"
   },
   locations: [
-    // ALL THE LOCATIONS OWNED BY THIS BUSINESS(OBJ) (AND OWNER(USER))
     {
       location: {
         type: mongoose.Schema.Types.ObjectId,

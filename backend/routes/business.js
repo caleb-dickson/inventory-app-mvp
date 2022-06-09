@@ -39,7 +39,7 @@ router.post(
   checkOwner,
   BusinessController.createLocation
 );
-// Fetch all locations docs for business = WORKING
+// Fetch all locations docs for business = DONE
 router.get(
   "/fetch-business-locations/:businessId",
   checkAuth,
@@ -62,21 +62,13 @@ router.put(
   BusinessController.addUsersToLocation
 );
 
-// PRODUCTS
-// Fetch all products docs for business = NEED?
-// router.get(
-//   "/fetch-products/:businessId",
-//   checkAuth,
-//   BusinessController.getProducts
-// );
-
 // INVENTORY
 // Fetch all inventories for location = NEED
-router.get(
-  "/fetch-inventory/:locationId",
-  checkAuth,
-  checkMgr,
-  BusinessController.getInventories
-);
+// router.get(
+//   "/fetch-inventory/:locationId",
+//   checkAuth,
+//   checkMgr,
+//   BusinessController.getInventories
+// );
 
 module.exports = router;
