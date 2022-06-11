@@ -21,7 +21,7 @@ router.post("/new-product", checkAuth, LocationController.createProduct);
 // ================================ //
 
 // Add a product to the Location's product list (pull data from the
-// business product, create new copy witht the location as the parentOrg)
+// business product, create new copy with the location as the parentOrg)
 // ================================ //
 
 // Fetch all products associated with parentOrg
@@ -29,7 +29,7 @@ router.post("/new-product", checkAuth, LocationController.createProduct);
 
 // INVENTORY
 // Start new inventory
-// ================================ //
+router.post("/new-inventory", checkAuth, LocationController.createInventory);
 
 // Update existing inventory
 // ================================ //

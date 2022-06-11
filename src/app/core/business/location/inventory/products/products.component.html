@@ -198,19 +198,19 @@
           <div class="toggle">
             <br />
             <mat-slide-toggle
-              ngModel="productStatusInput"
               matInput
               #isActive
               name="isActive"
               (change)="onProductStatusSelect($event.checked)"
               [checked]="productStatusInput === 'Active' ? true : false"
-              [value]="checked"
+              [value]="productStatusInput === 'Active' ? true : false"
             >
               {{ productStatusInput }}
               <mat-icon
                 matTooltip="Sets the inventory status of this product.
                 Set to 'Inactive' if you don't immediately plan to track
-                this product in this location's inventory."
+                this product in this location's inventory. Set to
+                'Actve' to include in the following inventory."
                 >help_outline</mat-icon
               >
             </mat-slide-toggle>
@@ -289,7 +289,7 @@
       </mat-card-title>
       <mat-card-content>
         <p>{{ product.product.department | uppercase }}</p>
-        <p> Status: {{ product.product.isActive ? 'Active' : 'Inactive' }} </p>
+        <p>Status: {{ product.product.isActive ? "Active" : "Inactive" }}</p>
         <p>{{ product.product.category }}</p>
         <p>
           {{
@@ -301,9 +301,8 @@
           per {{ product.product.unitMeasure.singular }}
         </p>
         <p>
-          {{
-            "Individual Item Size: " +
-              product.product.unitSize +
+          Unit Size: {{
+            product.product.unitSize +
               " " +
               (product.product.unitSize > 1
                 ? product.product.unitMeasure.plural

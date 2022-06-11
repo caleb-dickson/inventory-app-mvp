@@ -48,11 +48,10 @@ export const DELETEFromLocationSuccess = createAction(
 
 export const POSTCreateInventoryForLocationStart = createAction(
   '[Location] Save a New Inventory to Location START',
-  props<{ inventory: Inventory }>()
+  props<{ location: Location, inventory: Inventory }>()
 );
 export const POSTCreateInventoryForLocationSuccess = createAction(
-  '[Location] Save a New Inventory to Location SUCCESS',
-  props<{ locations: Location[] }>()
+  '[Location] Save a New Inventory to Location SUCCESS'
 );
 
 

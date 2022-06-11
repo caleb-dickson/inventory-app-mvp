@@ -61,14 +61,10 @@ export function locationReducer(
       ...state,
       loading: true,
     })),
-    on(
-      LocationActions.POSTCreateInventoryForLocationSuccess,
-      (state, action) => ({
-        ...state,
-        loading: false,
-        userLocations: action.locations,
-      })
-    ),
+    on(LocationActions.POSTCreateInventoryForLocationSuccess, (state) => ({
+      ...state,
+      loading: false,
+    })),
 
     on(LocationActions.ActivateLocation, (state, action) => ({
       ...state,

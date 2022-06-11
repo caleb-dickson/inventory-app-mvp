@@ -198,6 +198,7 @@ export class NewInventoryComponent implements OnInit {
 
     this.store.dispatch(
       LocationActions.POSTCreateInventoryForLocationStart({
+        location: this.activeLocation,
         inventory: inventoryForm.value,
       })
     );

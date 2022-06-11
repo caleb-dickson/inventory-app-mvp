@@ -56,6 +56,18 @@ locationSchema.methods.updateLocation = async function (locationUpdateData) {
   return this.save();
 };
 
+// ADD NEW INVENTORY DATA
+locationSchema.methods.addNewInventory = async function (newInventory) {
+ console.log(newInventory);
+ console.log("||| schemaMethod arg newInventory ^^^ |||");
+
+ this.inventoryData.push({ inventory: newInventory });
+ console.log(this.inventoryData);
+ console.log("||| updated inventoryData array ^^^ |||");
+
+ return this.save();
+}
+
 // TO ADD A LIST OF AUTHORIZED MANAGERS (User Refs) TO A LOCATION BY EMAIL
 locationSchema.methods.addManagers = async function (managerEmails) {
   const currentManagers = this.managers

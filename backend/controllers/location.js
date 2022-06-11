@@ -44,26 +44,26 @@ exports.fetchUserLocations = async (req, res, next) => {
       userLocations = await Location.find({
         "staff.staffMember": req.params.userId,
       })
-      .populate({
-        path: "productList.product",
-        model: "Product",
-      })
-      .populate({
-        path: "inventoryData.inventory",
-        model: "Inventory",
-      })
-      .populate({
-        path: "managers.manager",
-        model: "User",
-      })
-      .populate({
-        path: "staff.staffMember",
-        model: "User",
-      })
-      .populate({
-        path: "parentBusiness",
-        model: "Business",
-      });
+        .populate({
+          path: "productList.product",
+          model: "Product",
+        })
+        .populate({
+          path: "inventoryData.inventory",
+          model: "Inventory",
+        })
+        .populate({
+          path: "managers.manager",
+          model: "User",
+        })
+        .populate({
+          path: "staff.staffMember",
+          model: "User",
+        })
+        .populate({
+          path: "parentBusiness",
+          model: "Business",
+        });
       console.log(userLocations);
       console.log("||| ^^^ found locations here ^^^ |||");
     }
@@ -92,23 +92,55 @@ exports.fetchUserLocations = async (req, res, next) => {
 
 // UNFINISHED - WORKING
 exports.createInventory = async (req, res, next) => {
-  try {
-    const inventory = new Inventory({
-      dateStart: req.body.dateStart,
-      dateEnd: req.body.dateEnd,
-      type: req.body.type,
-      inventory: [],
-    });
+  console.log(req.body);
+  console.log("||| ^^^ req.body ^^^ |||");
 
+  try {
+    const parentLocation = await Location.findById(req.body.location._id);
+
+    const inventory = new Inventory({
+      parentLocation: req.body.location._id,
+      dateStart: req.body.inventory.dateStart,
+      dateEnd: req.body.inventory.dateEnd,
+      department: req.body.inventory.department,
+      isFinal: req.body.inventory.isFinal,
+      inventory: req.body.inventory.inventory,
+    });
     const newInventory = await inventory.save();
     console.log(newInventory);
+    console.log("||| ^^^ saved inventory ^^^ |||");
+
+    const modifiedLocation = await parentLocation.addNewInventory(newInventory);
+
+    const updatedLocation = await Location.findById(parentLocation._id)
+    .populate({
+      path: "parentBusiness",
+      model: "Business",
+    })
+      .populate({
+        path: "productList.product",
+        model: "Product",
+      })
+      .populate({
+        path: "inventoryData.inventory",
+        model: "Inventory",
+      })
+      .populate({
+        path: "managers.manager",
+        model: "User",
+      })
+      .populate({
+        path: "staff.staffMember",
+        model: "User",
+      })
 
     res.status(201).json({
       message: "Inventory created successfully",
-      inventory: {
-        ...newInventory._doc,
-        id: newInventory._id,
+      newInventory: {
+        inventory: newInventory._doc,
+        inventoryId: newInventory._id,
       },
+      updatedLocation: updatedLocation,
     });
   } catch (error) {
     console.log(error);

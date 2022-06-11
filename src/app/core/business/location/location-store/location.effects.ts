@@ -13,14 +13,13 @@ import {
   of,
   concatMap,
   catchError,
-  tap,
-  Subscription,
   withLatestFrom,
   // withLatestFrom,
 } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
 import { Location } from '../../business-control/location.model';
+import { Inventory } from '../../business-control/inventory.model';
 
 const BACKEND_URL = environment.apiUrl + '/location';
 
@@ -45,68 +44,6 @@ const handleError = (errorRes: HttpErrorResponse) => {
 
 @Injectable()
 export class LocationEffects {
-  private userAuthSub: Subscription;
-
-  addProductsToLocation$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LocationActions.POSTCreateProductForLocationStart),
-      withLatestFrom(this.store.select('auth')),
-      concatMap(([action, authState]) => {
-        console.log('||| addProductToLocation$ effect called |||===');
-        console.log(action);
-        console.log(authState.userAuth.userId);
-        return this.http
-          .post<{ message: string; updatedActiveLocation: Location }>(
-            BACKEND_URL + '/new-product',
-            {
-              product: action.product,
-              locationId: action.locationId,
-            }
-          )
-          .pipe(
-            map((resData) => {
-              console.log(resData);
-              console.log(resData.message);
-
-              if (resData && resData.updatedActiveLocation) {
-                localStorage.setItem(
-                  'activatedLocation',
-                  JSON.stringify(resData.updatedActiveLocation)
-                );
-
-                this.store.dispatch(
-                  LocationActions.ActivateLocation({
-                    location: resData.updatedActiveLocation,
-                  })
-                );
-                this.store.dispatch(
-                  LocationActions.POSTCreateProductForLocationSuccess()
-                );
-              }
-
-              return LocationActions.GETUserLocationsStart({
-                userId: authState.userAuth.userId,
-                userRole: authState.userAuth.userProfile.role,
-              });
-            })
-          );
-      }),
-      catchError((errorRes) => {
-        console.log(errorRes);
-        return handleError(errorRes);
-      })
-    )
-  );
-
-  // activateLocation$ = createEffect(
-  //   () => this.actions$.pipe(
-  //     ofType(LocationActions.ActivateLocation)),
-  //     switchMap(async (action) => {
-  //       return localStorage.setItem(
-  //         'activatedLocation',
-  //         JSON.stringify(action.location)
-  //       );
-  //     })
 
   fetchUserLocations$ = createEffect(() =>
     this.actions$.pipe(
@@ -154,6 +91,114 @@ export class LocationEffects {
       })
     )
   );
+
+  addNewInventory$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(LocationActions.POSTCreateInventoryForLocationStart),
+    withLatestFrom(this.store.select('auth')),
+    concatMap(([action, authState]) => {
+      console.log('||| addProductToLocation$ effect called |||===');
+      console.log(action);
+      console.log('||| ^^^ action ^^^ |||');
+
+      return this.http
+        .post<{
+          message: string,
+          newInventory: {
+            inventory: Inventory,
+            inventoryId: string,
+          },
+          updatedLocation: Location
+        }>(BACKEND_URL + "/new-inventory",
+        {
+          location: action.location,
+          inventory: action.inventory
+        }
+        )
+        .pipe(
+          map((resData) => {
+            console.log(resData);
+            console.log("||| ^^^ resData ^^^ |||");
+
+            if (resData && resData.updatedLocation) {
+              localStorage.setItem(
+                'activatedLocation',
+                JSON.stringify(resData.updatedLocation)
+              );
+
+              this.store.dispatch(
+                LocationActions.ActivateLocation({
+                  location: resData.updatedLocation,
+                })
+              );
+              this.store.dispatch(
+                LocationActions.POSTCreateProductForLocationSuccess()
+              );
+            }
+
+            return LocationActions.GETUserLocationsStart({
+              userId: authState.userAuth.userId,
+              userRole: authState.userAuth.userProfile.role,
+            });
+          })
+        )
+    }),
+    catchError((errorRes) => {
+      console.log(errorRes);
+      return handleError(errorRes);
+    })
+  ))
+
+  addProductsToLocation$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(LocationActions.POSTCreateProductForLocationStart),
+    withLatestFrom(this.store.select('auth')),
+    concatMap(([action, authState]) => {
+      console.log('||| addProductToLocation$ effect called |||===');
+      console.log(action);
+      console.log(authState.userAuth.userId);
+      return this.http
+        .post<{ message: string; updatedActiveLocation: Location }>(
+          BACKEND_URL + '/new-product',
+          {
+            product: action.product,
+            locationId: action.locationId,
+          }
+        )
+        .pipe(
+          map((resData) => {
+            console.log(resData);
+            console.log(resData.message);
+
+            if (resData && resData.updatedActiveLocation) {
+              localStorage.setItem(
+                'activatedLocation',
+                JSON.stringify(resData.updatedActiveLocation)
+              );
+
+              this.store.dispatch(
+                LocationActions.ActivateLocation({
+                  location: resData.updatedActiveLocation,
+                })
+              );
+              this.store.dispatch(
+                LocationActions.POSTCreateProductForLocationSuccess()
+              );
+            }
+
+            return LocationActions.GETUserLocationsStart({
+              userId: authState.userAuth.userId,
+              userRole: authState.userAuth.userProfile.role,
+            });
+          })
+        );
+    }),
+    catchError((errorRes) => {
+      console.log(errorRes);
+      return handleError(errorRes);
+    })
+  )
+);
 
   constructor(
     private actions$: Actions,
