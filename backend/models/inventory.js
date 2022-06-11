@@ -12,7 +12,7 @@ const inventorySchema = mongoose.Schema({
         required: false,
         ref: "Product",
       },
-      quantity: { type: Number, required: false },
+      quantity: { type: Number, required: false, default: 0 },
     },
   ],
 });

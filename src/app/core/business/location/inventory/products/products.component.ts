@@ -39,6 +39,8 @@ export class ProductsComponent implements OnInit {
 
   bizLoading: boolean;
 
+  newProductForm: NgForm;
+
   locationState: LocationState;
   activeLocation: Location;
   activeProducts: Product[] = [];
@@ -47,17 +49,17 @@ export class ProductsComponent implements OnInit {
   defaultUnits: UnitsCategories;
 
   productName: string = null;
-
+  productStatusInput = 'Active';
 
   ngOnInit() {
     this.productCategories = defaultCategories;
     this.defaultUnits = defaultUnits;
 
     this.userAuthSub = this.store
-    .select('auth')
-    .pipe(map((authState) => authState.userAuth))
-    .subscribe((user) => {
-      console.log(user);
+      .select('auth')
+      .pipe(map((authState) => authState.userAuth))
+      .subscribe((user) => {
+        console.log(user);
         this.user = user;
         if (!!user) {
           switch (user.userProfile.role) {
@@ -74,7 +76,6 @@ export class ProductsComponent implements OnInit {
         }
       });
 
-
     this.locationStoreSub = this.store
       .select('location')
       .subscribe((locState) => {
@@ -84,16 +85,21 @@ export class ProductsComponent implements OnInit {
         this.activeProducts = locState.activeProducts;
       });
 
-      this.businessStoreLoadingSub = this.store
-        .select('business')
-        .pipe(map((bizState) => bizState.loading))
-        .subscribe((loading) => this.bizLoading = loading)
-
+    this.businessStoreLoadingSub = this.store
+      .select('business')
+      .pipe(map((bizState) => bizState.loading))
+      .subscribe((loading) => (this.bizLoading = loading));
   }
 
   onProductNameInput(name: string) {
     console.log(name);
     this.productName = name;
+  }
+
+  onProductStatusSelect(checked: boolean) {
+    checked
+      ? (this.productStatusInput = 'Active')
+      : (this.productStatusInput = 'Inactive');
   }
 
   onResetForm(form: NgForm) {
@@ -113,6 +119,7 @@ export class ProductsComponent implements OnInit {
         product: {
           _id: null,
           parentOrg: this.activeLocation._id,
+          isActive: newProductForm.value.isActive,
           department: this.user.userProfile.department,
           category: newProductForm.value.category,
           name: newProductForm.value.name,
@@ -130,9 +137,13 @@ export class ProductsComponent implements OnInit {
   }
 
   onProductSelect(checked: boolean, product: Product) {
-    this.locationService.selectProducts(checked, [...this.activeProducts], product);
+    this.locationService.selectProducts(
+      checked,
+      [...this.activeProducts],
+      product
+    );
     // LOG THE CURRENT STATE FOR CONFIRMATION
-    console.log(this.activeProducts) // COMPONENT COPY
+    console.log(this.activeProducts); // COMPONENT COPY
     console.log(this.locationState.activeProducts); // STORE DATA
   }
 

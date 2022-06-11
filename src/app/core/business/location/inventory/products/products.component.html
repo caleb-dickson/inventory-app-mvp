@@ -86,7 +86,7 @@
                 #unitSize
               />
               <!-- <span matSuffix class="unit-suffix"> {{ unit ? unit.value : null }} </span> -->
-              <mat-error>Please enter a valid unit size.</mat-error>
+              <mat-error>Please enter the item's size.</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="short">
@@ -133,7 +133,7 @@
                 name="unitsPerPack"
                 #unitsPerPack
               />
-              <mat-error>Please enter a valid unit size.</mat-error>
+              <mat-error>Please enter a valid pack size.</mat-error>
             </mat-form-field>
           </div>
 
@@ -145,7 +145,7 @@
                 matSuffix
                 matTooltip="Periodic Automatic Replacement (PAR).
                 This is weekly usage, PLUS buffer stock DIVIDED by deliveries each inventory period.
-                If not divided into packs just enter number of cases.
+                If case not divided into packs just enter number of cases.
                 (You can update this number for each inventory)"
                 >help_outline</mat-icon
               >
@@ -177,7 +177,7 @@
                 individual items overall in the case."
                 >help_outline</mat-icon
               >
-              <mat-error>Please enter a valid pack size.</mat-error>
+              <mat-error>Please enter a valid case size.</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="ms-2">
@@ -191,37 +191,57 @@
                 name="casePrice"
                 #casePrice
               />
-              <mat-error>Please enter a valid pack price.</mat-error>
+              <mat-error>Please enter a valid case price.</mat-error>
             </mat-form-field>
+          </div>
+
+          <div class="toggle">
+            <br />
+            <mat-slide-toggle
+              ngModel="productStatusInput"
+              matInput
+              #isActive
+              name="isActive"
+              (change)="onProductStatusSelect($event.checked)"
+              [checked]="productStatusInput === 'Active' ? true : false"
+              [value]="checked"
+            >
+              {{ productStatusInput }}
+              <mat-icon
+                matTooltip="Sets the inventory status of this product.
+                Set to 'Inactive' if you don't immediately plan to track
+                this product in this location's inventory."
+                >help_outline</mat-icon
+              >
+            </mat-slide-toggle>
           </div>
         </form>
       </mat-card-content>
 
-      <mat-card-actions> </mat-card-actions>
+      <mat-card-actions align="end">
+        <button
+          mat-raised-button
+          type="button"
+          (click)="onResetForm(newProductForm)"
+        >
+          Reset
+        </button>
+        <mat-spinner
+          diameter="70"
+          strokeWidth="5"
+          *ngIf="locationState.loading"
+        ></mat-spinner>
+        <button
+          *ngIf="!locationState.loading"
+          mat-raised-button
+          type="submit"
+          [disabled]="newProductForm.invalid"
+          (click)="onNewProductSubmit(newProductForm)"
+        >
+          Submit
+        </button>
+      </mat-card-actions>
     </mat-card>
-    <mat-action-row>
-      <button
-        mat-raised-button
-        type="button"
-        (click)="onResetForm(newProductForm)"
-      >
-        Reset
-      </button>
-      <mat-spinner
-        diameter="70"
-        strokeWidth="5"
-        *ngIf="locationState.loading"
-      ></mat-spinner>
-      <button
-        *ngIf="!locationState.loading"
-        mat-raised-button
-        type="submit"
-        [disabled]="newProductForm.invalid"
-        (click)="onNewProductSubmit(newProductForm)"
-      >
-        Submit
-      </button>
-    </mat-action-row>
   </mat-expansion-panel>
 
   <div class="spinner">
@@ -269,6 +289,7 @@
       </mat-card-title>
       <mat-card-content>
         <p>{{ product.product.department | uppercase }}</p>
+        <p> Status: {{ product.product.isActive ? 'Active' : 'Inactive' }} </p>
         <p>{{ product.product.category }}</p>
         <p>
           {{
@@ -293,8 +314,7 @@
           {{
             (product.product.name | titlecase) +
               " per case: " +
-                product.product.unitsPerPack *
-                product.product.packsPerCase
+              product.product.unitsPerPack * product.product.packsPerCase
           }}
         </p>
         <p>Case price: {{ product.product.casePrice | currency }}</p>

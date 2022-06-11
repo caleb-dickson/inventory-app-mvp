@@ -122,6 +122,7 @@ exports.createProduct = async (req, res, next) => {
   try {
     const product = new Product({
       parentOrg: req.body.product.parentOrg,
+      isActive: req.body.product.isActive,
       department: req.body.product.department,
       category: req.body.product.category,
       name: req.body.product.name,

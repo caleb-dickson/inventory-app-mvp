@@ -41,6 +41,11 @@
       .hint {
         margin-block-end: 2rem;
       }
+      .toggle {
+        display: flex;
+        justify-content: end;
+        margin: 1rem
+      }
       .underline {
         text-decoration: underline;
       }

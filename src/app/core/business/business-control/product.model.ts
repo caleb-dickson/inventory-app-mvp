@@ -3,6 +3,7 @@ export interface Unit { singular: string, plural: string }
 export class Product {
   public _id: string | null;
   public parentOrg: string;
+  public isActive: boolean;
   public department: string;
   public category: string;
   public name: string;
@@ -16,6 +17,7 @@ export class Product {
   constructor(
     _id: string | null,
     parentOrg: string,
+    isActive: boolean,
     department: string,
     category: string,
     name: string,
@@ -28,6 +30,7 @@ export class Product {
   ) {
     this._id = _id;
     this.parentOrg = parentOrg;
+    this.isActive = isActive;
     this.department = department;
     this.category = category;
     this.name = name;

@@ -1,5 +1,11 @@
 import { Component, Injectable, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  NgForm,
+  Validators,
+} from '@angular/forms';
 import { DateAdapter } from '@angular/material/core';
 import {
   MatDateRangeSelectionStrategy,
@@ -19,6 +25,7 @@ import { Product } from '../../../business-control/product.model';
 
 import { LocationService } from '../../location-control/location.service';
 import { User } from 'src/app/auth/auth-control/user.model';
+import { Router } from '@angular/router';
 
 // THIS WILL BE SET BY THE BUSINESS OWNER IN THE FUTURE, FOR ALL LOCATIONS
 // Example: a two-week inventory period
@@ -69,6 +76,7 @@ export class RangeSelectionStrategy<D>
 export class NewInventoryComponent implements OnInit {
   constructor(
     private locationService: LocationService,
+    private router: Router,
     private store: Store<fromAppStore.AppState>
   ) {}
 
@@ -80,12 +88,14 @@ export class NewInventoryComponent implements OnInit {
   userDept: string;
 
   locationState: LocationState;
+  locationStateError: string;
   activeLocation: Location;
 
   loading: boolean;
 
   locationProducts: any[];
-  departmentProducts: StoredProduct[] = [];
+  inventoryProducts: StoredProduct[] = [];
+  initInvProducts = true;
 
   selectedProducts: Product[] = [];
   activeProducts: Product[] = [];
@@ -93,6 +103,7 @@ export class NewInventoryComponent implements OnInit {
   inventoryForm: FormGroup;
   inventoryValue: number;
   formIsFinal = false;
+  formError: string;
 
   inventoryPeriod = businessInventoryPeriod;
 
@@ -103,9 +114,7 @@ export class NewInventoryComponent implements OnInit {
       .subscribe((user) => {
         console.log(user);
         this.user = user;
-        if (user) {
-          this.userDept = user.userProfile.department;
-
+        if (!!user) {
           switch (user.userProfile.role) {
             case 3:
               this.userRole = 'owner';
@@ -117,8 +126,10 @@ export class NewInventoryComponent implements OnInit {
               this.userRole = 'staff';
               break;
           }
+          this.userDept = user.userProfile.department;
         }
         console.log(this.user);
+        console.log(this.userRole);
       });
 
     this.locationStoreSub = this.store
@@ -127,6 +138,7 @@ export class NewInventoryComponent implements OnInit {
         console.log(locState);
         this.locationState = locState;
         this.loading = locState.loading;
+        this.locationStateError = locState.locationError;
         this.activeProducts = locState.activeProducts;
         this.activeLocation = locState.activeLocation;
         if (
@@ -134,54 +146,44 @@ export class NewInventoryComponent implements OnInit {
           locState.activeLocation.productList &&
           locState.activeLocation.productList.length > 0
         ) {
-          for (const product of locState.activeLocation.productList) {
-            let productDept = product.product.department;
-
-            if (productDept === this.user.userProfile.department) {
-              this.departmentProducts.push(product);
-            }
-          }
-          console.log(this.departmentProducts);
-
-          // if (this.userRole !== 'owner' || this.userDept !== 'admin') {
-          //   this.locationProducts = this.departmentProducts;
-          // } else {
-          // }
           this.locationProducts = locState.activeLocation.productList;
 
+          if (this.initInvProducts && this.userDept !== 'admin') {
+            this.setProductList();
+          } else {
+            this.inventoryProducts = locState.activeLocation.productList;
+          }
           this.initInventoryForm();
+
           console.log(this.locationProducts);
           console.log(this.inventoryItemControls);
           console.log(this.activeLocation);
+          console.log(this.inventoryProducts);
         }
       });
-    console.log(this.userRole);
   }
 
-  // onProductSelect(checked: boolean, product: Product) {
-  //   this.locationService.selectProducts(
-  //     checked,
-  //     [...this.activeProducts],
-  //     product
-  //   );
-  //   // LOG THE CURRENT STATE FOR CONFIRMATION
-  //   console.log(this.activeProducts); // COMPONENT COPY
-  //   console.log(this.locationState.activeProducts); // STORE DATA
-  // }
+  setProductList() {
+    for (const product of this.locationState.activeLocation.productList) {
+      let productDept = product.product.department;
 
-  // onProductSelect() {}
-
-  onInventorySubmitDraft() {
-    if (this.inventoryForm.invalid) {
-      this.store.dispatch(
-        LocationActions.LocationError({ errorMessage: 'Form Invalid' })
-      );
+      if (
+        productDept === this.user.userProfile.department &&
+        product.product.isActive
+      ) {
+        this.inventoryProducts.push(product);
+        console.log(product);
+      }
     }
-
-    console.log(this.inventoryForm.value);
+    this.initInvProducts = false;
+    console.log(this.inventoryProducts);
   }
 
-  onInventorySubmitFinal(inventoryForm: NgForm) {
+  onResetInventoryForm() {
+    this.inventoryForm.reset();
+  }
+
+  onInventorySubmit(inventoryForm: NgForm) {
     if (inventoryForm.invalid) {
       this.store.dispatch(
         LocationActions.LocationError({ errorMessage: 'Form Invalid' })
@@ -190,38 +192,31 @@ export class NewInventoryComponent implements OnInit {
       this.formIsFinal = true;
       console.log(inventoryForm.value);
     }
+    console.log(this.locationState);
+    console.log(this.inventoryProducts);
+    console.log(this.inventoryForm.value);
 
+    this.store.dispatch(
+      LocationActions.POSTCreateInventoryForLocationStart({
+        inventory: inventoryForm.value,
+      })
+    );
+
+    this.router.navigate(['/app/dashboard']);
   }
-
-  // GETS AND HOLDS THE LIST OF inventoryForm CONTROLS
 
   private initInventoryForm() {
     let items = new FormArray([]);
 
-    if (this.userRole !== 'owner' || this.userDept !== 'admin') {
-      for (const product of this.departmentProducts) {
-        let productId = product.product._id;
-        let quantity: number;
+    for (const product of this.inventoryProducts) {
+      let productId = product.product._id;
 
-        items.push(
-          new FormGroup({
-            product: new FormControl(productId, Validators.required),
-            quantity: new FormControl(quantity, Validators.required),
-          })
-        );
-      }
-    } else {
-      for (const product of this.locationProducts) {
-        let productId = product.product._id;
-        let quantity: number;
-
-        items.push(
-          new FormGroup({
-            product: new FormControl(productId, Validators.required),
-            quantity: new FormControl(quantity, Validators.required),
-          })
-        );
-      }
+      items.push(
+        new FormGroup({
+          product: new FormControl(productId, Validators.required),
+          quantity: new FormControl(0),
+        })
+      );
     }
 
     this.inventoryForm = new FormGroup({
@@ -234,6 +229,7 @@ export class NewInventoryComponent implements OnInit {
     console.log(this.inventoryForm.value);
   }
 
+  // GETS AND HOLDS THE LIST OF inventoryForm CONTROLS
   get inventoryItemControls() {
     return (<FormArray>this.inventoryForm.get('inventory')).controls;
   }

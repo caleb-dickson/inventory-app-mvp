@@ -32,11 +32,7 @@
 >
   <h4>
     Add
-    {{
-      this.userDept !== "admin"
-        ? (userDept | uppercase)
-        : null
-    }}
+    {{ this.userDept !== "admin" ? (userDept | uppercase) : null }}
     products to the {{ locationState.activeLocation.locationName }} location to
     start a new inventory.
   </h4>
@@ -62,12 +58,14 @@
               <input
                 matInput
                 matStartDate
+                required
                 placeholder="Start date"
                 formControlName="dateStart"
               />
               <input
                 matInput
                 matEndDate
+                required
                 placeholder="End date"
                 formControlName="dateEnd"
               />
@@ -88,9 +86,7 @@
             *ngFor="
               let control of inventoryItemControls;
               let product;
-              of: this.userRole !== 'owner' || this.userDept !== 'admin'
-                ? departmentProducts
-                : locationProducts;
+              of: inventoryProducts;
               let i = index
             "
             [formGroupName]="i"
@@ -144,39 +140,65 @@
             </div>
           </mat-card>
         </div>
-        <div class="inventory-card-submit-status">
-          <mat-label>Save Type</mat-label>
-          <mat-radio-group #isFinal formControlName="isFinal" [value]="selected">
+        <div
+          *ngIf="user.userProfile.role > 1"
+          class="inventory-card-submit-status"
+        >
+          <mat-label>Save as:</mat-label>
+          <mat-radio-group
+            required
+            #isFinal
+            formControlName="isFinal"
+            [value]="selected"
+          >
             <mat-radio-button [value]="true">Final</mat-radio-button>
             <mat-radio-button [value]="false">Draft</mat-radio-button>
           </mat-radio-group>
         </div>
-
       </form>
     </mat-card-content>
     <mat-card-actions align="center">
-
+      <mat-error *ngIf="locationStateError">
+        {{ locationStateError }}
+      </mat-error>
+      <mat-error *ngIf="inventoryForm.dirty && inventoryForm.invalid">
+        Please complete all fields to save.
+      </mat-error>
       <button
+        *ngIf="userRole !== 'staff' || userDept === 'admin'"
         mat-raised-button
+        #invSubmit
         type="submit"
-        (click)="
-          userRole === 'manager'
-            ? (formIsFinal = true - onInventorySubmitFinal(inventoryForm))
-            : onInventorySubmitDraft(inventoryForm)
-        "
+        (click)="onInventorySubmit(inventoryForm)"
+        [disabled]="inventoryForm.invalid"
       >
-        {{ userRole !== "staff" ? "Finalize" : "Submit for Approval" }}
+        {{
+          inventoryForm.value.isFinal
+            ? "Finalize and Submit"
+            : "Save Working Draft"
+        }}
       </button>
-      <br />
-      <br />
-      <button mat-raised-button type="button" color="primary">Reset</button>
       <button
+        *ngIf="userRole === 'staff' && userDept !== 'admin'"
         mat-raised-button
         type="button"
         color="accent"
         (click)="onInventorySubmitDraft(inventoryForm)"
+        [disabled]="inventoryForm.invalid"
       >
-        Save Draft
+        Save
+      </button>
+
+      <br />
+      <br />
+      <button
+        mat-raised-button
+        type="button"
+        color="primary"
+        (click)="onResetInventoryForm()"
+        [disabled]="!inventoryForm.touched"
+      >
+        Reset
       </button>
     </mat-card-actions>
   </mat-card>

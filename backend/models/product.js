@@ -6,6 +6,7 @@ const productSchema = mongoose.Schema({
     required: true,
     // ref: "Business", REMOVED, MAY CAUSE BUGS?
   },
+  isActive: { type: Boolean, required: true, default: true },
   department: { type: String, required: true },
   category: { type: String, required: true },
   name: { type: String, required: true },
