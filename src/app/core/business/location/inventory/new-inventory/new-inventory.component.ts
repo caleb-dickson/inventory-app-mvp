@@ -26,6 +26,7 @@ import { Product } from '../../../business-control/product.model';
 import { LocationService } from '../../location-control/location.service';
 import { User } from 'src/app/auth/auth-control/user.model';
 import { Router } from '@angular/router';
+import { Inventory } from '../../../business-control/inventory.model';
 
 // THIS WILL BE SET BY THE BUSINESS OWNER IN THE FUTURE, FOR ALL LOCATIONS
 // Example: a two-week inventory period
@@ -90,6 +91,8 @@ export class NewInventoryComponent implements OnInit {
   locationState: LocationState;
   locationStateError: string;
   activeLocation: Location;
+  inventoryData: any[];
+  workingInventory: any[] = [];
 
   loading: boolean;
 
@@ -147,6 +150,7 @@ export class NewInventoryComponent implements OnInit {
           locState.activeLocation.productList.length > 0
         ) {
           this.locationProducts = locState.activeLocation.productList;
+          this.inventoryData = locState.activeLocation.inventoryData;
 
           if (this.initInvProducts && this.userDept !== 'admin') {
             this.setProductList();
@@ -159,8 +163,24 @@ export class NewInventoryComponent implements OnInit {
           console.log(this.inventoryItemControls);
           console.log(this.activeLocation);
           console.log(this.inventoryProducts);
+          console.log(this.inventoryData);
         }
       });
+
+    if (this.inventoryData) {
+      this.store.dispatch(
+        LocationActions.GETLocationInventoriesStart({
+          locationId: this.locationState.activeLocation._id,
+        })
+      );
+
+      this.inventoryData.forEach((inventory) => {
+        if (!inventory.inventory.isFinal) {
+          this.workingInventory.push(inventory.inventory);
+        }
+      });
+      console.log(this.workingInventory);
+    }
   }
 
   setProductList() {

@@ -44,6 +44,48 @@ const handleError = (errorRes: HttpErrorResponse) => {
 
 @Injectable()
 export class LocationEffects {
+  fetchLocationInventories$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(LocationActions.GETLocationInventoriesStart),
+      switchMap((action) => {
+        console.log('||| fetchLocationInventories$ effect called |||===');
+        console.log(action);
+
+        return this.http.get<{ fetchedInventories: Inventory[], message: string }>(
+          BACKEND_URL + '/fetch-location-inventories/' + action.locationId
+        ).pipe(
+          map((resData) => {
+            console.log(resData);
+            console.log("||| ^^^ resData ^^^ |||");
+            if (
+              resData &&
+              resData.fetchedInventories &&
+              resData.fetchedInventories.length > 0
+            ) {
+              const inventoryData = resData.fetchedInventories;
+              localStorage.setItem(
+                'inventoryData',
+                JSON.stringify(inventoryData)
+              );
+              return LocationActions.GETLocationInventoriesSuccess();
+            } else {
+              return LocationActions.LocationError({
+                errorMessage:
+                  'No authorized locations found. Ask the account owner for access.',
+              });
+            }
+
+
+
+          })
+        );
+      }),
+      catchError((errorRes) => {
+        console.log(errorRes);
+        return handleError(errorRes);
+      })
+    )
+  );
 
   fetchUserLocations$ = createEffect(() =>
     this.actions$.pipe(
@@ -93,112 +135,111 @@ export class LocationEffects {
   );
 
   addNewInventory$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(LocationActions.POSTCreateInventoryForLocationStart),
-    withLatestFrom(this.store.select('auth')),
-    concatMap(([action, authState]) => {
-      console.log('||| addProductToLocation$ effect called |||===');
-      console.log(action);
-      console.log('||| ^^^ action ^^^ |||');
+    this.actions$.pipe(
+      ofType(LocationActions.POSTCreateInventoryForLocationStart),
+      withLatestFrom(this.store.select('auth')),
+      concatMap(([action, authState]) => {
+        console.log('||| addProductToLocation$ effect called |||===');
+        console.log(action);
+        console.log('||| ^^^ action ^^^ |||');
 
-      return this.http
-        .post<{
-          message: string,
-          newInventory: {
-            inventory: Inventory,
-            inventoryId: string,
-          },
-          updatedLocation: Location
-        }>(BACKEND_URL + "/new-inventory",
-        {
-          location: action.location,
-          inventory: action.inventory
-        }
-        )
-        .pipe(
-          map((resData) => {
-            console.log(resData);
-            console.log("||| ^^^ resData ^^^ |||");
-
-            if (resData && resData.updatedLocation) {
-              localStorage.setItem(
-                'activatedLocation',
-                JSON.stringify(resData.updatedLocation)
-              );
-
-              this.store.dispatch(
-                LocationActions.ActivateLocation({
-                  location: resData.updatedLocation,
-                })
-              );
-              this.store.dispatch(
-                LocationActions.POSTCreateProductForLocationSuccess()
-              );
-            }
-
-            return LocationActions.GETUserLocationsStart({
-              userId: authState.userAuth.userId,
-              userRole: authState.userAuth.userProfile.role,
-            });
+        return this.http
+          .post<{
+            message: string;
+            newInventory: {
+              inventory: Inventory;
+              inventoryId: string;
+            };
+            updatedLocation: Location;
+          }>(BACKEND_URL + '/new-inventory', {
+            location: action.location,
+            inventory: action.inventory,
           })
-        )
-    }),
-    catchError((errorRes) => {
-      console.log(errorRes);
-      return handleError(errorRes);
-    })
-  ))
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              console.log('||| ^^^ resData ^^^ |||');
+
+              if (resData && resData.updatedLocation) {
+                localStorage.setItem(
+                  'activatedLocation',
+                  JSON.stringify(resData.updatedLocation)
+                );
+
+                this.store.dispatch(
+                  LocationActions.ActivateLocation({
+                    location: resData.updatedLocation,
+                  })
+                );
+                this.store.dispatch(
+                  LocationActions.POSTCreateProductForLocationSuccess()
+                );
+              }
+
+              return LocationActions.GETUserLocationsStart({
+                userId: authState.userAuth.userId,
+                userRole: authState.userAuth.userProfile.role,
+              });
+            })
+          );
+      }),
+      catchError((errorRes) => {
+        console.log(errorRes);
+        return handleError(errorRes);
+      })
+    )
+  );
 
   addProductsToLocation$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(LocationActions.POSTCreateProductForLocationStart),
-    withLatestFrom(this.store.select('auth')),
-    concatMap(([action, authState]) => {
-      console.log('||| addProductToLocation$ effect called |||===');
-      console.log(action);
-      console.log(authState.userAuth.userId);
-      return this.http
-        .post<{ message: string; updatedActiveLocation: Location }>(
-          BACKEND_URL + '/new-product',
-          {
-            product: action.product,
-            locationId: action.locationId,
-          }
-        )
-        .pipe(
-          map((resData) => {
-            console.log(resData);
-            console.log(resData.message);
-
-            if (resData && resData.updatedActiveLocation) {
-              localStorage.setItem(
-                'activatedLocation',
-                JSON.stringify(resData.updatedActiveLocation)
-              );
-
-              this.store.dispatch(
-                LocationActions.ActivateLocation({
-                  location: resData.updatedActiveLocation,
-                })
-              );
-              this.store.dispatch(
-                LocationActions.POSTCreateProductForLocationSuccess()
-              );
+    this.actions$.pipe(
+      ofType(LocationActions.POSTCreateProductForLocationStart),
+      withLatestFrom(this.store.select('auth')),
+      concatMap(([action, authState]) => {
+        console.log('||| addProductToLocation$ effect called |||===');
+        console.log(action);
+        console.log(authState.userAuth.userId);
+        return this.http
+          .post<{ message: string; updatedActiveLocation: Location }>(
+            BACKEND_URL + '/new-product',
+            {
+              product: action.product,
+              locationId: action.locationId,
             }
+          )
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              console.log(resData.message);
 
-            return LocationActions.GETUserLocationsStart({
-              userId: authState.userAuth.userId,
-              userRole: authState.userAuth.userProfile.role,
-            });
-          })
-        );
-    }),
-    catchError((errorRes) => {
-      console.log(errorRes);
-      return handleError(errorRes);
-    })
-  )
-);
+              if (resData && resData.updatedActiveLocation) {
+                localStorage.setItem(
+                  'activatedLocation',
+                  JSON.stringify(resData.updatedActiveLocation)
+                );
+
+                this.store.dispatch(
+                  LocationActions.ActivateLocation({
+                    location: resData.updatedActiveLocation,
+                  })
+                );
+                this.store.dispatch(
+                  LocationActions.POSTCreateProductForLocationSuccess()
+                );
+              }
+
+              return LocationActions.GETUserLocationsStart({
+                userId: authState.userAuth.userId,
+                userRole: authState.userAuth.userProfile.role,
+              });
+            })
+          );
+      }),
+      catchError((errorRes) => {
+        console.log(errorRes);
+        return handleError(errorRes);
+      })
+    )
+  );
 
   constructor(
     private actions$: Actions,

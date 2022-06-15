@@ -15,6 +15,16 @@ export const GETUserLocationsSuccess = createAction(
   props<{ locations: Location[] }>()
 );
 
+// WORKING
+export const GETLocationInventoriesStart = createAction(
+  '[Location] Fetch a List of Location Inventories START',
+  props<{ locationId: string }>()
+);
+// WORKING
+export const GETLocationInventoriesSuccess = createAction(
+  '[Location] Fetch a List of Location Inventories SUCCESS'
+);
+
 
 export const PUTUpdateManagerLocationStart = createAction(
   '[Location] Fetch Locations Where User is Authorized START',
@@ -61,10 +71,10 @@ export const ActivateLocation = createAction(
   '[Location] Select a Location as Activated',
   props<{ location: Location }>()
 );
-export const ActivateInventory = createAction(
-  '[Location] Select an Inventory as Activated',
-  props<{ inventory: Inventory }>()
-);
+// export const ActivateInventory = createAction(
+//   '[Location] Select an Inventory as Activated',
+//   props<{ inventory: Inventory }>()
+// );
 export const ActivateProducts = createAction(
   '[Location] Select Products as Activated',
   props<{ products: Product[] }>()

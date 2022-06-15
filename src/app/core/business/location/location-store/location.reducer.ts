@@ -30,6 +30,8 @@ export function locationReducer(
   return createReducer(
     initialState,
 
+    // FETCH/READ
+    // User's Locations
     on(LocationActions.GETUserLocationsStart, (state) => ({
       ...state,
       loading: true,
@@ -39,6 +41,18 @@ export function locationReducer(
       loading: false,
       userLocations: action.locations,
     })),
+    // Location Populated Inventory List
+    on(LocationActions.GETLocationInventoriesStart, (state) => ({
+      ...state,
+      loading: true,
+    })),
+    on(LocationActions.GETLocationInventoriesSuccess, (state) => ({
+      ...state,
+      loading: false,
+    })),
+
+
+    // UPDATE
     on(LocationActions.PUTUpdateManagerLocationStart, (state) => ({
       ...state,
       loading: true,
@@ -49,6 +63,8 @@ export function locationReducer(
       userLocations: action.locations,
     })),
 
+
+    // CREATE
     on(LocationActions.POSTCreateProductForLocationStart, (state) => ({
       ...state,
       loading: true,
@@ -66,14 +82,16 @@ export function locationReducer(
       loading: false,
     })),
 
+
+    // SELECT
     on(LocationActions.ActivateLocation, (state, action) => ({
       ...state,
       activeLocation: action.location,
     })),
-    on(LocationActions.ActivateInventory, (state, action) => ({
-      ...state,
-      activeInventory: action.inventory,
-    })),
+    // on(LocationActions.ActivateInventory, (state, action) => ({
+    //   ...state,
+    //   activeInventory: action.inventory,
+    // })),
     on(LocationActions.ActivateProducts, (state, action) => ({
       ...state,
       activeProducts: action.products,
@@ -85,6 +103,8 @@ export function locationReducer(
       loading: false,
     })),
 
+
+    // CLEAR STATE ON LOGOUT
     on(LocationActions.clearLocationState, (state) => ({
       userLocations: [],
       activeLocation: null,

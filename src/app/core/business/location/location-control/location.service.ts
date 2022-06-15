@@ -12,6 +12,7 @@ import { LocationIds } from '../../business-control/business.model';
 import { LocationState } from '../location-store/location.reducer';
 import { BusinessState } from '../../business-store/business.reducer';
 import { Product } from '../../business-control/product.model';
+import { Actions } from '@ngrx/effects';
 
 @Injectable({
   providedIn: 'root',
@@ -52,7 +53,7 @@ export class LocationService {
       'activatedLocation',
       JSON.stringify(activatedLocation)
     );
-    this.store.dispatch(
+    return this.store.dispatch(
       LocationActions.ActivateLocation({
         location: activatedLocation,
       })

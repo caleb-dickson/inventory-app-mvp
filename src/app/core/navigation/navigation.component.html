@@ -9,6 +9,7 @@
     [opened]="(isHandset$ | async) === false"
   >
     <mat-toolbar>
+      <!-- **OWNER** -->
       <span *ngIf="userRole === 'owner'" class="sidenav-owner-name">
         {{
           businessState.business
@@ -16,36 +17,39 @@
             : user.userProfile.firstName + " " + user.userProfile.lastName
         }}
       </span>
+      <!-- **NON-OWNER** -->
       <span *ngIf="userRole !== 'owner'" class="sidenav-non-owner-name">
         {{ user.userProfile.firstName + " " + user.userProfile.lastName }}
       </span>
       <br />
     </mat-toolbar>
+    <!-- **USER ROLE & DEPARTMENT** -->
     <p class="sidenav-user-role">
       {{ (userRole | titlecase) + " - " + (userDept | uppercase) }}
     </p>
+    <!-- **THEME CONTROL** -->
     <mat-slide-toggle
       (change)="onThemeModeSwitched($event)"
       [checked]="user.userProfile.themePref === 'theme-dark' ? true : false"
       >Dark Mode</mat-slide-toggle
     >
     <mat-nav-list>
-      <a mat-list-item href="/app/dashboard" routerLinkActive="active">
+      <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
         <mat-icon class="sidenav-icon">dashboard</mat-icon>Dashboard
       </a>
-      <a mat-list-item href="/app/dashboard" routerLinkActive="active">
+      <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
         <mat-icon class="sidenav-icon">trending_up</mat-icon>Insights
       </a>
-      <a mat-list-item href="/app/products" routerLinkActive="active">
+      <a mat-list-item routerLink="/app/products" routerLinkActive="active">
         <mat-icon class="sidenav-icon">sell</mat-icon>Products
       </a>
-      <a mat-list-item href="/app/new-inventory" routerLinkActive="active">
-        <mat-icon class="sidenav-icon">addchart</mat-icon>New/Current Inventory
+      <a mat-list-item routerLink="/app/new-inventory" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">addchart</mat-icon>Working Inventory
       </a>
       <a
         *ngIf="userRole === 'manager' || 'owner'"
         mat-list-item
-        href="/app/past-inventory"
+        routerLink="/app/past-inventory"
         routerLinkActive="active"
       >
         <mat-icon class="sidenav-icon">history</mat-icon>Past Inventory
@@ -68,7 +72,7 @@
       <a
         *ngIf="userRole === 'owner'"
         mat-list-item
-        href="/app/business"
+        routerLink="/app/business"
         routerLinkActive="active"
       >
         <mat-icon class="sidenav-icon">business</mat-icon>Manage Business
@@ -150,13 +154,13 @@
 
       <!-- **USER* -->
       <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **USER** ONLY HAS ACCESS TO ONE LOCATION -->
+      <!-- ===||| Push this down some |||=== -->
       <a
         *ngIf="userRole !== 'owner' && locationState.userLocations.length === 1"
         mat-list-item
-        routerLinkActive="active"
         (click)="onActivateLocation(locationState.userLocations[0])"
       >
-        <!-- [href]="manageRoute" -->
+        <!-- [routerLink]="manageRoute" -->
         <mat-icon class="sidenav-icon">{{ manageIcon }}</mat-icon
         >{{ singleUserLocationName }}
       </a>
@@ -167,10 +171,10 @@
         {{ locationState.locationError }}
       </mat-error>
 
-      <a mat-list-item href="/app/settings" routerLinkActive="active">
+      <a mat-list-item routerLink="/app/settings" routerLinkActive="active">
         <mat-icon class="sidenav-icon settings">settings</mat-icon>User Settings
       </a>
-      <a mat-list-item href="/app/support" routerLinkActive="active">
+      <a mat-list-item routerLink="/app/support" routerLinkActive="active">
         <mat-icon class="sidenav-icon">support_agent</mat-icon>Tech Support
       </a>
       <a

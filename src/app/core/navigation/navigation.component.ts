@@ -10,7 +10,7 @@ import { BusinessState } from '../business/business-store/business.reducer';
 import { LocationState } from '../business/location/location-store/location.reducer';
 
 import { Observable, Subscription } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { map, shareReplay, take } from 'rxjs/operators';
 
 import { User } from 'src/app/auth/auth-control/user.model';
 
@@ -171,7 +171,9 @@ export class NavigationComponent implements OnInit {
   }
 
   onActivateLocation(activatedLocation: Location) {
-    this.locationService.activateLocation(activatedLocation);
+    if (!this.activatedLocation) {
+      this.locationService.activateLocation(activatedLocation);
+    }
   }
 
   onLogout() {

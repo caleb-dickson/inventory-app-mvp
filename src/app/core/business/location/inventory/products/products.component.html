@@ -261,9 +261,7 @@
 
   <div>
     <button
-      *ngIf="
-        activeProducts.length > 0 && activeLocation.productList.length > 12
-      "
+      *ngIf="activeProducts.length > 0 && activeLocation.productList.length > 6"
       mat-raised-button
       color="primary"
       type="button"
@@ -301,7 +299,8 @@
           per {{ product.product.unitMeasure.singular }}
         </p>
         <p>
-          Unit Size: {{
+          Unit Size:
+          {{
             product.product.unitSize +
               " " +
               (product.product.unitSize > 1

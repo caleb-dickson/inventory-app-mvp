@@ -109,6 +109,7 @@ export class ProductsComponent implements OnInit {
   onNewProductSubmit(newProductForm: NgForm) {
     console.log(newProductForm);
     console.log(newProductForm.value);
+    console.log(this.productStatusInput);
 
     if (!newProductForm.valid) {
       return;
@@ -119,7 +120,7 @@ export class ProductsComponent implements OnInit {
         product: {
           _id: null,
           parentOrg: this.activeLocation._id,
-          isActive: newProductForm.value.isActive,
+          isActive: this.productStatusInput === 'Active' ? true : false,
           department: this.user.userProfile.department,
           category: newProductForm.value.category,
           name: newProductForm.value.name,
