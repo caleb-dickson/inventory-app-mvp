@@ -13,6 +13,7 @@ import { LocationState } from '../location-store/location.reducer';
 import { BusinessState } from '../../business-store/business.reducer';
 import { Product } from '../../business-control/product.model';
 import { Actions } from '@ngrx/effects';
+import { Inventory } from '../../business-control/inventory.model';
 
 @Injectable({
   providedIn: 'root',
@@ -43,8 +44,8 @@ export class LocationService {
   }
 
   activateLocation(activatedLocation: Location) {
-    console.log(activatedLocation)
-    console.log(this.locationState)
+    console.log(activatedLocation);
+    console.log(this.locationState);
     if (!activatedLocation) {
       return;
     }
@@ -86,11 +87,12 @@ export class LocationService {
           BusinessActions.GETBusinessLocationsSuccess({
             locations: businessLocations,
           })
-        ), this.store.dispatch(
-          LocationActions.GETUserLocationsSuccess({
-            locations: businessLocations,
-          })
-        );
+        ),
+          this.store.dispatch(
+            LocationActions.GETUserLocationsSuccess({
+              locations: businessLocations,
+            })
+          );
       } else if (!businessLocations) {
         console.log('||| getting locations from DB |||');
         console.log(storedBusiness);
@@ -138,10 +140,10 @@ export class LocationService {
     );
 
     if (activatedLocation) {
-      console.log(
+      console.warn(
         '||| Found active location: ' + activatedLocation.locationName + ' |||'
       );
-      console.log(activatedLocation)
+      console.log(activatedLocation);
       return this.store.dispatch(
         LocationActions.ActivateLocation({
           location: activatedLocation,
@@ -152,7 +154,11 @@ export class LocationService {
     }
   }
 
-  selectProducts(checked: boolean, activeProducts: Product[], product: Product) {
+  selectProducts(
+    checked: boolean,
+    activeProducts: Product[],
+    product: Product
+  ) {
     // EMPTY TYPED ARRAY FOR THE FILTER
     let updatedSelection: Product[] = [];
 
@@ -182,4 +188,47 @@ export class LocationService {
       })
     );
   }
+
+  // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
+  getPopulatedInventories(
+    initLocInventories: boolean,
+    inventoryData: Inventory[],
+    activeLocationId: string
+  ) {
+    // CHECK LOCALSTORAGE FOR ALREADY FETCHED INVENTORIES
+    const storedInv = JSON.parse(localStorage.getItem('inventoryData'));
+
+    if (storedInv) {
+      // CHECK TO SEE IF ANY DRAFTS ARE IN THE INVs
+      let draft: Inventory = null;
+      for (const inv of storedInv) {
+        if (!inv.isFinal) {
+          draft = inv;
+        }
+      }
+      // SEND INV DATA AND ANY DRAFTS FOUND TO THE STORE
+      this.store.dispatch(
+        LocationActions.GETLocationInventoriesSuccess({
+          inventoryData: storedInv,
+          draft: draft,
+        })
+      );
+    // IF NONE FOUND IN LOCALSTORAGE, FETCH THE POPULATED INVENTORIES
+    } else if (
+      !storedInv &&
+      initLocInventories &&
+      inventoryData &&
+      inventoryData.length > 0
+    ) {
+      this.store.dispatch(
+        LocationActions.GETLocationInventoriesStart({
+          locationId: activeLocationId,
+        })
+      );
+    }
+  }
+
+
+
+
 }

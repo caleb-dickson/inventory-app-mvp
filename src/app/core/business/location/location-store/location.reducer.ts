@@ -9,6 +9,7 @@ export interface LocationState {
   userLocations: Location[];
   activeLocation: Location;
   activeProducts: Product[];
+  activeLocationInventories: Inventory[];
   activeInventory: Inventory;
   locationError: string;
   loading: boolean;
@@ -18,6 +19,7 @@ const initialState: LocationState = {
   userLocations: [],
   activeLocation: null,
   activeProducts: [],
+  activeLocationInventories: [],
   activeInventory: null,
   locationError: null,
   loading: false,
@@ -40,17 +42,22 @@ export function locationReducer(
       ...state,
       loading: false,
       userLocations: action.locations,
+      activeLocation:
+        action.locations.length === 1
+          ? action.locations[0]
+          : state.activeLocation,
     })),
     // Location Populated Inventory List
     on(LocationActions.GETLocationInventoriesStart, (state) => ({
       ...state,
       loading: true,
     })),
-    on(LocationActions.GETLocationInventoriesSuccess, (state) => ({
+    on(LocationActions.GETLocationInventoriesSuccess, (state, action) => ({
       ...state,
       loading: false,
+      activeLocationInventories: [...action.inventoryData],
+      activeInventory: action.draft,
     })),
-
 
     // UPDATE
     on(LocationActions.PUTUpdateManagerLocationStart, (state) => ({
@@ -62,7 +69,18 @@ export function locationReducer(
       loading: false,
       userLocations: action.locations,
     })),
-
+    on(LocationActions.PUTUpdateInventoryForLocationStart, (state) => ({
+      ...state,
+      loading: true,
+    })),
+    on(
+      LocationActions.PUTUpdateInventoryForLocationSuccess,
+      (state, action) => ({
+        ...state,
+        loading: false,
+        activeInventory: action.updatedInventory,
+      })
+    ),
 
     // CREATE
     on(LocationActions.POSTCreateProductForLocationStart, (state) => ({
@@ -81,7 +99,6 @@ export function locationReducer(
       ...state,
       loading: false,
     })),
-
 
     // SELECT
     on(LocationActions.ActivateLocation, (state, action) => ({
@@ -103,12 +120,12 @@ export function locationReducer(
       loading: false,
     })),
 
-
     // CLEAR STATE ON LOGOUT
     on(LocationActions.clearLocationState, (state) => ({
       userLocations: [],
       activeLocation: null,
       activeProducts: [],
+      activeLocationInventories: [],
       activeInventory: null,
       locationError: null,
       loading: false,

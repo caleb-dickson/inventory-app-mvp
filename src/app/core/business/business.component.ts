@@ -57,6 +57,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
   addUserToLocationForm: FormGroup;
 
   ngOnInit() {
+    console.clear();
     // USER STORE
     this.userAuthSub = this.store
       .select('auth')

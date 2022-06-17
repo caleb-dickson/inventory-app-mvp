@@ -4,25 +4,23 @@ import { Inventory } from 'src/app/core/business/business-control/inventory.mode
 import { Product } from 'src/app/core/business/business-control/product.model';
 import { Location } from '../../business-control/location.model';
 
-// DONE
+
 export const GETUserLocationsStart = createAction(
   '[Location] Fetch Locations Where User is Authorized START',
   props<{ userId: string, userRole: number }>()
 );
-// DONE
 export const GETUserLocationsSuccess = createAction(
   '[Location] Fetch Locations Where User is Authorized SUCCESS',
   props<{ locations: Location[] }>()
 );
 
-// WORKING
 export const GETLocationInventoriesStart = createAction(
   '[Location] Fetch a List of Location Inventories START',
   props<{ locationId: string }>()
 );
-// WORKING
 export const GETLocationInventoriesSuccess = createAction(
-  '[Location] Fetch a List of Location Inventories SUCCESS'
+  '[Location] Fetch a List of Location Inventories SUCCESS',
+  props<{ inventoryData: Inventory[], draft: Inventory }>()
 );
 
 
@@ -33,6 +31,17 @@ export const PUTUpdateManagerLocationStart = createAction(
 export const PUTUpdateManagerLocationSuccess = createAction(
   '[Location] Fetch Locations Where User is Authorized SUCCESS',
   props<{ locations: Location[] }>()
+);
+
+// WORKING
+export const PUTUpdateInventoryForLocationStart = createAction(
+  '[Location] Update an Existing Inventory at Location START',
+  props<{ inventory: Inventory }>()
+);
+// WORKING
+export const PUTUpdateInventoryForLocationSuccess = createAction(
+  '[Location] Update an Existing Inventory at Location SUCCESS',
+  props<{ updatedInventory: Inventory }>()
 );
 
 

@@ -30,6 +30,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.storeSub = this.store.select('auth').subscribe((authState) => {
       this.isLoading = authState.loading;
       this.error = authState.authError;
+      console.clear();
       console.log(authState);
     });
   }

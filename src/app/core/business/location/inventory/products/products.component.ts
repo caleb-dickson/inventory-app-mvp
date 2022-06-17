@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
 import { Store } from '@ngrx/store';
@@ -24,15 +24,15 @@ import { User } from 'src/app/auth/auth-control/user.model';
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss'],
 })
-export class ProductsComponent implements OnInit {
+export class ProductsComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<fromAppStore.AppState>,
     private locationService: LocationService
   ) {}
 
-  private userAuthSub: Subscription;
-  private locationStoreSub: Subscription;
-  private businessStoreLoadingSub: Subscription;
+  private _userAuthSub: Subscription;
+  private _locationStoreSub: Subscription;
+  private _businessStoreLoadingSub: Subscription;
 
   user: User;
   userRole: string;
@@ -52,14 +52,15 @@ export class ProductsComponent implements OnInit {
   productStatusInput = 'Active';
 
   ngOnInit() {
+    console.clear();
+
     this.productCategories = defaultCategories;
     this.defaultUnits = defaultUnits;
 
-    this.userAuthSub = this.store
+    this._userAuthSub = this.store
       .select('auth')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((user) => {
-        console.log(user);
         this.user = user;
         if (!!user) {
           switch (user.userProfile.role) {
@@ -76,16 +77,17 @@ export class ProductsComponent implements OnInit {
         }
       });
 
-    this.locationStoreSub = this.store
+    this._locationStoreSub = this.store
       .select('location')
       .subscribe((locState) => {
-        console.log(locState);
         this.locationState = locState;
         this.activeLocation = locState.activeLocation;
         this.activeProducts = locState.activeProducts;
+        console.group('%cLocation State', 'font-size: 1rem', locState);
+        console.groupEnd();
       });
 
-    this.businessStoreLoadingSub = this.store
+    this._businessStoreLoadingSub = this.store
       .select('business')
       .pipe(map((bizState) => bizState.loading))
       .subscribe((loading) => (this.bizLoading = loading));
@@ -151,4 +153,11 @@ export class ProductsComponent implements OnInit {
   // onDeleteSelectedProducts() {
   //   this.selectedProducts = [];
   // }
+
+  ngOnDestroy(): void {
+      this._businessStoreLoadingSub.unsubscribe();
+      this._locationStoreSub.unsubscribe();
+      this._userAuthSub.unsubscribe();
+  }
+
 }

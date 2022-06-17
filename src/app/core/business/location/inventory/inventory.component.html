@@ -1,1 +1,167 @@
-<p>inventory works!</p>
+<div class="inventory">
+  <!-- NO WORKING DRAFTS MESSAGE -->
+  <div *ngIf="!inventoryDataPopulated" class="inventory-message">
+    <p>Finalized inventories will show up here once you created them.</p>
+  </div>
+
+  <div *ngIf="inventoryDataPopulated" class="inventory-main">
+    <mat-form-field appearance="standard">
+      <mat-label>Filter by date</mat-label>
+      <input
+        matInput
+        (keyup)="applyFilter($event)"
+        placeholder="Ex. 5/13/2023"
+        #input
+      />
+    </mat-form-field>
+
+    <mat-table
+    *ngFor="let inv of inventoryDataPopulated"
+    mat-table
+    matRipple
+    [dataSource]="inv.inventory"
+    class="mat-elevation-z8"
+    >
+
+    <!-- Prod Category Column -->
+    <ng-container matColumnDef="category">
+      <mat-header-cell mat-header-cell *matHeaderCellDef>Category</mat-header-cell>
+      <mat-cell mat-cell *matCellDef="let inv">{{ inv.product.category }}</mat-cell>
+    </ng-container>
+
+      <!-- Product Name Column -->
+      <ng-container matColumnDef="product name">
+        <mat-header-cell mat-header-cell *matHeaderCellDef>Product</mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let inv">{{ inv.product.name }}</mat-cell>
+      </ng-container>
+
+      <!-- Department Column -->
+      <ng-container matColumnDef="department">
+        <mat-header-cell mat-header-cell *matHeaderCellDef>Dept.</mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let inv">{{ inv.product.department | uppercase }}</mat-cell>
+      </ng-container>
+
+
+      <!-- Unit Column -->
+      <ng-container matColumnDef="unit">
+        <mat-header-cell mat-header-cell *matHeaderCellDef>Unit</mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let inv">
+          {{ inv.product.unitSize + " " }}
+          {{
+            inv.product.unitSize > 1
+              ? inv.product.unitMeasure.plural
+              : inv.product.unitMeasure.singular
+          }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Case Size Column -->
+      <ng-container matColumnDef="case size">
+        <mat-header-cell mat-header-cell *matHeaderCellDef>Case Size</mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let inv">
+          {{ inv.product.unitsPerPack * inv.product.packsPerCase }}
+          {{
+            inv.product.unitsPerPack > 1
+              ? inv.product.unitMeasure.plural
+              : inv.product.unitMeasure.singular
+          }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Par Column -->
+      <ng-container matColumnDef="packs par">
+        <mat-header-cell mat-header-cell *matHeaderCellDef>Packs Par</mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let inv">{{ inv.product.par }}</mat-cell>
+      </ng-container>
+
+      <!-- Quantity Column -->
+      <ng-container matColumnDef="in stock">
+        <mat-header-cell mat-header-cell *matHeaderCellDef>Qty. in Stock</mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let inv">{{ inv.quantity }}</mat-cell>
+      </ng-container>
+
+      <!-- Inv Value Column -->
+      <ng-container matColumnDef="inventory value">
+        <mat-header-cell mat-header-cell *matHeaderCellDef>Inv. Value</mat-header-cell>
+        <mat-cell mat-cell *matCellDef="let inv">
+          {{
+            (inv.product.casePrice /
+              (inv.product.unitSize *
+                inv.product.unitsPerPack *
+                inv.product.packsPerCase)) *
+              inv.quantity | currency
+          }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- <mat-row mat-row *matRowDef="let inv of inventoryDataPopulated">  </mat-row> -->
+      <mat-header-row mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
+  </div>
+
+  <!-- PAST INVENTORY START -->
+  <!-- <div *ngIf="inventoryDataPopulated" class="inventory-main">
+    <mat-expansion-panel
+      class="inventory-main-expansion"
+      *ngFor="let inv of inventoryDataPopulated"
+    >
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon class="inventory-main-expansion-icon">insert_chart_outlined</mat-icon>
+          {{ inv.dateEnd | date: "shortDate" }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="inventory-main-expansion-card-container">
+        <mat-card class="inventory-main-expansion-card-container-inner">
+          <mat-card-title>
+            {{ inv.department | uppercase }}
+          </mat-card-title>
+          <mat-card-subtitle>
+            Period Ending:
+            {{ inv.dateEnd | date: "shortDate" }}
+          </mat-card-subtitle>
+
+          <mat-card-content>
+
+            <mat-card *ngFor="let item of inv.inventory">
+              <h6> {{ item.product.name }} </h6>
+              <p> {{ item.product.category }} </p>
+              <p> {{ 'Quantity: ' + item.quantity }} </p>
+              <p>
+                Value in Stock:
+                {{
+                  (item.product.casePrice /
+              (item.product.unitSize *
+                item.product.unitsPerPack *
+                item.product.packsPerCase)) * item.quantity | currency
+                }}
+              </p>
+              <p> {{ 'Par: ' + item.product.par }} </p>
+            </mat-card>
+
+
+          </mat-card-content>
+
+          <mat-card-actions align="center">
+            <mat-error *ngIf="locationStateError">
+              {{ locationStateError }}
+            </mat-error>
+
+            <button
+              mat-raised-button
+              type="button"
+              color="primary"
+              (click)="onResetInventoryForm()"
+            >
+              Update
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </mat-expansion-panel>
+  </div> -->
+
+  <!-- PAST INVENTORY END END END -->
+</div>

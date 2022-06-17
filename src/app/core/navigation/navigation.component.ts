@@ -63,6 +63,7 @@ export class NavigationComponent implements OnInit {
   manageRoute: string;
 
   ngOnInit() {
+    console.clear();
     this.userAuthSub = this.store
       .select('auth')
       .pipe(map((authState) => authState.userAuth))

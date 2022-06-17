@@ -1,0 +1,54 @@
+.inventory {
+
+  // &-message {}
+
+  &-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    mat-table {
+      margin: 2rem;
+      width: 70vw;
+      min-width: 35rem
+    }
+//     display: flex;
+//     flex-direction: column;
+//     align-items: center;
+//     margin: 2rem;
+
+//     mat-table {
+//       display: flex;
+//       flex-direction: column;
+//       // align-items: center;
+//       margin: 2rem;
+//       width: 95vw;
+//       min-width: 30rem;
+//       max-width: 50rem;
+//       margin: 2rem;
+
+//       td {
+//         width: 3rem;
+//       }
+
+//     }
+
+//     &-expansion {
+
+//       &-icon {
+
+//       }
+
+//     &-card-container {
+
+//       &-inner {
+//         display: flex;
+//         flex-direction: column;
+//         align-items: center;
+//         margin: 2rem;
+
+//       }
+//     }
+//     }
+  }
+}

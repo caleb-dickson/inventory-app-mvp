@@ -260,6 +260,7 @@ export class AuthEffects {
           const guestUserData = { themePref: 'theme-dark' };
           localStorage.setItem('guestUserData', JSON.stringify(guestUserData));
           this.router.navigate(['/']);
+          console.clear();
           console.log('||| USER WAS LOGGED OUT |||');
         })
       ),
