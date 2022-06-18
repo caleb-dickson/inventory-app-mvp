@@ -38,7 +38,14 @@
 </div>
 
 <!-- NEW INVENTORY MAIN START -->
-<div class="new-inventory-container">
+<div
+  *ngIf="
+    locationState.activeLocation &&
+    locationState.activeLocation.productList &&
+    locationState.activeLocation.productList.length > 0
+  "
+  class="new-inventory-container"
+>
   <mat-expansion-panel class="inventory-expansion">
     <mat-expansion-panel-header>
       <mat-panel-title
@@ -220,7 +227,7 @@
 <!-- NEW INVENTORY MAIN END END END -->
 
 <!-- NO WORKING DRAFTS MESSAGE -->
-<div *ngIf="!workingInventory">
+<div *ngIf="!workingInventory || !locationState.activeLocation">
   <p>No working inventory drafts found.</p>
 </div>
 
@@ -280,7 +287,6 @@
                 [formGroupName]="i"
                 class="inventory-products"
               >
-                <p>{{ indx.product.name }}</p>
                 <div class="inventory-products-input">
                   <h6>{{ indx.product.name }}</h6>
                   <p>
@@ -330,20 +336,26 @@
                 </div>
               </mat-card>
             </div>
+            <div class="inventory-card-submit-value">
+              Total Inventory Value: <br />
+              {{ workingInventory.value | currency }}
+            </div>
             <div
               *ngIf="user.userProfile.role > 1"
               class="inventory-card-submit-status"
             >
-              <mat-label>Save as:</mat-label>
-              <mat-radio-group
-                required
-                #isFinal
-                formControlName="isFinal"
-                [value]="selected"
-              >
-                <mat-radio-button [value]="true">Final</mat-radio-button>
-                <mat-radio-button [value]="false">Draft</mat-radio-button>
-              </mat-radio-group>
+              <div class="inventory-card-submit-status-box">
+                <mat-label>Save as:</mat-label>
+                <mat-radio-group
+                  required
+                  #isFinal
+                  formControlName="isFinal"
+                  [value]="selected"
+                >
+                  <mat-radio-button [value]="true">Final</mat-radio-button>
+                  <mat-radio-button [value]="false">Draft</mat-radio-button>
+                </mat-radio-group>
+              </div>
             </div>
           </form>
         </mat-card-content>

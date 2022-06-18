@@ -14,8 +14,7 @@ import {
   concatMap,
   catchError,
   tap,
-  Subscription,
-  // withLatestFrom,
+  Subscription
 } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
@@ -27,7 +26,6 @@ import { User } from 'src/app/auth/auth-control/user.model';
 const BACKEND_URL = environment.apiUrl + '/business';
 
 const handleError = (errorRes: HttpErrorResponse) => {
-  console.log(errorRes);
   let errorMessage = errorRes.error.message;
 
   if (!errorRes.error.message) {
@@ -57,7 +55,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.POSTBusinessStart),
       concatMap((action) => {
-        console.log('||| addBusinessStart$ effect called |||===');
+        console.warn('||| addBusinessStart$ effect called |||');
         return this.http
           .post<{
             message: string;
@@ -71,8 +69,8 @@ export class BusinessEffects {
             locations: [],
           })
           .pipe(
-            tap((resData) => console.log(resData)),
             map((resData) => {
+              console.log(resData)
               if (resData.business) {
                 const storedBusiness = {
                   business: {
@@ -132,7 +130,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.PUTBusinessStart),
       concatMap((action) => {
-        console.log('||| updateBusinessStart$ effect called |||===');
+        console.warn('||| updateBusinessStart$ effect called |||');
         return this.http
           .put<{
             message: string;
@@ -143,8 +141,8 @@ export class BusinessEffects {
             updatedBusinessName: action.business.businessName,
           })
           .pipe(
-            tap((resData) => console.log(resData)), // remove?
             map((resData) => {
+              console.log(resData)
               const storedBusiness = {
                 business: resData.updatedBusiness,
               };
@@ -171,15 +169,14 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.GETBusinessStart),
       switchMap((action) => {
-        console.log('||| fetchBusiness$ effect called |||===');
+        console.warn('||| fetchBusiness$ effect called |||');
         return this.http
           .get<{ business: Business; businessId: string; message: string }>(
             BACKEND_URL + '/fetch-business/' + action.ownerId
           )
           .pipe(
-            tap((resData) => console.log(resData)), // remove?
             map((resData) => {
-              console.log('||| Here ya go. Business fetched from DB |||');
+              console.log(resData)
               const storedBusiness = {
                 business: resData.business,
               };
@@ -217,7 +214,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.POSTLocationStart),
       concatMap((action) => {
-        console.log('||| addLocationStart$ effect called |||===');
+        console.warn('||| addLocationStart$ effect called |||');
         return this.http
           .post<{
             message: string;
@@ -229,9 +226,8 @@ export class BusinessEffects {
             inventoryData: [],
           })
           .pipe(
-            tap((resData) => console.log(resData)), // remove?
             map((resData) => {
-              console.log(resData.location.createdLoc);
+              console.log(resData)
 
               const storedBusiness = {
                 business: {
@@ -266,7 +262,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.GETBusinessLocationsStart),
       concatMap((action) => {
-        console.log('||| fetchBusinessLocations$ effect called |||===');
+        console.warn('||| fetchBusinessLocations$ effect called |||');
         console.log('||| businessId: ===>>>' + action.businessId);
         return this.http
           .get<{ fetchedLocations: Location[] }>(
@@ -297,7 +293,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.PUTLocationStart),
       concatMap((action) => {
-        console.log('||| updateLocationStart$ effect called |||===');
+        console.warn('||| updateLocationStart$ effect called |||');
         console.log(action.location);
         return this.http
           .put<{
@@ -306,9 +302,9 @@ export class BusinessEffects {
             locationUpdateData: action.location,
           })
           .pipe(
-            tap((resData) => console.log(resData)), // remove?
             map((resData) => {
-              // this.store.dispatch(BusinessActions.PUTLocationSuccess());
+              console.log(resData)
+
               return BusinessActions.GETBusinessStart({
                 ownerId: this.user.userId,
               });
@@ -326,7 +322,7 @@ export class BusinessEffects {
     this.actions$.pipe(
       ofType(BusinessActions.PUTUserToLocationStart),
       concatMap((action) => {
-        console.log('||| addLocationUsers$ effect called |||===');
+        console.warn('||| addLocationUsers$ effect called |||');
         console.log(action);
         return this.http
           .put<{ message: string; businessId: string }>(

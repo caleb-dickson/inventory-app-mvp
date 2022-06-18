@@ -172,8 +172,9 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
 
         console.group('%cLocation State', 'font-size: 1rem', locState);
         console.groupEnd();
+        console.log(this.workingInventory)
       });
-  }
+    }
 
   // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
   private _onGetPopulatedInventories() {
@@ -217,10 +218,23 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     }
     console.log(this.newInventoryForm.value);
 
+    const newInventory: Inventory = {
+      _id: null,
+      parentLocation: this.activeLocation._id,
+      dateStart: newInventoryForm.value.dateStart,
+      dateEnd: newInventoryForm.value.dateEnd,
+      department: this.userDept,
+      isFinal: newInventoryForm.value.isFinal,
+      inventory: newInventoryForm.value.inventory,
+      value: this.getInventoriesValues(newInventoryForm.value.inventory),
+    };
+
+    console.log(newInventory);
+
     this._store.dispatch(
       LocationActions.POSTCreateInventoryForLocationStart({
         location: this.activeLocation,
-        inventory: newInventoryForm.value,
+        inventory: newInventory,
       })
     );
 
@@ -229,6 +243,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     this._router.navigate(['/app/dashboard']);
   }
 
+  // FOR EXISTING INV DRAFT DOCS
   onDraftInventorySubmit(draftInventoryForm: NgForm) {
     if (draftInventoryForm.invalid) {
       this._store.dispatch(
@@ -268,11 +283,10 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     }
 
     for (const product of this.newInventoryProducts) {
-      let productId = product.product._id;
 
       items.push(
         new FormGroup({
-          product: new FormControl(productId, Validators.required),
+          product: new FormControl(product.product, Validators.required),
           quantity: new FormControl(0),
         })
       );
@@ -334,6 +348,28 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
   // GETS AND HOLDS THE LIST OF DRAFTInventoryItemControls CONTROLS
   get draftInventoryItemControls() {
     return (<FormArray>this.draftInventoryForm.get('dInventory')).controls;
+  }
+
+  getInventoriesValues(
+    inventoryItems: [{ product: Product; quantity: number }]
+  ) {
+    let value: number = 0;
+
+    console.log(inventoryItems);
+    for (let index = 0; index < inventoryItems.length; index++) {
+      const item = inventoryItems[index];
+
+      const unitPrice =
+        item.product.casePrice /
+        (item.product.unitSize *
+          item.product.unitsPerPack *
+          item.product.packsPerCase);
+      let itemValue = unitPrice * item.quantity;
+
+      value += itemValue;
+    }
+    console.log(value);
+    return value;
   }
 
   ngOnDestroy(): void {

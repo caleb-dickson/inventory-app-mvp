@@ -75,10 +75,13 @@ export class InventoryComponent implements OnInit, OnDestroy {
   userDept: string;
 
   locationState: LocationState;
+  // STATE VALUE ALIASES / VARS
   locationStateError: string;
   activeLocation: Location;
   inventoryData: any[];
   inventoryDataPopulated: Inventory[];
+  needInvVal = true;
+  inventoryPopulatedValue = [];
   workingInventory: any;
   workingInventoryItems: any;
 
@@ -157,6 +160,11 @@ export class InventoryComponent implements OnInit, OnDestroy {
           ];
           this.dataSource = new MatTableDataSource(this.inventoryDataPopulated);
 
+          // this.inventoryPopulatedValue
+          // if (this.needInvVal) {
+          //   this.getInventoriesValues();
+          // }
+
           // AND POPULATED INVENTORIES ARE NOT ALREADY FETCHED SINCE LAST RELOAD
           if (this.initLocInventories) {
             this._onGetPopulatedInventories();
@@ -167,12 +175,15 @@ export class InventoryComponent implements OnInit, OnDestroy {
             this.workingInventoryItems = this.workingInventory.inventory;
             // this._initPastInventoryUpdateForm();
           }
+          if (locState.activeLocationInventories) {
+            this.inventoryDataPopulated = locState.activeLocationInventories;
+          }
         }
 
         console.group(
           '%cLocation State',
           `font-size: 1rem;
-           color: lightgreen;`,
+          color: lightgreen;`,
           locState
         );
         console.groupEnd();
@@ -189,6 +200,42 @@ export class InventoryComponent implements OnInit, OnDestroy {
     console.log(this.inventoryDataPopulated);
     this.initLocInventories = false;
   }
+
+  // getInventoriesValues() {
+  //   interface invWithSum {
+  //     inv: Inventory;
+  //     value: number;
+  //   }
+
+  //   let invData: invWithSum[] = [];
+
+  //   for (const inv of this.inventoryDataPopulated) {
+  //     let invEl: any;
+  //     let sum: number = 0;
+
+  //     for (let index = 0; index < inv.inventory.length; index++) {
+  //       const element = inv.inventory[index];
+  //       invEl = element;
+
+  //       const unitPrice =
+  //         element.product.casePrice /
+  //         (element.product.unitSize *
+  //           element.product.unitsPerPack *
+  //           element.product.packsPerCase);
+  //       let itemValue = unitPrice * element.quantity;
+
+  //       sum += itemValue;
+  //     }
+  //     const invD = {
+  //       inv: invEl,
+  //       value: sum,
+  //     };
+
+  //     this.inventoryPopulatedValue.push(invD);
+  //     this.needInvVal = false;
+  //   }
+  //   console.log(this.inventoryPopulatedValue);
+  // }
 
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;

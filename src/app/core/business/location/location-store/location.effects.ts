@@ -143,45 +143,6 @@ export class LocationEffects {
     )
   );
 
-  updateLocationInventory$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(LocationActions.PUTUpdateInventoryForLocationStart),
-      withLatestFrom(this.store.select('auth')),
-      exhaustMap(([action, authState]) => {
-        console.warn('||| updateLocationInventory$ effect called |||===');
-        console.log(action);
-
-        return this.http
-          .put<{ updatedInventory: Inventory }>(
-            BACKEND_URL + '/update-inventory',
-            {
-              inventory: action.inventory,
-            }
-          )
-          .pipe(
-            map((resData) => {
-              console.log(resData);
-              console.log('||| ^^^ resData ^^^ |||');
-
-              if (resData.updatedInventory) {
-                return LocationActions.PUTUpdateInventoryForLocationSuccess({
-                  updatedInventory: resData.updatedInventory,
-                });
-              }
-              return LocationActions.GETUserLocationsStart({
-                userId: authState.userAuth.userId,
-                userRole: authState.userAuth.userProfile.role,
-              });
-            })
-          );
-      }),
-      catchError((errorRes) => {
-        console.warn(errorRes);
-        return handleError(errorRes);
-      })
-    )
-  );
-
   addNewInventory$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LocationActions.POSTCreateInventoryForLocationStart),
@@ -237,6 +198,45 @@ export class LocationEffects {
       })
     )
   );
+
+  updateLocationInventory$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(LocationActions.PUTUpdateInventoryForLocationStart),
+    withLatestFrom(this.store.select('auth')),
+    exhaustMap(([action, authState]) => {
+      console.warn('||| updateLocationInventory$ effect called |||===');
+      console.log(action);
+
+      return this.http
+        .put<{ updatedInventory: Inventory }>(
+          BACKEND_URL + '/update-inventory',
+          {
+            inventory: action.inventory,
+          }
+        )
+        .pipe(
+          map((resData) => {
+            console.log(resData);
+            console.log('||| ^^^ resData ^^^ |||');
+
+            if (resData.updatedInventory) {
+              return LocationActions.PUTUpdateInventoryForLocationSuccess({
+                updatedInventory: resData.updatedInventory,
+              });
+            }
+            return LocationActions.GETUserLocationsStart({
+              userId: authState.userAuth.userId,
+              userRole: authState.userAuth.userProfile.role,
+            });
+          })
+        );
+    }),
+    catchError((errorRes) => {
+      console.warn(errorRes);
+      return handleError(errorRes);
+    })
+  )
+);
 
   fetchLocationInventories$ = createEffect(() =>
     this.actions$.pipe(

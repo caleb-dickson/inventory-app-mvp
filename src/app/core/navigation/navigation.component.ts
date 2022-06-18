@@ -72,7 +72,9 @@ export class NavigationComponent implements OnInit {
         this.isAuthenticated = !!user;
         if (this.isAuthenticated) {
           this.user = user;
-          this.userDept = user.userProfile.department ? user.userProfile.department : null;
+          this.userDept = user.userProfile.department
+            ? user.userProfile.department
+            : null;
           switch (user.userProfile.role) {
             case 3:
               this.userRole = 'owner';
@@ -172,9 +174,10 @@ export class NavigationComponent implements OnInit {
   }
 
   onActivateLocation(activatedLocation: Location) {
-    if (!this.activatedLocation) {
-      this.locationService.activateLocation(activatedLocation);
-    }
+    console.log(activatedLocation);
+    console.log(this.activatedLocation);
+
+    this.locationService.activateLocation(activatedLocation);
   }
 
   onLogout() {
