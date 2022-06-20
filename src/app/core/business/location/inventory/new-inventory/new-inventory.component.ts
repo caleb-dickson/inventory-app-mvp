@@ -22,12 +22,13 @@ import { map, Subscription } from 'rxjs';
 
 import { Location } from '../../../business-control/location.model';
 import { Product } from '../../../business-control/product.model';
-import { User } from 'src/app/auth/auth-control/user.model';
+import { User } from 'src/app/users/user-control/user.model';
 import { Router } from '@angular/router';
 import { Inventory } from '../../../business-control/inventory.model';
 
 import { LocationService } from '../../location-control/location.service';
-import { BusinessInventoryPeriod } from '../inventory.component';
+import { InventoryService } from '../inventory-control/inventory.service';
+import { BusinessInventoryPeriod } from '../../../business-control/business.model';
 
 @Injectable()
 export class RangeSelectionStrategy<D>
@@ -66,9 +67,10 @@ export class RangeSelectionStrategy<D>
 })
 export class NewInventoryComponent implements OnInit, OnDestroy {
   constructor(
-    private _locationService: LocationService,
+    private _store: Store<fromAppStore.AppState>,
     private _router: Router,
-    private _store: Store<fromAppStore.AppState>
+    private _locationService: LocationService,
+    private _inventoryService: InventoryService
   ) {}
 
   private _userAuthSub: Subscription;
@@ -98,7 +100,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
 
   newInventoryForm: FormGroup;
   draftInventoryForm: FormGroup;
-  // inventoryValue: number;
+  inventoryPeriod = BusinessInventoryPeriod - 1;
   formIsFinal = false;
   formError: string;
 
@@ -106,7 +108,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     console.clear();
 
     this._userAuthSub = this._store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((user) => {
         this.user = user;
@@ -160,21 +162,21 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
             this.newInventoryProducts = locState.activeLocation.productList;
           }
 
-          // NOW WE CAN INITIALIZE THE NEW INV FORM WITH THE CORRECT PRODUCT LIST
-          this.initNewInventoryForm();
+          // NOW WE CAN INITIALIZE THE NEW INV FORM HAVING DEFINED AN
+          // ACCURATE PRODUCT LIST
+          this._initNewInventoryForm();
 
           // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
           if (this.workingInventory) {
             this.workingInventoryItems = this.workingInventory.inventory;
-            this.initDraftInventoryForm();
+            this._initDraftInventoryForm();
           }
         }
 
         console.group('%cLocation State', 'font-size: 1rem', locState);
         console.groupEnd();
-        console.log(this.workingInventory)
       });
-    }
+  }
 
   // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
   private _onGetPopulatedInventories() {
@@ -189,7 +191,6 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
   setProductList() {
     for (const product of this.locationState.activeLocation.productList) {
       let productDept = product.product.department;
-
       if (
         productDept === this.user.userProfile.department &&
         product.product.isActive
@@ -205,41 +206,21 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
   }
 
   onResetDraftInventoryForm() {
-    this.newInventoryForm.reset();
+    this.draftInventoryForm.reset();
+    // console.log(this.workingInventory);
+    // console.log(this.workingInventoryItems);
+    // this._initDraftInventoryForm();
   }
 
-  onNewInventorySubmit(newInventoryForm: NgForm) {
-    if (newInventoryForm.invalid) {
-      this._store.dispatch(
-        LocationActions.LocationError({ errorMessage: 'Form Invalid' })
-      );
-    } else {
-      console.log(newInventoryForm.value);
-    }
-    console.log(this.newInventoryForm.value);
-
-    const newInventory: Inventory = {
-      _id: null,
-      parentLocation: this.activeLocation._id,
-      dateStart: newInventoryForm.value.dateStart,
-      dateEnd: newInventoryForm.value.dateEnd,
-      department: this.userDept,
-      isFinal: newInventoryForm.value.isFinal,
-      inventory: newInventoryForm.value.inventory,
-      value: this.getInventoriesValues(newInventoryForm.value.inventory),
-    };
-
-    console.log(newInventory);
-
-    this._store.dispatch(
-      LocationActions.POSTCreateInventoryForLocationStart({
-        location: this.activeLocation,
-        inventory: newInventory,
-      })
+  onInventorySubmit(newInventoryForm: NgForm, saveNew: boolean) {
+    console.log(newInventoryForm);
+    console.log(saveNew);
+    this._inventoryService.saveInventory(
+      newInventoryForm,
+      this.activeLocation,
+      this.userDept,
+      saveNew
     );
-
-    localStorage.removeItem('inventoryData');
-
     this._router.navigate(['/app/dashboard']);
   }
 
@@ -265,9 +246,12 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     this._router.navigate(['/app/dashboard']);
   }
 
-  private initNewInventoryForm() {
-    let items = new FormArray([]);
+  private _initNewInventoryForm() {
+    let start = new Date();
+    let beginDate = start.getDate() - this.inventoryPeriod;
+    beginDate = start.setDate(beginDate);
 
+    let items = new FormArray([]);
     let arr: any[] = [];
 
     for (const product of this.locationProducts) {
@@ -283,7 +267,6 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     }
 
     for (const product of this.newInventoryProducts) {
-
       items.push(
         new FormGroup({
           product: new FormControl(product.product, Validators.required),
@@ -293,15 +276,15 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     }
 
     this.newInventoryForm = new FormGroup({
-      dateStart: new FormControl(null, Validators.required),
-      dateEnd: new FormControl(null, Validators.required),
+      dateStart: new FormControl(start, Validators.required),
+      dateEnd: new FormControl(new Date(), Validators.required),
       department: new FormControl(this.userDept, Validators.required),
       isFinal: new FormControl(this.formIsFinal, Validators.required),
       inventory: items,
     });
   }
 
-  private initDraftInventoryForm() {
+  private _initDraftInventoryForm() {
     let items = new FormArray([]);
 
     for (const item of this.workingInventory.inventory) {
@@ -334,7 +317,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
         this.workingInventory.isFinal,
         Validators.required
       ),
-      dInventory: items,
+      inventory: items,
     });
     console.log(this.draftInventoryForm.value);
     console.log(this.draftInventoryItemControls);
@@ -347,29 +330,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
 
   // GETS AND HOLDS THE LIST OF DRAFTInventoryItemControls CONTROLS
   get draftInventoryItemControls() {
-    return (<FormArray>this.draftInventoryForm.get('dInventory')).controls;
-  }
-
-  getInventoriesValues(
-    inventoryItems: [{ product: Product; quantity: number }]
-  ) {
-    let value: number = 0;
-
-    console.log(inventoryItems);
-    for (let index = 0; index < inventoryItems.length; index++) {
-      const item = inventoryItems[index];
-
-      const unitPrice =
-        item.product.casePrice /
-        (item.product.unitSize *
-          item.product.unitsPerPack *
-          item.product.packsPerCase);
-      let itemValue = unitPrice * item.quantity;
-
-      value += itemValue;
-    }
-    console.log(value);
-    return value;
+    return (<FormArray>this.draftInventoryForm.get('inventory')).controls;
   }
 
   ngOnDestroy(): void {

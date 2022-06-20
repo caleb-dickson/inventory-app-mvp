@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 
 import { Subscription } from 'rxjs';
 
@@ -12,30 +12,29 @@ import { LocationIds } from '../../business-control/business.model';
 import { LocationState } from '../location-store/location.reducer';
 import { BusinessState } from '../../business-store/business.reducer';
 import { Product } from '../../business-control/product.model';
-import { Actions } from '@ngrx/effects';
 import { Inventory } from '../../business-control/inventory.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class LocationService {
-  constructor(private store: Store<fromAppStore.AppState>) {}
+export class LocationService implements OnInit {
+  constructor(private _store: Store<fromAppStore.AppState>) {}
 
-  private businessStoreSub: Subscription;
-  private locationStoreSub: Subscription;
+  private _businessStoreSub: Subscription;
+  private _locationStoreSub: Subscription;
 
   businessState: BusinessState;
   locationState: LocationState;
 
   ngOnInit() {
-    this.locationStoreSub = this.store
+    this._locationStoreSub = this._store
       .select('location')
       .subscribe((locState) => {
         console.log(locState);
         this.locationState = locState;
       });
 
-    this.businessStoreSub = this.store
+    this._businessStoreSub = this._store
       .select('business')
       .subscribe((bizState) => {
         console.log(bizState);
@@ -54,7 +53,7 @@ export class LocationService {
       'activatedLocation',
       JSON.stringify(activatedLocation)
     );
-    return this.store.dispatch(
+    return this._store.dispatch(
       LocationActions.ActivateLocation({
         location: activatedLocation,
       })
@@ -83,12 +82,12 @@ export class LocationService {
       if (businessLocations) {
         console.log(businessLocations);
         console.log('||| locations fetched from local storage |||');
-        this.store.dispatch(
+        this._store.dispatch(
           BusinessActions.GETBusinessLocationsSuccess({
             locations: businessLocations,
           })
         ),
-          this.store.dispatch(
+          this._store.dispatch(
             LocationActions.GETUserLocationsSuccess({
               locations: businessLocations,
             })
@@ -96,13 +95,13 @@ export class LocationService {
       } else if (!businessLocations) {
         console.log('||| getting locations from DB |||');
         console.log(storedBusiness);
-        this.store.dispatch(
+        this._store.dispatch(
           BusinessActions.GETBusinessLocationsStart({
             businessId: storedBusiness.business._id,
           })
         );
       } else {
-        this.store.dispatch(
+        this._store.dispatch(
           BusinessActions.BusinessError({ errorMessage: 'No locations found.' })
         );
       }
@@ -110,7 +109,7 @@ export class LocationService {
       if (userLocations) {
         console.log(userLocations);
         console.log('||| userLocations fetched from local storage |||');
-        this.store.dispatch(
+        this._store.dispatch(
           LocationActions.GETUserLocationsSuccess({
             locations: userLocations,
           })
@@ -118,14 +117,14 @@ export class LocationService {
       } else if (!userLocations) {
         console.log('||| getting userLocations from DB |||');
         console.log(userId);
-        this.store.dispatch(
+        this._store.dispatch(
           LocationActions.GETUserLocationsStart({
             userId: userId,
             userRole: userNumberRole,
           })
         );
       } else {
-        this.store.dispatch(
+        this._store.dispatch(
           LocationActions.LocationError({
             errorMessage: 'No user locations found.',
           })
@@ -144,7 +143,7 @@ export class LocationService {
         '||| Found active location: ' + activatedLocation.locationName + ' |||'
       );
       console.log(activatedLocation);
-      return this.store.dispatch(
+      return this._store.dispatch(
         LocationActions.ActivateLocation({
           location: activatedLocation,
         })
@@ -182,7 +181,7 @@ export class LocationService {
       activeProducts = [...updatedSelection];
     }
     // SEND THE LIST TO THE STORE
-    this.store.dispatch(
+    this._store.dispatch(
       LocationActions.ActivateProducts({
         products: [...activeProducts],
       })
@@ -207,7 +206,7 @@ export class LocationService {
         }
       }
       // SEND INV DATA AND ANY DRAFTS FOUND TO THE STORE
-      this.store.dispatch(
+      this._store.dispatch(
         LocationActions.GETLocationInventoriesSuccess({
           inventoryData: storedInv,
           draft: draft,
@@ -220,7 +219,7 @@ export class LocationService {
       inventoryData &&
       inventoryData.length > 0
     ) {
-      this.store.dispatch(
+      this._store.dispatch(
         LocationActions.GETLocationInventoriesStart({
           locationId: activeLocationId,
         })

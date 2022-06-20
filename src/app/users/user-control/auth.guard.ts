@@ -14,7 +14,7 @@ import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
 
 @Injectable()
-export class OwnerGuard implements CanActivate {
+export class AuthGuard implements CanActivate {
   constructor(
     private store: Store<fromAppStore.AppState>,
     private router: Router
@@ -28,19 +28,17 @@ export class OwnerGuard implements CanActivate {
     | UrlTree
     | Promise<boolean | UrlTree>
     | Observable<boolean | UrlTree> {
-    return this.store.select('auth').pipe(
+    return this.store.select('user').pipe(
       take(1),
       map((authState) => {
-        return authState.userAuth.userProfile.role;
+        return authState.userAuth;
       }),
-      map((userRole) => {
-        const isOwner = userRole === 3 ? true : false;
-        if (isOwner) {
+      map((user) => {
+        const isAuth = !!user;
+        if (isAuth) {
           return true;
         }
-        console.log(isOwner);
-        console.log('||| owner guard ^^^ |||')
-        return this.router.createUrlTree(['/app/location']);
+        return this.router.createUrlTree(['/']);
       })
     );
   }

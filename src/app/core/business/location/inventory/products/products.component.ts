@@ -17,7 +17,7 @@ import { defaultUnits, UnitsCategories } from './models/units-list.model';
 import { Product } from '../../../business-control/product.model';
 
 import { LocationService } from '../../location-control/location.service';
-import { User } from 'src/app/auth/auth-control/user.model';
+import { User } from 'src/app/users/user-control/user.model';
 
 @Component({
   selector: 'app-products',
@@ -58,7 +58,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this.defaultUnits = defaultUnits;
 
     this._userAuthSub = this.store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((user) => {
         this.user = user;

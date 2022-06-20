@@ -23,7 +23,7 @@ export class FooterComponent implements OnInit {
 
   ngOnInit(): void {
     this.userAuthSub = this.store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((user) => {
         this.isAuthenticated = !!user;

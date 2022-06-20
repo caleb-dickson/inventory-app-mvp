@@ -3,7 +3,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 import { ErrorComponent } from "./error/error.component";
 
-import { AuthGuard } from './auth/auth-control/auth.guard';
+import { AuthGuard } from './users/user-control/auth.guard';
 import { LandingComponent } from './landing/landing.component';
 import { CoreComponent } from './core/core.component';
 import { CommonModule } from '@angular/common';
@@ -26,7 +26,7 @@ const routes: Routes = [
     onSameUrlNavigation: 'ignore',
     scrollOffset: [0, 25],
     preloadingStrategy: PreloadAllModules,
-    
+
   }),
   CommonModule
 ],

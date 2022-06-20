@@ -4,7 +4,7 @@ import { Component, Inject, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map, Subscription } from 'rxjs';
 import * as fromAppStore from './app-store/app.reducer';
-import * as AuthActions from './auth/auth-store/auth.actions';
+import * as AuthActions from './users/user-store/user.actions';
 import { ThemeService } from './theme.service';
 
 @Component({
@@ -31,7 +31,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.store.dispatch(AuthActions.autoLogin());
 
     this.userAuthSub = this.store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((userAuth) => {
         this.isAuthenticated = !!userAuth;

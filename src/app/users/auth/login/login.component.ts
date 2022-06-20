@@ -7,8 +7,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 
 import { Store } from '@ngrx/store';
-import * as fromAppStore from '../../app-store/app.reducer';
-import * as AuthActions from '../../auth/auth-store/auth.actions';
+import * as fromAppStore from '../../../app-store/app.reducer';
+import * as AuthActions from '../../user-store/user.actions';
 
 @Component({
   templateUrl: './login.component.html',
@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.storeSub = this.store.select('auth').subscribe((authState) => {
+    this.storeSub = this.store.select('user').subscribe((authState) => {
       this.isLoading = authState.loading;
       this.error = authState.authError;
       console.clear();

@@ -5,9 +5,9 @@ import { map } from 'rxjs/operators';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
-import * as AuthActions from '../../../auth/auth-store/auth.actions';
+import * as AuthActions from '../../../users/user-store/user.actions';
 
-import { AuthService } from '../../../auth/auth-control/auth.service';
+import { AuthService } from '../../../users/user-control/auth.service';
 import { ThemeService } from 'src/app/theme.service';
 
 @Component({
@@ -35,7 +35,7 @@ export class HeaderComponent implements OnInit {
 
     ngOnInit() {
       this.userAuthSub = this.store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((userAuth) => {
         this.isAuthenticated = !!userAuth;

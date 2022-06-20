@@ -11,7 +11,7 @@ import { CoreComponent } from './core.component';
 import { NavigationComponent } from './navigation/navigation.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
-import { SettingsComponent } from './settings/settings.component';
+import { UserSettingsComponent } from './user-settings/user-settings.component';
 import { BusinessComponent } from './business/business.component';
 import { InventoryComponent } from './business/location/inventory/inventory.component';
 import { ProductsComponent } from './business/location/inventory/products/products.component';
@@ -23,7 +23,7 @@ import { NewInventoryComponent } from './business/location/inventory/new-invento
     DashboardComponent,
     NavigationComponent,
     CoreComponent,
-    SettingsComponent,
+    UserSettingsComponent,
     BusinessComponent,
     InventoryComponent,
     ProductsComponent,

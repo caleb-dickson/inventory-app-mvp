@@ -5,7 +5,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
 import * as BusinessActions from './business.actions';
-import { authSuccess } from '../../../auth/auth-store/auth.actions';
+import { authSuccess } from '../../../users/user-store/user.actions';
 
 import {
   switchMap,
@@ -21,7 +21,7 @@ import { environment } from 'src/environments/environment';
 
 import { Business } from '../business-control/business.model';
 import { Location } from '../business-control/location.model';
-import { User } from 'src/app/auth/auth-control/user.model';
+import { User } from 'src/app/users/user-control/user.model';
 
 const BACKEND_URL = environment.apiUrl + '/business';
 
@@ -47,7 +47,7 @@ const handleError = (errorRes: HttpErrorResponse) => {
 export class BusinessEffects {
   user: User;
   userAuthSub: Subscription = this.store
-    .select('auth')
+    .select('user')
     .pipe(map((authState) => authState.userAuth))
     .subscribe((userAuth) => (this.user = userAuth));
 

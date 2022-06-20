@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Subject } from 'rxjs';
-import { AuthState } from './auth/auth-store/auth.reducer';
+import { UserState } from './users/user-store/user.reducer';
 
 @Injectable({
   providedIn: 'root',

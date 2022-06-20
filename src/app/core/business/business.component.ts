@@ -7,9 +7,9 @@ import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
 import * as BusinessActions from '../business/business-store/business.actions';
 
-import { User } from 'src/app/auth/auth-control/user.model';
+import { User } from 'src/app/users/user-control/user.model';
 import { Location } from './business-control/location.model';
-import { AuthState } from 'src/app/auth/auth-store/auth.reducer';
+import { UserState } from 'src/app/users/user-store/user.reducer';
 import { BusinessState } from './business-store/business.reducer';
 
 @Component({
@@ -26,7 +26,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
 
   // STATE RELATED VARIABLES
   // Auth State
-  authState: AuthState;
+  authState: UserState;
   user: User;
   userId: string;
   userRole: string;
@@ -60,7 +60,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
     console.clear();
     // USER STORE
     this.userAuthSub = this.store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState))
       .subscribe((authState) => {
         this.authState = authState;

@@ -69,7 +69,7 @@
               <!-- INVENTORY DATE RANGE PICKER -->
               <mat-form-field appearance="fill">
                 <mat-label
-                  >Select a {{ inventoryPeriod }} day date range</mat-label
+                  >Select a {{ inventoryPeriod +1 }} day date range</mat-label
                 >
                 <mat-date-range-input [rangePicker]="picker">
                   <input
@@ -102,32 +102,32 @@
               <mat-card
                 *ngFor="
                   let control of newInventoryItemControls;
-                  let indx;
+                  let item;
                   of: newInventoryProducts;
                   let i = index
                 "
                 [formGroupName]="i"
                 class="inventory-products"
               >
-                <p>{{ indx.product.name }}</p>
+                <p>{{ item.product.name }}</p>
                 <div class="inventory-products-input">
-                  <h6>{{ indx.product.name }}</h6>
+                  <h6>{{ item.product.name }}</h6>
                   <p>
                     {{
-                      indx.product.unitSize +
+                      item.product.unitSize +
                         " " +
-                        (indx.product.unitSize > 1
-                          ? indx.product.unitMeasure.plural
-                          : indx.product.unitMeasure.singular)
+                        (item.product.unitSize > 1
+                          ? item.product.unitMeasure.plural
+                          : item.product.unitMeasure.singular)
                     }}
                     {{
                       " x " +
-                        indx.product.unitsPerPack * indx.product.packsPerCase
+                        item.product.unitsPerPack * item.product.packsPerCase
                     }}
                     per case
                   </p>
                   <p>
-                    How many {{ indx.product.unitMeasure.plural }} in stock?
+                    How many {{ item.product.unitMeasure.plural }} in stock?
                   </p>
                   <mat-form-field appearance="outline" hidden>
                     <input
@@ -149,10 +149,10 @@
                   <p *ngIf="quantity.value">
                     Value:
                     {{
-                      (indx.product.casePrice /
-                        (indx.product.unitSize *
-                          indx.product.unitsPerPack *
-                          indx.product.packsPerCase)) *
+                      (item.product.casePrice /
+                        (item.product.unitSize *
+                          item.product.unitsPerPack *
+                          item.product.packsPerCase)) *
                         quantity.value | currency
                     }}
                   </p>
@@ -188,7 +188,7 @@
             mat-raised-button
             #invSubmit
             type="submit"
-            (click)="onNewInventorySubmit(newInventoryForm)"
+            (click)="onInventorySubmit(newInventoryForm, true)"
             [disabled]="newInventoryForm.invalid"
           >
             {{
@@ -202,7 +202,7 @@
             mat-raised-button
             type="button"
             color="accent"
-            (click)="onNewInventorySubmit(newInventoryForm)"
+            (click)="onInventorySubmit(newInventoryForm, true)"
             [disabled]="newInventoryForm.invalid"
           >
             Save
@@ -228,7 +228,7 @@
 
 <!-- NO WORKING DRAFTS MESSAGE -->
 <div *ngIf="!workingInventory || !locationState.activeLocation">
-  <p>No working inventory drafts found.</p>
+  <p>No working {{ userDept | uppercase }} inventory drafts found.</p>
 </div>
 
 <!-- WORKING INVENTORIES START -->
@@ -249,7 +249,7 @@
             <div class="inventory-card-control">
               <mat-form-field appearance="fill">
                 <mat-label
-                  >Select a {{ inventoryPeriod }} day date range</mat-label
+                  >Select a {{ inventoryPeriod + 1 }} day date range</mat-label
                 >
                 <mat-date-range-input [rangePicker]="picker">
                   <input
@@ -276,35 +276,35 @@
               </mat-form-field>
             </div>
 
-            <div formArrayName="dInventory">
+            <div formArrayName="inventory">
               <mat-card
                 *ngFor="
                   let control of draftInventoryItemControls;
-                  let indx;
+                  let i = index;
+                  let item;
                   of: workingInventoryItems;
-                  let i = index
                 "
                 [formGroupName]="i"
                 class="inventory-products"
               >
                 <div class="inventory-products-input">
-                  <h6>{{ indx.product.name }}</h6>
+                  <h6>{{ item.product.name }}</h6>
                   <p>
                     {{
-                      indx.product.unitSize +
+                      item.product.unitSize +
                         " " +
-                        (indx.product.unitSize > 1
-                          ? indx.product.unitMeasure.plural
-                          : indx.product.unitMeasure.singular)
+                        (item.product.unitSize > 1
+                          ? item.product.unitMeasure.plural
+                          : item.product.unitMeasure.singular)
                     }}
                     {{
                       " x " +
-                        indx.product.unitsPerPack * indx.product.packsPerCase
+                        item.product.unitsPerPack * item.product.packsPerCase
                     }}
                     per case
                   </p>
                   <p>
-                    How many {{ indx.product.unitMeasure.plural }} in stock?
+                    How many {{ item.product.unitMeasure.plural }} in stock?
                   </p>
                   <mat-form-field appearance="outline" hidden>
                     <input
@@ -326,10 +326,10 @@
                   <p *ngIf="quantity.value">
                     Value:
                     {{
-                      (indx.product.casePrice /
-                        (indx.product.unitSize *
-                          indx.product.unitsPerPack *
-                          indx.product.packsPerCase)) *
+                      (item.product.casePrice /
+                        (item.product.unitSize *
+                          item.product.unitsPerPack *
+                          item.product.packsPerCase)) *
                         quantity.value | currency
                     }}
                   </p>
@@ -373,7 +373,7 @@
             mat-raised-button
             #invSubmit
             type="submit"
-            (click)="onDraftInventorySubmit(draftInventoryForm)"
+            (click)="onInventorySubmit(draftInventoryForm, false)"
             [disabled]="draftInventoryForm.invalid"
           >
             {{
@@ -387,7 +387,7 @@
             mat-raised-button
             type="button"
             color="accent"
-            (click)="onDraftInventorySubmit(draftInventoryForm)"
+            (click)="onInventorySubmit(draftInventoryForm, false)"
             [disabled]="draftInventoryForm.invalid"
           >
             Save
@@ -399,7 +399,7 @@
             mat-raised-button
             type="button"
             color="primary"
-            (click)="onResetNewInventoryForm()"
+            (click)="onResetDraftInventoryForm()"
             [disabled]="!draftInventoryForm.touched"
           >
             Reset

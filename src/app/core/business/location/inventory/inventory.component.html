@@ -4,10 +4,12 @@
     *ngIf="
       !inventoryDataPopulated ||
       (inventoryDataPopulated && inventoryDataPopulated.length === 0)
+      &&
+      userDept !== 'admin'
     "
     class="inventory-message"
   >
-    <p>Past inventories will show up here when finalized.</p>
+    <p>Past {{ userDept | uppercase }} inventories will show up here when finalized.</p>
   </div>
 
   <div

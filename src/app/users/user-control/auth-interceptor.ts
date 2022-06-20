@@ -15,7 +15,7 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private store: Store<fromAppStore.AppState>) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {
-    return this.store.select('auth').pipe(
+    return this.store.select('user').pipe(
       take(1),
       map(authState => {
         return authState.userAuth;

@@ -95,7 +95,7 @@ export class LocationEffects {
   addProductsToLocation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LocationActions.POSTCreateProductForLocationStart),
-      withLatestFrom(this.store.select('auth')),
+      withLatestFrom(this.store.select('user')),
       concatMap(([action, authState]) => {
         console.warn('||| addProductToLocation$ effect called |||===');
         console.log(action);
@@ -146,7 +146,7 @@ export class LocationEffects {
   addNewInventory$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LocationActions.POSTCreateInventoryForLocationStart),
-      withLatestFrom(this.store.select('auth')),
+      withLatestFrom(this.store.select('user')),
       concatMap(([action, authState]) => {
         console.warn('||| addProductToLocation$ effect called |||===');
         console.log(action);
@@ -202,7 +202,7 @@ export class LocationEffects {
   updateLocationInventory$ = createEffect(() =>
   this.actions$.pipe(
     ofType(LocationActions.PUTUpdateInventoryForLocationStart),
-    withLatestFrom(this.store.select('auth')),
+    withLatestFrom(this.store.select('user')),
     exhaustMap(([action, authState]) => {
       console.warn('||| updateLocationInventory$ effect called |||===');
       console.log(action);

@@ -2,11 +2,11 @@ import { Injectable } from '@angular/core';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
-import * as AuthActions from '../auth-store/auth.actions';
+import * as AuthActions from '../user-store/user.actions';
 
 import { MatDialog } from '@angular/material/dialog';
-import { LoginComponent } from '../login/login.component';
-import { SignupComponent } from '../signup/signup.component';
+import { LoginComponent } from '../auth/login/login.component';
+import { SignupComponent } from '../auth/signup/signup.component';
 
 export interface AuthResponseData {
   email: string;

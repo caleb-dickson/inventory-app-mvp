@@ -5,10 +5,10 @@ import { Subscription } from 'rxjs';
 
 
 import { Store } from '@ngrx/store';
-import * as fromAppStore from '../../app-store/app.reducer';
-import * as AuthActions from '../../auth/auth-store/auth.actions';
+import * as fromAppStore from '../../../app-store/app.reducer';
+import * as AuthActions from '../../user-store/user.actions';
 
-import { AuthService } from '../auth-control/auth.service';
+import { AuthService } from '../../user-control/auth.service';
 
 @Component({
   templateUrl: './signup.component.html',
@@ -25,7 +25,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.storeSub = this.store.select('auth').subscribe((authState) => {
+    this.storeSub = this.store.select('user').subscribe((authState) => {
       this.isLoading = authState.loading;
       this.error = authState.authError;
     });

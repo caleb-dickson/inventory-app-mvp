@@ -1,6 +1,7 @@
 import { Location } from "./location.model";
 
 export interface LocationIds { location: string };
+export const BusinessInventoryPeriod = 14;
 
 
 export class Business {

@@ -1,17 +1,5 @@
-import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
-import {
-  FormArray,
-  FormControl,
-  FormGroup,
-  NgForm,
-  Validators,
-} from '@angular/forms';
-import {
-  DateRange,
-  MatDateRangeSelectionStrategy,
-  MAT_DATE_RANGE_SELECTION_STRATEGY,
-} from '@angular/material/datepicker';
-import { MatRipple } from '@angular/material/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormGroup, NgForm } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Store } from '@ngrx/store';
@@ -25,35 +13,22 @@ import { Location } from '../../business-control/location.model';
 import { Product } from '../../business-control/product.model';
 
 import { LocationService } from '../location-control/location.service';
-import { User } from 'src/app/auth/auth-control/user.model';
+import { User } from 'src/app/users/user-control/user.model';
 import { Router } from '@angular/router';
 import { Inventory } from '../../business-control/inventory.model';
+import { InventoryService } from './inventory-control/inventory.service';
+import { BusinessInventoryPeriod } from '../../business-control/business.model';
 
-export const BusinessInventoryPeriod = 14;
-
-// @Injectable()
-// class RangeSelectionStrategy<D>
-//   implements MatDateRangeSelectionStrategy<D>
-// {
-//   inventoryPeriod = BusinessInventoryPeriod - 1;
-
-//   constructor(private _dateAdapter: DateAdapter<D>) {}
-
-//   selectionFinished(date: D | null): DateRange<D> {
-//     return this._createDateRange(date);
-//   }
-//   createPreview(activeDate: D | null): DateRange<D> {
-//     return this._createDateRange(activeDate);
-//   }
-//   private _createDateRange(date: D | null): DateRange<D> {
-//     if (date) {
-//       const start = this._dateAdapter.addCalendarDays(date, 0);
-//       const end = this._dateAdapter.addCalendarDays(date, this.inventoryPeriod);
-//       return new DateRange<D>(start, end);
-//     }
-//     return new DateRange<D>(null, null);
-//   }
-// }
+const inventoryColumns = [
+  'category',
+  'product name',
+  'department',
+  'unit',
+  'case size',
+  'packs par',
+  'in stock',
+  'inventory value',
+];
 
 @Component({
   selector: 'app-inventory',
@@ -62,9 +37,10 @@ export const BusinessInventoryPeriod = 14;
 })
 export class InventoryComponent implements OnInit, OnDestroy {
   constructor(
-    private _locationService: LocationService,
+    private _store: Store<fromAppStore.AppState>,
     private _router: Router,
-    private _store: Store<fromAppStore.AppState>
+    private _locationService: LocationService,
+    private _inventoryService: InventoryService
   ) {}
 
   private _userAuthSub: Subscription;
@@ -95,21 +71,20 @@ export class InventoryComponent implements OnInit, OnDestroy {
   selectedProducts: Product[] = [];
   activeProducts: Product[] = [];
 
-  displayedColumns: string[];
   dataSource: MatTableDataSource<Inventory>;
 
   pastInventoryUpdateForm: FormGroup;
-  // inventoryValue: number;
   formIsFinal = false;
   formError: string;
 
   inventoryPeriod = BusinessInventoryPeriod - 1;
+  displayedColumns = inventoryColumns;
 
   ngOnInit(): void {
-    console.clear();
+    // console.clear();
 
     this._userAuthSub = this._store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((user) => {
         this.user = user;
@@ -147,18 +122,9 @@ export class InventoryComponent implements OnInit, OnDestroy {
         ) {
           this.locationProducts = locState.activeLocation.productList;
           this.inventoryData = locState.activeLocation.inventoryData;
-          this.inventoryDataPopulated = locState.activeLocationInventories;
-          this.displayedColumns = [
-            'category',
-            'product name',
-            'department',
-            'unit',
-            'case size',
-            'packs par',
-            'in stock',
-            'inventory value',
-          ];
-          this.dataSource = new MatTableDataSource(this.inventoryDataPopulated);
+          this.inventoryDataPopulated = locState.activeLocationInventories
+            .filter((inv) => inv.isFinal && (inv.department === this.userDept))
+            .sort((a, b) => (a.dateEnd < b.dateEnd ? 1 : -1));
 
           // this.inventoryPopulatedValue
           // if (this.needInvVal) {
@@ -167,27 +133,31 @@ export class InventoryComponent implements OnInit, OnDestroy {
 
           // AND POPULATED INVENTORIES ARE NOT ALREADY FETCHED SINCE LAST RELOAD
           if (this.initLocInventories) {
+            console.log(this.initLocInventories);
             this._onGetPopulatedInventories();
           }
 
-          // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
-          if (this.workingInventory) {
-            this.workingInventoryItems = this.workingInventory.inventory;
-            // this._initPastInventoryUpdateForm();
-          }
-          if (locState.activeLocationInventories) {
-            this.inventoryDataPopulated = locState.activeLocationInventories;
-          }
+          //   // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
+          //   if (this.workingInventory) {
+          //     this.workingInventoryItems = this.workingInventory.inventory;
+          //     // this._initPastInventoryUpdateForm();
+          //   }
+          //   if (locState.activeLocationInventories) {
+          //     this.inventoryDataPopulated = locState.activeLocationInventories;
+          //   }
         }
 
         console.group(
           '%cLocation State',
           `font-size: 1rem;
-          color: lightgreen;`,
+            color: lightgreen;`,
           locState
         );
         console.groupEnd();
+        console.log(this.inventoryDataPopulated);
+        console.log(this.locationState.activeLocationInventories);
       });
+    this.dataSource = new MatTableDataSource(this.inventoryDataPopulated);
   }
 
   // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
@@ -201,51 +171,15 @@ export class InventoryComponent implements OnInit, OnDestroy {
     this.initLocInventories = false;
   }
 
-  // getInventoriesValues() {
-  //   interface invWithSum {
-  //     inv: Inventory;
-  //     value: number;
-  //   }
-
-  //   let invData: invWithSum[] = [];
-
-  //   for (const inv of this.inventoryDataPopulated) {
-  //     let invEl: any;
-  //     let sum: number = 0;
-
-  //     for (let index = 0; index < inv.inventory.length; index++) {
-  //       const element = inv.inventory[index];
-  //       invEl = element;
-
-  //       const unitPrice =
-  //         element.product.casePrice /
-  //         (element.product.unitSize *
-  //           element.product.unitsPerPack *
-  //           element.product.packsPerCase);
-  //       let itemValue = unitPrice * element.quantity;
-
-  //       sum += itemValue;
-  //     }
-  //     const invD = {
-  //       inv: invEl,
-  //       value: sum,
-  //     };
-
-  //     this.inventoryPopulatedValue.push(invD);
-  //     this.needInvVal = false;
-  //   }
-  //   console.log(this.inventoryPopulatedValue);
+  // WORKING
+  // applyFilter(event: Event) {
+  //   const filterValue = (event.target as HTMLInputElement).value;
+  //   this.dataSource.filter = filterValue.trim().toLowerCase();
   // }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-  }
-
-  setProductList() {
+  onSetInvProductList() {
     for (const product of this.locationState.activeLocation.productList) {
       let productDept = product.product.department;
-
       if (
         productDept === this.user.userProfile.department &&
         product.product.isActive
@@ -281,6 +215,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
     this._router.navigate(['/app/dashboard']);
   }
 
+  // FUTURE UPDATE
   // private _initPastInventoryUpdateForm() {
   //   let items = new FormArray([]);
 

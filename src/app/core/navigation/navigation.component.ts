@@ -3,7 +3,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
-import * as AuthActions from '../../auth/auth-store/auth.actions';
+import * as AuthActions from '../../users/user-store/user.actions';
 import * as BusinessActions from '../business/business-store/business.actions';
 import * as LocationActions from '../business/location/location-store/location.actions';
 import { BusinessState } from '../business/business-store/business.reducer';
@@ -12,7 +12,7 @@ import { LocationState } from '../business/location/location-store/location.redu
 import { Observable, Subscription } from 'rxjs';
 import { map, shareReplay, take } from 'rxjs/operators';
 
-import { User } from 'src/app/auth/auth-control/user.model';
+import { User } from 'src/app/users/user-control/user.model';
 
 import { ThemeService } from 'src/app/theme.service';
 import {
@@ -55,6 +55,7 @@ export class NavigationComponent implements OnInit {
   multiBizLocations: Location[];
 
   locationState: LocationState;
+  singleUserLocation: Location;
   singleUserLocationName: string;
   multiUserLocations: Location[];
   activatedLocation: Location;
@@ -65,7 +66,7 @@ export class NavigationComponent implements OnInit {
   ngOnInit() {
     console.clear();
     this.userAuthSub = this.store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((user) => {
         console.log(user);
@@ -105,6 +106,11 @@ export class NavigationComponent implements OnInit {
             ? this.locationState.userLocations
             : null;
 
+        this.singleUserLocation =
+        this.locationState.userLocations.length === 1
+          ? this.locationState.userLocations[0]
+          : null;
+
         this.singleUserLocationName =
           this.locationState.userLocations.length === 1
             ? this.locationState.userLocations[0].locationName
@@ -130,6 +136,7 @@ export class NavigationComponent implements OnInit {
               ? bizState.businessLocations[0].locationName
               : null;
         }
+        // console.log(bizState)
       });
 
     this.themeSub = this.themeService.themeStatus.subscribe((themeModeData) => {
@@ -137,7 +144,7 @@ export class NavigationComponent implements OnInit {
     });
     this.themeService.getThemeMode();
 
-    if (this.userRole === 'owner') {
+    if (this.userRole === 'owner' || this.userDept === 'admin') {
       this.manageRoute = '/app/business';
     } else if (this.userRole === 'manager') {
       this.manageRoute = '/app/location';
@@ -145,16 +152,25 @@ export class NavigationComponent implements OnInit {
       this.manageRoute = null;
     }
 
-    this.manageIcon = this.userRole === 'owner' ? 'business' : 'store';
+    this.manageIcon = this.userRole === 'owner' || this.userDept === 'admin' ? 'business' : 'store';
 
     this.isHandset$.subscribe((state) => {
       this.sideNavOpen = !state;
     });
 
+    // if (this.userRole !== 'owner') {
+    //   if (this.multiUserLocations) {
+    //     this.locationService.getActivatedLocation();
+    //   } else if (this.singleUserLocationName) {
+    //     this.onActivateLocation(this.singleUserLocation)
+    //   }
+    // }
+
     if (this.userRole === 'owner') {
       if (this.multiBizLocations) {
         this.locationService.getActivatedLocation();
       } else if (this.singleBizLocationName) {
+        console.log(this.singleBizLocationName)
         this.onActivateLocation(this.businessState.businessLocations[0]);
       }
     } else {
@@ -164,6 +180,7 @@ export class NavigationComponent implements OnInit {
         this.locationService.getActivatedLocation();
         // IF USER ONLY HAS ONE AUTHORIZED LOCATION, ACTIVATE THAT ONE
       } else if (this.locationState.userLocations.length === 1) {
+        console.log('got')
         this.onActivateLocation(this.locationState.userLocations[0]);
       }
     }

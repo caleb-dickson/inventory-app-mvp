@@ -40,14 +40,14 @@
       <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
         <mat-icon class="sidenav-icon">trending_up</mat-icon>Insights
       </a>
-      <a mat-list-item routerLink="/app/products" routerLinkActive="active">
+      <a *ngIf="userRole !== 'staff' || userDept === 'admin'" mat-list-item routerLink="/app/products" routerLinkActive="active">
         <mat-icon class="sidenav-icon">sell</mat-icon>Products
       </a>
       <a mat-list-item routerLink="/app/new-inventory" routerLinkActive="active">
         <mat-icon class="sidenav-icon">addchart</mat-icon>Working Inventory
       </a>
       <a
-        *ngIf="userRole === 'manager' || 'owner'"
+        *ngIf="userRole !== 'staff' || userDept === 'admin'"
         mat-list-item
         routerLink="/app/past-inventory"
         routerLinkActive="active"

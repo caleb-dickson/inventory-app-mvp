@@ -14,7 +14,7 @@ import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class ManagerGuard implements CanActivate {
   constructor(
     private store: Store<fromAppStore.AppState>,
     private router: Router
@@ -28,17 +28,18 @@ export class AuthGuard implements CanActivate {
     | UrlTree
     | Promise<boolean | UrlTree>
     | Observable<boolean | UrlTree> {
-    return this.store.select('auth').pipe(
+    return this.store.select('user').pipe(
       take(1),
       map((authState) => {
-        return authState.userAuth;
+        return authState.userAuth.userProfile;
       }),
-      map((user) => {
-        const isAuth = !!user;
-        if (isAuth) {
+      map((userProfile) => {
+        const isMgr = userProfile.role > 1 || userProfile.department === 'admin' ? true : false;
+        if (isMgr) {
           return true;
         }
-        return this.router.createUrlTree(['/']);
+        console.log(isMgr);
+        return this.router.createUrlTree(['/app/dashboard']);
       })
     );
   }

@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 
-import { LoginComponent } from './login/login.component';
-import { SignupComponent } from './signup/signup.component';
+import { LoginComponent } from './auth/login/login.component';
+import { SignupComponent } from './auth/signup/signup.component';
 import { MaterialModule } from '../material.module';
-import { AuthComponent } from './auth.component';
+import { AuthComponent } from './auth/auth.component';
 
 const authRoutes: Routes = [
   {
@@ -25,8 +25,8 @@ const authRoutes: Routes = [
     CommonModule,
     RouterModule.forChild(authRoutes),
     FormsModule,
-    MaterialModule
+    MaterialModule,
   ],
   exports: [AuthComponent, LoginComponent, SignupComponent],
 })
-export class AuthModule {}
+export class UserModule {}

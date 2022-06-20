@@ -1,5 +1,5 @@
-import { Component, Inject, OnInit, Renderer2 } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
+import { Component, OnInit, /* Inject, Renderer2 */ } from '@angular/core';
+// import { DOCUMENT } from '@angular/common';
 
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../app-store/app.reducer';
 
-import { AuthService } from '../auth/auth-control/auth.service';
+import { AuthService } from '../users/user-control/auth.service';
 import { ThemeService } from '../theme.service';
 import { NgForm } from '@angular/forms';
 
@@ -23,20 +23,20 @@ export class LandingComponent implements OnInit {
   displayName: string;
   error: string;
 
-  private userAuthSub: Subscription;
-  private themeSub: Subscription;
+  private _userSub: Subscription;
+  private _themeSub: Subscription;
 
   constructor(
-    @Inject(DOCUMENT) private document: Document,
-    private renderer: Renderer2,
+    // @Inject(DOCUMENT) private document: Document,
+    // private renderer: Renderer2,
     private authService: AuthService,
     private themeService: ThemeService,
     private store: Store<fromAppStore.AppState>
   ) {}
 
   ngOnInit() {
-    this.userAuthSub = this.store
-      .select('auth')
+    this._userSub = this.store
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((userAuth) => {
         this.isAuthenticated = !!userAuth;
@@ -45,7 +45,7 @@ export class LandingComponent implements OnInit {
         }
       });
 
-    this.themeSub = this.themeService.themeStatus.subscribe((themeModeData) => {
+    this._themeSub = this.themeService.themeStatus.subscribe((themeModeData) => {
       this.themeMode = themeModeData;
     });
     this.themeService.getThemeMode();

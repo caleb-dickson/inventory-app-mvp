@@ -2,10 +2,10 @@ import { Component, Input, OnDestroy, OnInit, Output } from '@angular/core';
 
 import { Store } from '@ngrx/store';
 import { map, Subscription } from 'rxjs';
-import * as fromAppStore from '../app-store/app.reducer';
+import * as fromAppStore from '../../app-store/app.reducer';
 
-import { AuthService } from '../auth/auth-control/auth.service';
-import { ThemeService } from '../theme.service';
+import { AuthService } from '../user-control/auth.service';
+import { ThemeService } from '../../theme.service';
 
 @Component({
   selector: 'app-auth',
@@ -28,7 +28,7 @@ export class AuthComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.userAuthSub = this.store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((userAuth) => {
         this.isAuthenticated = !!userAuth;

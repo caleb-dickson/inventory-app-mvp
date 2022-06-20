@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as fromAppStore from '../../app-store/app.reducer';
-import * as AuthActions from './auth.actions';
+import * as UserActions from './user.actions';
 import { clearBusinessState } from '../../core/business/business-store/business.actions';
 import { clearLocationState } from 'src/app/core/business/location/location-store/location.actions';
 
@@ -14,13 +14,12 @@ import { catchError, concatMap, map, switchMap, tap } from 'rxjs/operators';
 
 import { environment } from 'src/environments/environment';
 
-import { AuthService } from '../auth-control/auth.service';
+import { AuthService } from '../user-control/auth.service';
 
-import { User } from '../auth-control/user.model';
+import { User } from '../user-control/user.model';
 import { Location } from '../../core/business/business-control/location.model';
 
 import { MatDialog } from '@angular/material/dialog';
-import { ThemeService } from 'src/app/theme.service';
 
 const BACKEND_URL = environment.apiUrl + '/user';
 
@@ -35,17 +34,17 @@ const handleError = (errorRes: HttpErrorResponse) => {
       ' ' +
       errorRes.statusText +
       'An unknown error has occurred.';
-    return of(AuthActions.authFail({ errorMessage }));
+    return of(UserActions.authFail({ errorMessage }));
   }
 
-  return of(AuthActions.authFail({ errorMessage }));
+  return of(UserActions.authFail({ errorMessage }));
 };
 
 @Injectable()
-export class AuthEffects {
+export class UserEffects {
   signupStart$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.signupStart),
+      ofType(UserActions.signupStart),
       switchMap((action) => {
         return this.http
           .post<{ email: string; password: string }>(BACKEND_URL + '/signup', {
@@ -64,7 +63,7 @@ export class AuthEffects {
           .pipe(
             tap((resData) => console.log(resData)),
             map((resData) => {
-              return AuthActions.loginStart({
+              return UserActions.loginStart({
                 email: action.newUser.email,
                 password: action.newUser.password,
               });
@@ -80,7 +79,7 @@ export class AuthEffects {
 
   loginStart$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.loginStart),
+      ofType(UserActions.loginStart),
       switchMap((action) => {
         return this.http
           .post<{
@@ -128,7 +127,7 @@ export class AuthEffects {
                 this.dialog.closeAll();
                 this.router.navigate(['/app/dashboard']);
               }
-              return AuthActions.authSuccess({
+              return UserActions.authSuccess({
                 user: {
                   userId: resData.userId,
                   email: resData.user.email,
@@ -148,7 +147,7 @@ export class AuthEffects {
 
   fetchUserLocations$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.GETUserLocationsStart),
+      ofType(UserActions.GETUserLocationsStart),
       concatMap((action) => {
         console.log('||| userId: ===>>>' + action.userId);
         return this.http
@@ -167,7 +166,7 @@ export class AuthEffects {
                 const locations = resData.fetchedLocations;
                 localStorage.setItem('locations', JSON.stringify(locations));
 
-                return AuthActions.GETUserLocationsSuccess({
+                return UserActions.GETUserLocationsSuccess({
                   locations: returnedLocations,
                 });
               }
@@ -183,7 +182,7 @@ export class AuthEffects {
 
   autoLogin$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(AuthActions.autoLogin),
+      ofType(UserActions.autoLogin),
       map(() => {
         // PULL AUTHDATA FROM LOCAL STORAGE
         const userAuthData: {
@@ -230,7 +229,7 @@ export class AuthEffects {
           const now = new Date().getTime();
           const expirationDuration = authorizedUser.expiration.getTime() - now;
           this.authService.setLogoutTimer(expirationDuration);
-          return AuthActions.authSuccess({
+          return UserActions.authSuccess({
             user: {
               userId: userAuthData.userId,
               email: userProfile.email,
@@ -240,7 +239,7 @@ export class AuthEffects {
           });
         } else {
           console.log('User ID is: ' + authorizedUser.userId);
-          return AuthActions.authFail({
+          return UserActions.authFail({
             errorMessage: 'Not authenticated! Log in.',
           });
         }
@@ -251,7 +250,7 @@ export class AuthEffects {
   authLogout$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthActions.logout),
+        ofType(UserActions.logout),
         tap(() => {
           this.authService.clearLogoutTimer();
           localStorage.clear();

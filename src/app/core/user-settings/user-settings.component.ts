@@ -6,14 +6,14 @@ import { Store } from '@ngrx/store';
 import { map, Subscription } from 'rxjs';
 import * as fromAppStore from '../../app-store/app.reducer';
 
-import { User } from 'src/app/auth/auth-control/user.model';
+import { User } from 'src/app/users/user-control/user.model';
 
 @Component({
-  selector: 'app-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss'],
+  selector: 'app-user-settings',
+  templateUrl: './user-settings.component.html',
+  styleUrls: ['./user-settings.component.scss'],
 })
-export class SettingsComponent implements OnInit {
+export class UserSettingsComponent implements OnInit {
   userProfileForm: FormGroup;
   imagePreview: string;
 
@@ -29,7 +29,7 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit() {
     this.userAuthSub = this.store
-      .select('auth')
+      .select('user')
       .pipe(map((authState) => authState.userAuth))
       .subscribe((user) => {
         this.user = user;
