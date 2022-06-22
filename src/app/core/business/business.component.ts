@@ -162,7 +162,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
 
         // SET FORM VALUE AS INPUT FILE
         this.businessForm.patchValue({ userPhoto: this.bizPhotoUpload });
-        this.businessForm.get('userPhoto').updateValueAndValidity();
+        this.businessForm.get('businessPhoto').updateValueAndValidity();
 
         // READ AND VALIDATE THE FILE
         const reader = new FileReader();
@@ -188,16 +188,16 @@ export class BusinessComponent implements OnInit, OnDestroy {
           // IF MIME TYPE IS INVALID, SET FORM ERROR
           if (!this.mimeTypeValid) {
             this.businessForm
-              .get('userPhoto')
+              .get('businessPhoto')
               .setErrors({ invalidMimeType: true });
 
             // IF FILE IS TOO LARGE, SET FORM ERROR
           } else if (!this.fileSizeOk) {
-            this.businessForm.get('userPhoto').setErrors({ fileTooLarge: true });
+            this.businessForm.get('businessPhoto').setErrors({ fileTooLarge: true });
           }
         };
 
-        this.businessForm.get('userPhoto').updateValueAndValidity();
+        this.businessForm.get('businessPhoto').updateValueAndValidity();
         reader.readAsDataURL(this.bizPhotoUpload);
         console.log(this.businessForm.value);
   }

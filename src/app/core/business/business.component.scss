@@ -29,6 +29,21 @@
           margin-inline-start: 1rem;
         }
 
+        &-photo {
+          display: flex;
+
+          button {
+            height: 2.5rem;
+          }
+
+          input[type="file"] {
+            visibility: hidden;
+          }
+          img {
+            margin-inline-start: -15rem;
+          }
+        }
+
         &-name {
           margin-top: 0.8rem;
 

@@ -1,11 +1,7 @@
 <div class="business-manage">
   <mat-card>
     <mat-card-header>
-      <img
-        mat-card-avatar
-        [src]="businessPhoto"
-        alt="Business photo"
-      />
+      <img mat-card-avatar [src]="businessPhoto" alt="Business photo" />
       <mat-card-title>Manage Business</mat-card-title>
       <mat-card-subtitle>
         {{ user.userProfile.firstName + " " + user.userProfile.lastName }} -
@@ -78,6 +74,33 @@
             <mat-label *ngIf="!businessName"> Add business</mat-label>
           </button>
         </p>
+        <div class="business-info-photo">
+          <button mat-stroked-button type="button" (click)="filePicker.click()">
+            Change Business Photo
+          </button>
+          <input
+            #filePicker
+            type="file"
+            accept="image/png, image/jpg, image/jpeg"
+            (change)="onBusinessPhotoPicked($event)"
+          />
+          <div
+            class="image-preview"
+            *ngIf="
+              imagePreview &&
+              imagePreview !== '' &&
+              businessForm.get('businessPhoto').valid
+            "
+          >
+            <img
+              [src]="imagePreview"
+              [alt]="
+                businessForm.get('businessName').value + '-businessPhoto'
+                  | lowercase
+              "
+            />
+          </div>
+        </div>
         <h6 class="business-info-subtitle">
           {{ locations ? "Manage Locations" : null }}
         </h6>
