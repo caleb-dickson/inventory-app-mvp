@@ -7,6 +7,7 @@ import * as AuthActions from '../user-store/user.actions';
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../auth/login/login.component';
 import { SignupComponent } from '../auth/signup/signup.component';
+import { NgForm } from '@angular/forms';
 
 export interface AuthResponseData {
   email: string;
@@ -14,7 +15,7 @@ export interface AuthResponseData {
 }
 
 @Injectable({ providedIn: 'root' })
-export class AuthService {
+export class UserService {
   private tokenExpirationTimer: any;
 
   constructor(
@@ -61,4 +62,5 @@ export class AuthService {
     }
     this.store.dispatch(AuthActions.clearError());
   }
+
 }

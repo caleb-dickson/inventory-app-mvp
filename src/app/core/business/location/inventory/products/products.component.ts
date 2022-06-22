@@ -38,6 +38,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   userRole: string;
 
   bizLoading: boolean;
+  locLoading: boolean;
 
   newProductForm: NgForm;
 
@@ -59,7 +60,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
     this._userAuthSub = this.store
       .select('user')
-      .pipe(map((authState) => authState.userAuth))
+      .pipe(map((authState) => authState.user))
       .subscribe((user) => {
         this.user = user;
         if (!!user) {
@@ -83,6 +84,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.locationState = locState;
         this.activeLocation = locState.activeLocation;
         this.activeProducts = locState.activeProducts;
+        this.locLoading = locState.loading;
         console.group('%cLocation State', 'font-size: 1rem', locState);
         console.groupEnd();
       });

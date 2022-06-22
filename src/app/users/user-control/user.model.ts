@@ -1,7 +1,8 @@
 export class User {
+  _id: string | null;
   userId: string | null;
   email: string;
-  password: string;
+  password: string | null;
   userProfile: {
     role: number;
     department: string;
@@ -9,9 +10,11 @@ export class User {
     lastName: string;
     phoneNumber: string;
     themePref: string | null;
+    userPhoto: string | null;
   };
 
   constructor(
+    _id: string | null,
     userId: string | null,
     email: string,
     password: string,
@@ -22,6 +25,7 @@ export class User {
       lastName: string,
       phoneNumber: string,
       themePref: string | null,
+      userPhoto: string | null
     },
   ) {
     this.userId = userId;

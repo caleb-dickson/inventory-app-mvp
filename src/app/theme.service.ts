@@ -35,11 +35,10 @@ export class ThemeService {
     }
   }
 
-  switchThemeMode(checked: boolean) {
-    const themeMode = checked ? 'theme-dark' : 'theme-light';
-    this.themeStatus.next(themeMode);
+  switchThemeMode(theme: string) {
+    this.themeStatus.next(theme);
     const guestUserData = {
-      themePref: themeMode,
+      themePref: theme,
     };
     localStorage.setItem('guestUserData', JSON.stringify(guestUserData));
   }

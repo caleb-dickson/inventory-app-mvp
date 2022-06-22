@@ -32,7 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.userAuthSub = this.store
       .select('user')
-      .pipe(map((authState) => authState.userAuth))
+      .pipe(map((authState) => authState.user))
       .subscribe((userAuth) => {
         this.isAuthenticated = !!userAuth;
       });
@@ -47,10 +47,10 @@ export class AppComponent implements OnInit, OnDestroy {
       this.themeService.setThemeMode();
       this.themeService.getThemeMode();
       if (this.themeMode == 'theme-light') {
-        this.themeService.switchThemeMode(false);
+        this.themeService.switchThemeMode(this.themeMode);
         this.renderer.setAttribute(this.document.body, 'class', this.themeMode);
       } else {
-        this.themeService.switchThemeMode(true);
+        this.themeService.switchThemeMode(this.themeMode);
         this.renderer.setAttribute(this.document.body, 'class', this.themeMode);
       }
     }

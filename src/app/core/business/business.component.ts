@@ -39,6 +39,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
 
   businessName: string;
   businessId: string;
+  businessPhoto: string;
   businessSubmitMode: string;
 
   locations: Location[];
@@ -56,6 +57,12 @@ export class BusinessComponent implements OnInit, OnDestroy {
   updateLocationForm: FormGroup;
   addUserToLocationForm: FormGroup;
 
+  imagePreview: string;
+  bizPhotoUpload: Blob | null;
+  mimeType: string;
+  mimeTypeValid = true;
+  fileSizeOk = true;
+
   ngOnInit() {
     console.clear();
     // USER STORE
@@ -64,9 +71,9 @@ export class BusinessComponent implements OnInit, OnDestroy {
       .pipe(map((authState) => authState))
       .subscribe((authState) => {
         this.authState = authState;
-        if (authState && authState.userAuth) {
-          this.user = authState.userAuth;
-          this.userId = authState.userAuth.userId;
+        if (authState && authState.user) {
+          this.user = authState.user;
+          this.userId = authState.user.userId;
         }
       });
 
@@ -83,17 +90,17 @@ export class BusinessComponent implements OnInit, OnDestroy {
           this.locations = bizState.businessLocations;
           this.locationAddUserSelector = bizState.locationSelected;
           this.locationEditSelector = bizState.locationSelected;
-          console.log(this.locations);
+          this.businessPhoto = bizState.business.businessPhoto;
 
-          this.initBusinessForm();
-          this.initNewLocationForm();
-          this.initUpdateLocationForm();
+          this._initBusinessForm();
+          this._initNewLocationForm();
+          this._initUpdateLocationForm();
 
           if (
             this.locationAddUserSelector &&
             this.locationAddUserSelector.locationName
           ) {
-            this.initAddUserToLocationForm();
+            this._initAddUserToLocationForm();
           }
         }
       });
@@ -114,37 +121,85 @@ export class BusinessComponent implements OnInit, OnDestroy {
 
   onEditBusiness(mode: string) {
     this.businessSubmitMode = mode;
-    this.initBusinessForm();
+    this._initBusinessForm();
   }
 
   onEditLocation(mode: boolean | null, location?: Location) {
     this.locationEditMode = mode;
     this.store.dispatch(BusinessActions.SelectLocation({ location: location }));
     console.log(this.locationEditSelector);
-    this.initUpdateLocationForm();
+    this._initUpdateLocationForm();
   }
 
   onCreateLocation(mode: boolean) {
     this.locationSubmitMode = mode;
-    this.initNewLocationForm();
+    this._initNewLocationForm();
   }
 
   // RESETS THE FORMS AND UI TO ABORT EDITING
   onCancelForm(formToCancel: string) {
     if (formToCancel === 'business') {
       this.businessSubmitMode = null;
-      this.initBusinessForm();
+      this._initBusinessForm();
     } else if (formToCancel === 'location') {
       this.locationSubmitMode = false;
-      this.initNewLocationForm();
+      this._initNewLocationForm();
     } else if (formToCancel === 'location-update') {
       this.locationEditMode = false;
-      this.initUpdateLocationForm();
+      this._initUpdateLocationForm();
     } else if (formToCancel === 'add-location-user') {
       this.addUserToLocationMode = null;
       this.locationAddUserSelector = null;
     }
+    this.mimeTypeValid = true;
+    this.fileSizeOk = true;
+    this.imagePreview = null;
     this.store.dispatch(BusinessActions.clearError());
+  }
+
+  onBusinessPhotoPicked(event: Event) {
+    this.bizPhotoUpload = (event.target as HTMLInputElement).files[0];
+
+        // SET FORM VALUE AS INPUT FILE
+        this.businessForm.patchValue({ userPhoto: this.bizPhotoUpload });
+        this.businessForm.get('userPhoto').updateValueAndValidity();
+
+        // READ AND VALIDATE THE FILE
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          this.imagePreview = reader.result as string;
+          this.mimeType = this.bizPhotoUpload.type;
+
+          // CHECK FILE SIZE AND ASSIGN VALIDITY VALUE
+          this.fileSizeOk = this.bizPhotoUpload.size < 5000000 ? true : false;
+
+          // CHECK MIME TYPE AND ASSIGN VALIDITY VALUE
+          switch (this.mimeType) {
+            case 'image/png':
+            case 'image/jpg':
+            case 'image/jpeg':
+              this.mimeTypeValid = true;
+              break;
+            default:
+              this.mimeTypeValid = false;
+              break;
+          }
+
+          // IF MIME TYPE IS INVALID, SET FORM ERROR
+          if (!this.mimeTypeValid) {
+            this.businessForm
+              .get('userPhoto')
+              .setErrors({ invalidMimeType: true });
+
+            // IF FILE IS TOO LARGE, SET FORM ERROR
+          } else if (!this.fileSizeOk) {
+            this.businessForm.get('userPhoto').setErrors({ fileTooLarge: true });
+          }
+        };
+
+        this.businessForm.get('userPhoto').updateValueAndValidity();
+        reader.readAsDataURL(this.bizPhotoUpload);
+        console.log(this.businessForm.value);
   }
 
   // BUSINESS FORM SUBMIT (JUST TO CHANGE BUSINESS NAME FOR NOW)
@@ -153,6 +208,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.businessSubmitMode === 'new') {
+      this.businessForm.updateValueAndValidity();
       console.log(this.businessForm.value);
       console.log(this.businessForm);
       this.store.dispatch(
@@ -161,6 +217,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
             _id: null,
             businessName: this.businessForm.value.businessName,
             ownerId: this.userId,
+            businessPhoto: this.businessPhoto,
             locations: [],
           },
         })
@@ -168,12 +225,14 @@ export class BusinessComponent implements OnInit, OnDestroy {
     } else {
     }
     this.businessSubmitMode === 'update';
+    this.businessForm.updateValueAndValidity();
     this.store.dispatch(
       BusinessActions.PUTBusinessStart({
         business: {
           _id: this.businessId,
           businessName: this.businessForm.value.businessName,
           ownerId: this.userId,
+          businessPhoto: this.businessPhoto,
           locations: this.locations,
         },
       })
@@ -201,7 +260,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
       })
     );
     this.locationSubmitMode = null;
-    this.initNewLocationForm();
+    this._initNewLocationForm();
   }
 
   // LOCATION FORM SUBMIT (JUST TO CHANGE LOCATION NAME FOR NOW)
@@ -251,27 +310,16 @@ export class BusinessComponent implements OnInit, OnDestroy {
     this.addUserToLocationMode = null;
   }
 
-  // FUTURE IMPLEMENT
-  // onAvatarPicked(event: Event) {
-  //   const file = (event.target as HTMLInputElement).files[0];
-  //   this.userProfileForm.patchValue({ image: file });
-  //   this.userProfileForm.get('avatar').updateValueAndValidity();
-  //   const reader = new FileReader();
-  //   reader.onload = () => {
-  //     this.imagePreview = reader.result as string;
-  //   };
-  //   reader.readAsDataURL(file);
-  // }
-
-  private initBusinessForm() {
+  private _initBusinessForm() {
     this.businessForm = new FormGroup({
       businessName: new FormControl(this.businessName, {
         validators: [Validators.required],
       }),
+      businessPhoto: new FormControl(null)
     });
   }
 
-  private initNewLocationForm() {
+  private _initNewLocationForm() {
     this.newLocationForm = new FormGroup({
       locationName: new FormControl(null, {
         validators: [Validators.required],
@@ -279,7 +327,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
     });
   }
 
-  private initUpdateLocationForm() {
+  private _initUpdateLocationForm() {
     if (this.locationEditSelector && this.locationEditSelector.locationName) {
       this.updateLocationForm = new FormGroup({
         locationName: new FormControl(this.locationEditSelector.locationName, {
@@ -295,11 +343,10 @@ export class BusinessComponent implements OnInit, OnDestroy {
 
     this.store.dispatch(BusinessActions.SelectLocation({ location: location }));
 
-    this.initAddUserToLocationForm();
-    console.log(this.addUserToLocationMode);
+    this._initAddUserToLocationForm();
   }
 
-  private initAddUserToLocationForm() {
+  private _initAddUserToLocationForm() {
     let emails = new FormArray([]);
 
     this.addUserToLocationForm = new FormGroup({

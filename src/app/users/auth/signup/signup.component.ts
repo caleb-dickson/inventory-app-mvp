@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
 import * as AuthActions from '../../user-store/user.actions';
 
-import { AuthService } from '../../user-control/auth.service';
+import { UserService } from '../../user-control/user.service';
 
 @Component({
   templateUrl: './signup.component.html',
@@ -20,7 +20,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   private storeSub: Subscription;
 
   constructor(
-    public authService: AuthService,
+    public userService: UserService,
     private store: Store<fromAppStore.AppState>
   ) {}
 
@@ -50,6 +50,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       AuthActions.signupStart({
         newUser: {
+          _id: null,
           userId: null,
           email: signupForm.value.email,
           password: signupForm.value.password,
@@ -59,7 +60,8 @@ export class SignupComponent implements OnInit, OnDestroy {
             firstName: signupForm.value.firstName,
             lastName: signupForm.value.lastName,
             phoneNumber: signupForm.value.phoneNumber,
-            themePref: themePref
+            themePref: themePref,
+            userPhoto: null
           },
         },
       })

@@ -1,9 +1,5 @@
 @use "../../../sass/abstracts/variables" as var;
 
-input[type="file"] {
-  visibility: hidden;
-}
-
 .settings {
   display: flex;
   justify-content: center;
@@ -19,10 +15,10 @@ input[type="file"] {
     // mat-card-subtitle {}
 
     mat-card-content {
-
-
       .user-form {
-
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         p {
           font-size: 1.2rem;
           font-weight: 415;
@@ -31,20 +27,25 @@ input[type="file"] {
 
         mat-form-field {
           padding-inline: 2rem;
+          width: 30rem;
         }
 
+        .theme-toggle {
+          display: flex;
+          flex-direction: column;
+          margin-inline-start: 2rem;
+          margin-block-start: 1rem;
+          margin-block-end: 1.5rem;
+        }
       }
 
-      .business-form {
+      .user-photo-upload {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
 
-        mat-form-field {
-          padding-inline: 2rem;
-        }
-
-        p {
-          font-size: 1.2rem;
-          font-weight: 415;
-          margin-top: 1rem;
+        input[type="file"] {
+          visibility: hidden;
         }
       }
     }
@@ -52,6 +53,5 @@ input[type="file"] {
     // mat-card-actions {
     //   button {}
     // }
-
   }
 }

@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../app-store/app.reducer';
 
-import { AuthService } from '../users/user-control/auth.service';
+import { UserService } from '../users/user-control/user.service';
 import { ThemeService } from '../theme.service';
 import { NgForm } from '@angular/forms';
 
@@ -29,7 +29,7 @@ export class LandingComponent implements OnInit {
   constructor(
     // @Inject(DOCUMENT) private document: Document,
     // private renderer: Renderer2,
-    private authService: AuthService,
+    private userService: UserService,
     private themeService: ThemeService,
     private store: Store<fromAppStore.AppState>
   ) {}
@@ -37,7 +37,7 @@ export class LandingComponent implements OnInit {
   ngOnInit() {
     this._userSub = this.store
       .select('user')
-      .pipe(map((authState) => authState.userAuth))
+      .pipe(map((authState) => authState.user))
       .subscribe((userAuth) => {
         this.isAuthenticated = !!userAuth;
         if (this.isAuthenticated) {
@@ -60,6 +60,6 @@ export class LandingComponent implements OnInit {
   }
 
   onOpenAuth(mode: string) {
-    this.authService.openAuthForm(mode);
+    this.userService.openAuthForm(mode);
   }
 }

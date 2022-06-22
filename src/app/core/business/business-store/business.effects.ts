@@ -48,7 +48,7 @@ export class BusinessEffects {
   user: User;
   userAuthSub: Subscription = this.store
     .select('user')
-    .pipe(map((authState) => authState.userAuth))
+    .pipe(map((authState) => authState.user))
     .subscribe((userAuth) => (this.user = userAuth));
 
   addBusinessStart$ = createEffect(() =>
@@ -100,6 +100,7 @@ export class BusinessEffects {
               this.store.dispatch(
                 authSuccess({
                   user: {
+                    _id: resData.updatedUserId,
                     userId: resData.updatedUserId,
                     email: resData.updatedUser.email,
                     password: resData.updatedUser.password,
@@ -113,6 +114,7 @@ export class BusinessEffects {
                   _id: resData.businessId,
                   businessName: resData.business.businessName,
                   ownerId: resData.business.ownerId,
+                  businessPhoto: resData.business.businessPhoto,
                   locations: [],
                 },
               });
@@ -155,12 +157,12 @@ export class BusinessEffects {
               return BusinessActions.PUTBusinessSuccess({
                 business: resData.updatedBusiness,
               });
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return handleError(errorRes);
             })
           );
-      }),
-      catchError((errorRes) => {
-        console.log(errorRes);
-        return handleError(errorRes);
       })
     )
   );
@@ -200,12 +202,12 @@ export class BusinessEffects {
                   business: resData.business,
                 });
               }
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return handleError(errorRes);
             })
           );
-      }),
-      catchError((errorRes) => {
-        console.log(errorRes);
-        return handleError(errorRes);
       })
     )
   );
@@ -252,6 +254,10 @@ export class BusinessEffects {
               return BusinessActions.GETBusinessSuccess({
                 business: resData.updatedBusiness.business,
               });
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return handleError(errorRes);
             })
           );
       })
@@ -279,12 +285,12 @@ export class BusinessEffects {
                   locations: resData.fetchedLocations,
                 });
               }
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return handleError(errorRes);
             })
           );
-      }),
-      catchError((errorRes) => {
-        console.log(errorRes);
-        return handleError(errorRes);
       })
     )
   );
@@ -308,12 +314,12 @@ export class BusinessEffects {
               return BusinessActions.GETBusinessStart({
                 ownerId: this.user.userId,
               });
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return handleError(errorRes);
             })
           );
-      }),
-      catchError((errorRes) => {
-        console.log(errorRes);
-        return handleError(errorRes);
       })
     )
   );

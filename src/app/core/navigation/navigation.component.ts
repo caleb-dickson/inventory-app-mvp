@@ -67,7 +67,7 @@ export class NavigationComponent implements OnInit {
     console.clear();
     this.userAuthSub = this.store
       .select('user')
-      .pipe(map((authState) => authState.userAuth))
+      .pipe(map((authState) => authState.user))
       .subscribe((user) => {
         console.log(user);
         this.isAuthenticated = !!user;
@@ -107,9 +107,9 @@ export class NavigationComponent implements OnInit {
             : null;
 
         this.singleUserLocation =
-        this.locationState.userLocations.length === 1
-          ? this.locationState.userLocations[0]
-          : null;
+          this.locationState.userLocations.length === 1
+            ? this.locationState.userLocations[0]
+            : null;
 
         this.singleUserLocationName =
           this.locationState.userLocations.length === 1
@@ -152,7 +152,10 @@ export class NavigationComponent implements OnInit {
       this.manageRoute = null;
     }
 
-    this.manageIcon = this.userRole === 'owner' || this.userDept === 'admin' ? 'business' : 'store';
+    this.manageIcon =
+      this.userRole === 'owner' || this.userDept === 'admin'
+        ? 'business'
+        : 'store';
 
     this.isHandset$.subscribe((state) => {
       this.sideNavOpen = !state;
@@ -170,7 +173,7 @@ export class NavigationComponent implements OnInit {
       if (this.multiBizLocations) {
         this.locationService.getActivatedLocation();
       } else if (this.singleBizLocationName) {
-        console.log(this.singleBizLocationName)
+        console.log(this.singleBizLocationName);
         this.onActivateLocation(this.businessState.businessLocations[0]);
       }
     } else {
@@ -180,7 +183,7 @@ export class NavigationComponent implements OnInit {
         this.locationService.getActivatedLocation();
         // IF USER ONLY HAS ONE AUTHORIZED LOCATION, ACTIVATE THAT ONE
       } else if (this.locationState.userLocations.length === 1) {
-        console.log('got')
+        console.log('got');
         this.onActivateLocation(this.locationState.userLocations[0]);
       }
     }
@@ -209,7 +212,8 @@ export class NavigationComponent implements OnInit {
     );
 
   onThemeModeSwitched($event: any) {
-    this.themeService.switchThemeMode($event.checked);
+    let theme = $event.checked ? 'theme-dark' : 'theme-light';
+    this.themeService.switchThemeMode(theme);
   }
 
   checkBusiness() {
@@ -227,6 +231,7 @@ export class NavigationComponent implements OnInit {
             _id: storedBusiness.business._id,
             businessName: storedBusiness.business.businessName,
             ownerId: storedBusiness.business.ownerId,
+            businessPhoto: storedBusiness.business.businessPhoto,
             locations: [...storedBusiness.business.locations],
           },
         })

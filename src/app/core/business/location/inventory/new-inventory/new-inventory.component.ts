@@ -109,7 +109,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
 
     this._userAuthSub = this._store
       .select('user')
-      .pipe(map((authState) => authState.userAuth))
+      .pipe(map((authState) => authState.user))
       .subscribe((user) => {
         this.user = user;
         if (user) {

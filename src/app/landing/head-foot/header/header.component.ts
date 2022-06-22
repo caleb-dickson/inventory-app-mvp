@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
 import * as AuthActions from '../../../users/user-store/user.actions';
 
-import { AuthService } from '../../../users/user-control/auth.service';
+import { UserService } from '../../../users/user-control/user.service';
 import { ThemeService } from 'src/app/theme.service';
 
 @Component({
@@ -29,14 +29,14 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private themeService: ThemeService,
-    private authService: AuthService,
+    private userService: UserService,
     private store: Store<fromAppStore.AppState>
     ) {}
 
     ngOnInit() {
       this.userAuthSub = this.store
       .select('user')
-      .pipe(map((authState) => authState.userAuth))
+      .pipe(map((authState) => authState.user))
       .subscribe((userAuth) => {
         this.isAuthenticated = !!userAuth;
         if (this.isAuthenticated) {
@@ -60,7 +60,7 @@ export class HeaderComponent implements OnInit {
     }
 
     onOpenAuth(mode: string) {
-      this.authService.openAuthForm(mode);
+      this.userService.openAuthForm(mode);
     }
 
     toggleCollapsedHeader() {

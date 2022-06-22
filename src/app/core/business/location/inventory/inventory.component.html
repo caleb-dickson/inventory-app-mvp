@@ -3,19 +3,27 @@
   <div
     *ngIf="
       !inventoryDataPopulated ||
-      (inventoryDataPopulated && inventoryDataPopulated.length === 0)
-      &&
-      userDept !== 'admin'
+      (inventoryDataPopulated &&
+        inventoryDataPopulated.length === 0 &&
+        userDept !== 'admin')
     "
     class="inventory-message"
   >
-    <p>Past {{ userDept | uppercase }} inventories will show up here when finalized.</p>
+    <p>
+      Past {{ userDept | uppercase }} inventories will show up here when
+      finalized.
+    </p>
   </div>
 
   <div
     *ngIf="inventoryDataPopulated && inventoryDataPopulated.length >= 1"
     class="inventory-main"
   >
+    <mat-spinner
+      diameter="100"
+      strokeWidth="6"
+      *ngIf="loading"
+    ></mat-spinner>
     <!-- INVENTORY DATE FILTER -->
     <mat-form-field appearance="standard">
       <mat-label>Filter by date</mat-label>

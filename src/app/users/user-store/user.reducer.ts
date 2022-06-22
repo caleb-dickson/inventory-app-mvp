@@ -1,63 +1,79 @@
 import { Action, createReducer, on } from '@ngrx/store';
 
-import * as AuthActions from './user.actions';
+import * as UserActions from './user.actions';
 
 import { Location } from 'src/app/core/business/business-control/location.model';
 import { User } from '../user-control/user.model';
 
 export interface UserState {
-  userAuth: User;
+  user: User;
   userLocations: Location[];
+  userError: string;
   authError: string;
   loading: boolean;
 }
 
 const initialState: UserState = {
-  userAuth: null,
+  user: null,
   userLocations: [],
+  userError: null,
   authError: null,
   loading: false,
 };
 
-
-export function userReducer(authState: UserState | undefined, authAction: Action) {
+export function userReducer(
+  authState: UserState | undefined,
+  authAction: Action
+) {
   return createReducer(
     initialState,
-    on(AuthActions.loginStart, AuthActions.signupStart, (state) => ({
+    on(UserActions.loginStart, UserActions.signupStart, (state) => ({
       ...state,
       authError: null,
       loading: true,
     })),
-    on(AuthActions.authSuccess, (state, action) => ({
+    on(UserActions.authSuccess, (state, action) => ({
       ...state,
       authError: null,
       loading: false,
-      userAuth: action.user
+      user: action.user,
     })),
-    on(AuthActions.authFail, (state, action) => ({
+    on(UserActions.authFail, (state, action) => ({
       ...state,
-      userAuth: null,
+      user: null,
       authError: action.errorMessage,
       loading: false,
     })),
 
-    on(AuthActions.GETUserLocationsStart, (state) => ({
+    on(UserActions.GETUserLocationsStart, (state) => ({
       ...state,
       authError: null,
       loading: true,
     })),
-    on(AuthActions.GETUserLocationsSuccess, (state, action) => ({
+    on(UserActions.GETUserLocationsSuccess, (state, action) => ({
       ...state,
       authError: null,
       loading: false,
-      userLocations: action.locations
+      userLocations: action.locations,
     })),
 
-
-    on(AuthActions.logout, (state) => ({
+    on(UserActions.PUTUpdateUserStart, (state) => ({
       ...state,
-      userAuth: null,
+      loading: true
     })),
-    on(AuthActions.clearError, (state) => ({ ...state, authError: null }))
+    on(UserActions.PUTUpdateUserSuccess, (state, action) => ({
+      ...state,
+      loading: false,
+      user: action.user
+    })),
+
+    on(UserActions.logout, (state) => ({
+      ...state = initialState
+    })),
+    on(UserActions.userError, (state, action) => ({
+      ...state,
+      userError: action.message,
+    })),
+    on(UserActions.clearError, (state) => ({ ...state, authError: null }))
   )(authState, authAction);
 }

@@ -3,8 +3,8 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        src="../../../assets/inv-logo-simple.png"
-        alt="Your profile photo"
+        [src]="businessPhoto"
+        alt="Business photo"
       />
       <mat-card-title>Manage Business</mat-card-title>
       <mat-card-subtitle>
@@ -266,8 +266,8 @@
           <mat-label>
             {{
               addUserToLocationMode && locationAddUserSelector === location
-                ? "Invite More"
-                : "Invite Managers"
+                ? "Add More"
+                : "Add Managers"
             }}</mat-label
           >
         </button>
@@ -322,8 +322,8 @@
           <mat-label>
             {{
               addUserToLocationMode && locationAddUserSelector === location
-                ? "Invite More"
-                : "Invite Junior Staff"
+                ? "Add More"
+                : "Add Junior Staff"
             }}</mat-label
           >
         </button>

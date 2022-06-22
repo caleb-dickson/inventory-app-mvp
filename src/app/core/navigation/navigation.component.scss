@@ -7,12 +7,19 @@
     padding-left: 1rem;
     width: 13rem;
 
-    mat-toolbar {
+    mat-toolbar-row {
       background: inherit;
       // position: sticky;
       // top: 0;
       // z-index: 100;
       // max-width: 10rem;
+
+      img {
+        height: 7rem;
+        width: 7rem;
+        transform: translateY(2rem);
+        z-index: -1;
+      }
 
       .sidenav-owner-name {
         overflow: hidden;
@@ -23,7 +30,8 @@
       .sidenav-non-owner-name {
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: 1.3rem;
+        font-size: 1rem;
+        margin-block-start: 1rem;
       }
     }
 

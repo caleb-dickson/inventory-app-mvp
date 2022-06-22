@@ -1,4 +1,5 @@
-<div *ngIf="!locationState.loading" class="product">
+<mat-spinner diameter="100" strokeWidth="6" *ngIf="locLoading || bizLoading"></mat-spinner>
+<div *ngIf="!locLoading && !bizLoading" class="product">
   <h4 *ngIf="!activeLocation" class="no-active-location">
     Select a location to access products.
   </h4>

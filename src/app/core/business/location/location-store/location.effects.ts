@@ -82,12 +82,12 @@ export class LocationEffects {
                     'No authorized locations found. Ask the account owner for access.',
                 });
               }
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return handleError(errorRes);
             })
           );
-      }),
-      catchError((errorRes) => {
-        console.log(errorRes);
-        return handleError(errorRes);
       })
     )
   );
@@ -99,7 +99,7 @@ export class LocationEffects {
       concatMap(([action, authState]) => {
         console.warn('||| addProductToLocation$ effect called |||===');
         console.log(action);
-        console.log(authState.userAuth.userId);
+        console.log(authState.user.userId);
         return this.http
           .post<{ message: string; updatedActiveLocation: Location }>(
             BACKEND_URL + '/new-product',
@@ -130,15 +130,15 @@ export class LocationEffects {
               }
 
               return LocationActions.GETUserLocationsStart({
-                userId: authState.userAuth.userId,
-                userRole: authState.userAuth.userProfile.role,
+                userId: authState.user.userId,
+                userRole: authState.user.userProfile.role,
               });
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return handleError(errorRes);
             })
           );
-      }),
-      catchError((errorRes) => {
-        console.log(errorRes);
-        return handleError(errorRes);
       })
     )
   );
@@ -186,15 +186,15 @@ export class LocationEffects {
               }
 
               return LocationActions.GETUserLocationsStart({
-                userId: authState.userAuth.userId,
-                userRole: authState.userAuth.userProfile.role,
+                userId: authState.user.userId,
+                userRole: authState.user.userProfile.role,
               });
+            }),
+            catchError((errorRes) => {
+              console.warn(errorRes);
+              return handleError(errorRes);
             })
           );
-      }),
-      catchError((errorRes) => {
-        console.warn(errorRes);
-        return handleError(errorRes);
       })
     )
   );
@@ -225,15 +225,15 @@ export class LocationEffects {
               });
             }
             return LocationActions.GETUserLocationsStart({
-              userId: authState.userAuth.userId,
-              userRole: authState.userAuth.userProfile.role,
+              userId: authState.user.userId,
+              userRole: authState.user.userProfile.role,
             });
+          }),
+          catchError((errorRes) => {
+            console.warn(errorRes);
+            return handleError(errorRes);
           })
         );
-    }),
-    catchError((errorRes) => {
-      console.warn(errorRes);
-      return handleError(errorRes);
     })
   )
 );
@@ -281,12 +281,12 @@ export class LocationEffects {
                   errorMessage: 'No inventories found for this location.',
                 });
               }
+            }),
+            catchError((errorRes) => {
+              console.warn(errorRes);
+              return handleError(errorRes);
             })
           );
-      }),
-      catchError((errorRes) => {
-        console.warn(errorRes);
-        return handleError(errorRes);
       })
     )
   );

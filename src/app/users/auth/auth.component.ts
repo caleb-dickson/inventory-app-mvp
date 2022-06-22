@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { map, Subscription } from 'rxjs';
 import * as fromAppStore from '../../app-store/app.reducer';
 
-import { AuthService } from '../user-control/auth.service';
+import { UserService } from '../user-control/user.service';
 import { ThemeService } from '../../theme.service';
 
 @Component({
@@ -21,7 +21,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   private themeSub: Subscription;
 
   constructor(
-    private authService: AuthService,
+    private userService: UserService,
     private themeService: ThemeService,
     private store: Store<fromAppStore.AppState>
   ) {}
@@ -29,7 +29,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.userAuthSub = this.store
       .select('user')
-      .pipe(map((authState) => authState.userAuth))
+      .pipe(map((authState) => authState.user))
       .subscribe((userAuth) => {
         this.isAuthenticated = !!userAuth;
       });
@@ -41,7 +41,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   onOpenAuth(mode: string) {
-    this.authService.openAuthForm(mode);
+    this.userService.openAuthForm(mode);
   }
 
   ngOnDestroy() {

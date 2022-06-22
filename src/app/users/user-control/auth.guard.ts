@@ -31,7 +31,7 @@ export class AuthGuard implements CanActivate {
     return this.store.select('user').pipe(
       take(1),
       map((authState) => {
-        return authState.userAuth;
+        return authState.user;
       }),
       map((user) => {
         const isAuth = !!user;

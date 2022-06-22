@@ -8,7 +8,14 @@
     [mode]="(isHandset$ | async) ? 'over' : 'side'"
     [opened]="(isHandset$ | async) === false"
   >
-    <mat-toolbar>
+    <mat-toolbar-row>
+      <img
+      [src]="user.userProfile.userPhoto"
+      alt="Your profile photo"
+    />
+    </mat-toolbar-row>
+    <mat-toolbar-row>
+
       <!-- **OWNER** -->
       <span *ngIf="userRole === 'owner'" class="sidenav-owner-name">
         {{
@@ -22,7 +29,7 @@
         {{ user.userProfile.firstName + " " + user.userProfile.lastName }}
       </span>
       <br />
-    </mat-toolbar>
+    </mat-toolbar-row>
     <!-- **USER ROLE & DEPARTMENT** -->
     <p class="sidenav-user-role">
       {{ (userRole | titlecase) + " - " + (userDept | uppercase) }}
@@ -30,7 +37,7 @@
     <!-- **THEME CONTROL** -->
     <mat-slide-toggle
       (change)="onThemeModeSwitched($event)"
-      [checked]="user.userProfile.themePref === 'theme-dark' ? true : false"
+      [checked]="themeMode === 'theme-dark' ? true : false"
       >Dark Mode</mat-slide-toggle
     >
     <mat-nav-list>

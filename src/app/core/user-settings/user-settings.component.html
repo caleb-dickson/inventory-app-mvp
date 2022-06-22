@@ -1,22 +1,44 @@
 <div class="settings">
   <mat-card class="settings-owner">
-    <mat-card-header>
+    <mat-spinner
+    diameter="100"
+    strokeWidth="6"
+    *ngIf="userLoading"
+  ></mat-spinner>
+    <mat-card-header *ngIf="!userLoading">
       <img
         mat-card-avatar
-        src="../../../assets/inv-logo-simple.png"
+        [src]="user.userProfile.userPhoto"
         alt="Your profile photo"
       />
       <mat-card-title>Settings</mat-card-title>
       <mat-card-subtitle>
-        {{ user.userProfile.firstName + " " + user.userProfile.lastName }} - {{ userRole }}
+        {{ user.userProfile.firstName + " " + user.userProfile.lastName }} -
+        {{ userRole }}
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <form
-        [formGroup]="userProfileForm"
-        (ngSubmit)="onUserProfileSubmit()"
-        class="user-form"
-      >
+      <form [formGroup]="userProfileForm" class="user-form">
+        <p>Authorization</p>
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input matInput type="text" formControlName="email"/>
+          <mat-error *ngIf="userProfileForm.get('email').invalid"
+            >Please enter the email you'd like to sign in with.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field appearance="standard">
+          <mat-label>Inventory Department</mat-label>
+          <mat-select type="text" formControlName="department" (valueChange)="onDepartmentSelect($event)">
+            <mat-option
+              *ngFor="let dept of ['boh', 'foh', 'admin']"
+              [value]="dept"
+            >
+              {{ dept | uppercase }}
+            </mat-option>
+          </mat-select>
+          <mat-error>Please select a department.</mat-error>
+        </mat-form-field>
         <p>User Profile</p>
         <mat-form-field>
           <mat-label>First Name</mat-label>
@@ -44,9 +66,20 @@
             >Please enter your phone number (ex. 4048534924).</mat-error
           >
         </mat-form-field>
-        <div class="avatar-upload">
+        <div class="theme-toggle">
+          <mat-label>Theme Preference:</mat-label>
+          <mat-slide-toggle
+            matInput
+            formControlName="themePref"
+            [checked]="themeMode === 'theme-dark' ? true : false"
+            (change)="onThemeToggle($event.checked)"
+          >
+            {{ themePref === "theme-dark" ? "Dark" : "Light" }}
+          </mat-slide-toggle>
+        </div>
+        <div class="user-photo-upload">
           <button mat-stroked-button type="button" (click)="filePicker.click()">
-            Choose Profile Picture
+            Change Profile Picture
           </button>
           <input
             #filePicker
@@ -54,45 +87,42 @@
             accept="image/png, image/jpg, image/jpeg"
             (change)="onAvatarPicked($event)"
           />
-        </div>
-        <div
-          class="image-preview"
-          *ngIf="
-            imagePreview !== '' &&
-            imagePreview &&
-            userProfileForm.get('avatar').valid
-          "
-        >
-          <img
-            [src]="imagePreview"
-            [alt]="userProfileForm.value.firstName + '-avatar' | lowercase"
-          />
-        </div>
-      </form>
-
-      <!-- <form [formGroup]="businessProfileForm" (ngSubmit)="onBusinessProfileSubmit()" class="business-form">
-        <p>Business Profile</p>
-        <mat-form-field>
-          <mat-label>Business Name</mat-label>
-          <input
-            matInput
-            type="text"
-            formControlName="businessName"
-            [value]="userData.businessName"
-          />
-          <mat-error *ngIf="businessProfileForm.get('businessName').invalid"
-            >Please enter your first name.</mat-error
+          <div
+            class="image-preview"
+            *ngIf="
+              imagePreview &&
+              imagePreview !== '' &&
+              userProfileForm.get('userPhoto').valid
+            "
           >
-        </mat-form-field>
-      </form> -->
+            <img
+              [src]="imagePreview"
+              [alt]="
+                userProfileForm.get('firstName').value + '-userPhoto'
+                  | lowercase
+              "
+            />
+          </div>
+        </div>
+        <mat-error *ngIf="!mimeTypeValid">
+          File invalid: {{ mimeType }}.
+          <br />
+          Only .png, .jpg and .jpeg files are accepted.</mat-error
+        >
+        <br />
+        <mat-error *ngIf="!fileSizeOk"
+          >File too large. Max file size is 90bytes.</mat-error
+        >
+      </form>
     </mat-card-content>
     <mat-card-actions align="center">
-      <button mat-raised-button type="button" (click)="onCancelForm()">
+      <button mat-raised-button type="button" (click)="onResetForm()">
         Reset All
       </button>
       <button
         mat-raised-button
         type="submit"
+        (click)="onUserProfileSubmit(userProfileForm)"
         [disabled]="userProfileForm.invalid"
       >
         Save

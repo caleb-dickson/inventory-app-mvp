@@ -1,10 +1,12 @@
 <!-- TITLE BLOCK -->
+<mat-spinner diameter="100" strokeWidth="6" *ngIf="loading"></mat-spinner>
 <div
   class="location"
   *ngIf="
     locationState.activeLocation &&
     locationState.activeLocation.productList &&
-    locationState.activeLocation.productList.length > 0
+    locationState.activeLocation.productList.length > 0 &&
+    !loading
   "
 >
   <h4>{{ activeLocation.locationName }}</h4>
@@ -69,7 +71,7 @@
               <!-- INVENTORY DATE RANGE PICKER -->
               <mat-form-field appearance="fill">
                 <mat-label
-                  >Select a {{ inventoryPeriod +1 }} day date range</mat-label
+                  >Select a {{ inventoryPeriod + 1 }} day date range</mat-label
                 >
                 <mat-date-range-input [rangePicker]="picker">
                   <input
@@ -282,7 +284,7 @@
                   let control of draftInventoryItemControls;
                   let i = index;
                   let item;
-                  of: workingInventoryItems;
+                  of: workingInventoryItems
                 "
                 [formGroupName]="i"
                 class="inventory-products"

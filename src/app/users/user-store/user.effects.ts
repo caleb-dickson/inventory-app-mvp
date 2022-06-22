@@ -10,11 +10,18 @@ import { clearBusinessState } from '../../core/business/business-store/business.
 import { clearLocationState } from 'src/app/core/business/location/location-store/location.actions';
 
 import { of } from 'rxjs';
-import { catchError, concatMap, map, switchMap, tap } from 'rxjs/operators';
+import {
+  catchError,
+  concatMap,
+  exhaustMap,
+  map,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
 
 import { environment } from 'src/environments/environment';
 
-import { AuthService } from '../user-control/auth.service';
+import { UserService } from '../user-control/user.service';
 
 import { User } from '../user-control/user.model';
 import { Location } from '../../core/business/business-control/location.model';
@@ -61,7 +68,6 @@ export class UserEffects {
             },
           })
           .pipe(
-            tap((resData) => console.log(resData)),
             map((resData) => {
               return UserActions.loginStart({
                 email: action.newUser.email,
@@ -92,11 +98,10 @@ export class UserEffects {
             password: action.password,
           })
           .pipe(
-            tap((resData) => console.log(resData)),
             map((resData) => {
               if (resData.token) {
                 console.log(resData.expiresIn);
-                this.authService.setLogoutTimer(resData.expiresIn * 1000);
+                this.userService.setLogoutTimer(resData.expiresIn * 1000);
 
                 const now = new Date();
                 const expirationDate = new Date(
@@ -129,6 +134,7 @@ export class UserEffects {
               }
               return UserActions.authSuccess({
                 user: {
+                  _id: resData.userId,
                   userId: resData.userId,
                   email: resData.user.email,
                   password: resData.token,
@@ -141,6 +147,31 @@ export class UserEffects {
               return handleError(errorRes);
             })
           );
+      })
+    )
+  );
+
+  updateUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UserActions.PUTUpdateUserSuccess),
+      map((action) => {
+        console.warn('||| updateUser$ effect called |||===');
+        console.log(action);
+
+        const userProfileData = {
+          _id: action.user.userId,
+          userId: action.user._id,
+          email: action.user.email,
+          userProfile: action.user.userProfile,
+        };
+
+        localStorage.setItem(
+          'userProfileData',
+          JSON.stringify(userProfileData)
+        );
+
+        // return UserActions.autoLogin();
+        return { type: 'dummy data' };
       })
     )
   );
@@ -197,8 +228,9 @@ export class UserEffects {
 
         // PULL PROFILE DATA FROM LOCAL STORAGE
         const userProfileData: {
-          userId: string;
+          userId: string | null;
           email: string;
+          password: string;
           userProfile: {
             role: number;
             department: string;
@@ -206,8 +238,7 @@ export class UserEffects {
             lastName: string;
             phoneNumber: string;
             themePref: string | null;
-            business: string | null;
-            userLocationId: string | null;
+            userPhoto: string | null;
           };
         } = JSON.parse(localStorage.getItem('userProfileData'));
 
@@ -228,9 +259,10 @@ export class UserEffects {
         if (authorizedUser.userId) {
           const now = new Date().getTime();
           const expirationDuration = authorizedUser.expiration.getTime() - now;
-          this.authService.setLogoutTimer(expirationDuration);
+          this.userService.setLogoutTimer(expirationDuration);
           return UserActions.authSuccess({
             user: {
+              _id: userAuthData.userId,
               userId: userAuthData.userId,
               email: userProfile.email,
               password: userAuthData.token,
@@ -252,7 +284,7 @@ export class UserEffects {
       this.actions$.pipe(
         ofType(UserActions.logout),
         tap(() => {
-          this.authService.clearLogoutTimer();
+          this.userService.clearLogoutTimer();
           localStorage.clear();
           this.store.dispatch(clearBusinessState());
           this.store.dispatch(clearLocationState());
@@ -271,7 +303,7 @@ export class UserEffects {
     private actions$: Actions,
     private http: HttpClient,
     private router: Router,
-    private authService: AuthService,
+    private userService: UserService,
     private store: Store<fromAppStore.AppState>
   ) {}
 }
