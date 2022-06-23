@@ -1,3 +1,3 @@
 # InventoryMvp
 
-This repo contains the first MVP for a MEAN stack commercial inventory app.
+This repo contains the deployment version for a MEAN stack commercial inventory app.
