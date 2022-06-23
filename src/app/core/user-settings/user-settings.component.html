@@ -1,10 +1,10 @@
 <div class="settings">
   <mat-card class="settings-owner">
     <mat-spinner
-    diameter="100"
-    strokeWidth="6"
-    *ngIf="userLoading"
-  ></mat-spinner>
+      diameter="100"
+      strokeWidth="6"
+      *ngIf="userLoading"
+    ></mat-spinner>
     <mat-card-header *ngIf="!userLoading">
       <img
         mat-card-avatar
@@ -22,14 +22,18 @@
         <p>Authorization</p>
         <mat-form-field>
           <mat-label>Email</mat-label>
-          <input matInput type="text" formControlName="email"/>
+          <input matInput type="text" formControlName="email" />
           <mat-error *ngIf="userProfileForm.get('email').invalid"
             >Please enter the email you'd like to sign in with.</mat-error
           >
         </mat-form-field>
         <mat-form-field appearance="standard">
           <mat-label>Inventory Department</mat-label>
-          <mat-select type="text" formControlName="department" (valueChange)="onDepartmentSelect($event)">
+          <mat-select
+            type="text"
+            formControlName="department"
+            (valueChange)="onDepartmentSelect($event)"
+          >
             <mat-option
               *ngFor="let dept of ['boh', 'foh', 'admin']"
               [value]="dept"
@@ -90,13 +94,13 @@
           <div
             class="image-preview"
             *ngIf="
-              imagePreview &&
+              userPhoto &&
               imagePreview !== '' &&
               userProfileForm.get('userPhoto').valid
             "
           >
             <img
-              [src]="imagePreview"
+              [src]="imagePreview ? imagePreview : userPhoto"
               [alt]="
                 userProfileForm.get('firstName').value + '-userPhoto'
                   | lowercase

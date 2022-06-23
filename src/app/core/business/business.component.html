@@ -12,52 +12,7 @@
       <section class="business-info">
         <h5 class="business-info-title">Business Profile</h5>
         <h6 class="business-info-subtitle">Business Name</h6>
-        <form
-          *ngIf="businessSubmitMode"
-          [formGroup]="businessForm"
-          (ngSubmit)="onBusinessSubmit()"
-          class="business-form"
-        >
-          <p *ngIf="!businessState && !businessName">Name Your Business</p>
-          <mat-form-field class="business-info-form">
-            <!-- <mat-label>Business Name</mat-label> -->
-            <input
-              matInput
-              type="text"
-              spellcheck="false"
-              formControlName="businessName"
-              autofocus
-            />
-            <mat-error *ngIf="businessForm.get('businessName').invalid">
-              Please enter a name for your business.
-            </mat-error>
-          </mat-form-field>
-          <button
-            class="business-submit"
-            type="submit"
-            mat-raised-button
-            [disabled]="businessForm.invalid"
-          >
-            {{ businessSubmitMode === "update" ? "Update" : "Create" }}
-          </button>
-          <button
-            class="business-cancel"
-            type="button"
-            mat-raised-button
-            (click)="onCancelForm('business')"
-          >
-            Cancel
-          </button>
-          <mat-error
-            *ngIf="businessError && !businessForm.get('businessName')"
-            >{{ businessError }}</mat-error
-          >
-        </form>
-        <mat-spinner
-          diameter="70"
-          strokeWidth="3"
-          *ngIf="loading"
-        ></mat-spinner>
+
         <p *ngIf="!businessSubmitMode && !loading" class="business-info-name">
           {{
             businessName ? businessName : "Add your business to get started."
@@ -74,33 +29,104 @@
             <mat-label *ngIf="!businessName"> Add business</mat-label>
           </button>
         </p>
-        <div class="business-info-photo">
-          <button mat-stroked-button type="button" (click)="filePicker.click()">
-            Change Business Photo
-          </button>
-          <input
-            #filePicker
-            type="file"
-            accept="image/png, image/jpg, image/jpeg"
-            (change)="onBusinessPhotoPicked($event)"
-          />
-          <div
-            class="image-preview"
-            *ngIf="
-              imagePreview &&
-              imagePreview !== '' &&
-              businessForm.get('businessPhoto').valid
-            "
-          >
-            <img
-              [src]="imagePreview"
-              [alt]="
-                businessForm.get('businessName').value + '-businessPhoto'
-                  | lowercase
-              "
-            />
+
+        <form
+          [formGroup]="businessForm"
+          (ngSubmit)="onBusinessSubmit()"
+          class="business-form"
+        >
+          <p *ngIf="!businessState && !businessName">Name Your Business</p>
+          <div *ngIf="businessSubmitMode">
+            <mat-form-field class="business-info-form">
+              <!-- <mat-label>Business Name</mat-label> -->
+              <input
+                matInput
+                type="text"
+                spellcheck="false"
+                formControlName="businessName"
+                autofocus
+              />
+              <mat-error *ngIf="businessForm.get('businessName').invalid">
+                Please enter a name for your business.
+              </mat-error>
+            </mat-form-field>
+            <button
+              class="business-submit"
+              type="submit"
+              mat-raised-button
+              [disabled]="businessForm.invalid"
+            >
+              {{ businessSubmitMode === "update" ? "Update" : "Create" }}
+            </button>
+            <button
+              class="business-cancel"
+              type="button"
+              mat-raised-button
+              (click)="onCancelForm('business')"
+            >
+              Cancel
+            </button>
+            <mat-error
+              *ngIf="businessError && !businessForm.get('businessName')"
+              >{{ businessError }}</mat-error
+            >
           </div>
-        </div>
+          <div class="business-info-photo">
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="filePicker.click()"
+            >
+              Change Business Photo
+            </button>
+            <input
+              #filePicker
+              type="file"
+              accept="image/png, image/jpg, image/jpeg"
+              (change)="onBusinessPhotoPicked($event)"
+            />
+            <div
+              class="image-preview"
+              *ngIf="
+                businessPhoto &&
+                imagePreview !== '' &&
+                businessForm.get('businessPhoto').valid
+              "
+            >
+              <img
+                [src]="imagePreview ? imagePreview : businessPhoto"
+                [alt]="
+                  businessForm.get('businessName').value + '-businessPhoto'
+                    | lowercase
+                "
+              />
+            </div>
+          </div>
+          <button
+          *ngIf="businessForm.get('businessPhoto').value || businessForm.get('businessName').touched"
+          class="business-cancel"
+          type="button"
+          mat-raised-button
+          (click)="onCancelForm('business')"
+        >
+          Reset
+        </button>
+          <button
+          *ngIf="businessForm.get('businessPhoto').value"
+          class="business-submit"
+          type="submit"
+          mat-raised-button
+          [disabled]="businessForm.invalid"
+          >
+          {{ businessSubmitMode === "update" || businessPhoto ? "Update" : "Create" }}
+        </button>
+        </form>
+        <mat-spinner
+          diameter="70"
+          strokeWidth="3"
+          *ngIf="loading"
+        ></mat-spinner>
+
         <h6 class="business-info-subtitle">
           {{ locations ? "Manage Locations" : null }}
         </h6>
@@ -183,6 +209,11 @@
 <div class="locations" *ngFor="let location of locations">
   <mat-card *ngIf="!loading">
     <mat-card-header>
+      <img
+        mat-card-avatar
+        [src]="location.locationPhoto"
+        alt="Business photo"
+      />
       <mat-card-title [id]="location._id">
         <mat-icon class="store-icon">store</mat-icon>
         {{ location.locationName }}

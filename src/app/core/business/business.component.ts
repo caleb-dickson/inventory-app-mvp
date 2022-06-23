@@ -1,16 +1,23 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { map, Subscription } from 'rxjs';
+import { catchError, concatMap, map, Subscription } from 'rxjs';
+
+import { environment } from 'src/environments/environment';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
 import * as BusinessActions from '../business/business-store/business.actions';
+import { authSuccess } from '../../users/user-store/user.actions';
 
 import { User } from 'src/app/users/user-control/user.model';
 import { Location } from './business-control/location.model';
 import { UserState } from 'src/app/users/user-store/user.reducer';
 import { BusinessState } from './business-store/business.reducer';
+import { HttpClient } from '@angular/common/http';
+import { Business } from './business-control/business.model';
+
+const BACKEND_URL = environment.apiUrl + '/business';
 
 @Component({
   selector: 'app-manage',
@@ -18,7 +25,10 @@ import { BusinessState } from './business-store/business.reducer';
   styleUrls: ['./business.component.scss'],
 })
 export class BusinessComponent implements OnInit, OnDestroy {
-  constructor(private store: Store<fromAppStore.AppState>) {}
+  constructor(
+    private store: Store<fromAppStore.AppState>,
+    private http: HttpClient
+  ) {}
 
   // SUBSCRIPTIONS
   private userAuthSub: Subscription;
@@ -160,46 +170,48 @@ export class BusinessComponent implements OnInit, OnDestroy {
   onBusinessPhotoPicked(event: Event) {
     this.bizPhotoUpload = (event.target as HTMLInputElement).files[0];
 
-        // SET FORM VALUE AS INPUT FILE
-        this.businessForm.patchValue({ userPhoto: this.bizPhotoUpload });
-        this.businessForm.get('businessPhoto').updateValueAndValidity();
+    // SET FORM VALUE AS INPUT FILE
+    this.businessForm.patchValue({ businessPhoto: this.bizPhotoUpload });
+    this.businessForm.get('businessPhoto').updateValueAndValidity();
 
-        // READ AND VALIDATE THE FILE
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          this.imagePreview = reader.result as string;
-          this.mimeType = this.bizPhotoUpload.type;
+    // READ AND VALIDATE THE FILE
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      this.imagePreview = reader.result as string;
+      this.mimeType = this.bizPhotoUpload.type;
 
-          // CHECK FILE SIZE AND ASSIGN VALIDITY VALUE
-          this.fileSizeOk = this.bizPhotoUpload.size < 5000000 ? true : false;
+      // CHECK FILE SIZE AND ASSIGN VALIDITY VALUE
+      this.fileSizeOk = this.bizPhotoUpload.size < 5000000 ? true : false;
 
-          // CHECK MIME TYPE AND ASSIGN VALIDITY VALUE
-          switch (this.mimeType) {
-            case 'image/png':
-            case 'image/jpg':
-            case 'image/jpeg':
-              this.mimeTypeValid = true;
-              break;
-            default:
-              this.mimeTypeValid = false;
-              break;
-          }
+      // CHECK MIME TYPE AND ASSIGN VALIDITY VALUE
+      switch (this.mimeType) {
+        case 'image/png':
+        case 'image/jpg':
+        case 'image/jpeg':
+          this.mimeTypeValid = true;
+          break;
+        default:
+          this.mimeTypeValid = false;
+          break;
+      }
 
-          // IF MIME TYPE IS INVALID, SET FORM ERROR
-          if (!this.mimeTypeValid) {
-            this.businessForm
-              .get('businessPhoto')
-              .setErrors({ invalidMimeType: true });
+      // IF MIME TYPE IS INVALID, SET FORM ERROR
+      if (!this.mimeTypeValid) {
+        this.businessForm
+          .get('businessPhoto')
+          .setErrors({ invalidMimeType: true });
 
-            // IF FILE IS TOO LARGE, SET FORM ERROR
-          } else if (!this.fileSizeOk) {
-            this.businessForm.get('businessPhoto').setErrors({ fileTooLarge: true });
-          }
-        };
+        // IF FILE IS TOO LARGE, SET FORM ERROR
+      } else if (!this.fileSizeOk) {
+        this.businessForm
+          .get('businessPhoto')
+          .setErrors({ fileTooLarge: true });
+      }
+    };
 
-        this.businessForm.get('businessPhoto').updateValueAndValidity();
-        reader.readAsDataURL(this.bizPhotoUpload);
-        console.log(this.businessForm.value);
+    this.businessForm.get('businessPhoto').updateValueAndValidity();
+    reader.readAsDataURL(this.bizPhotoUpload);
+    console.log(this.businessForm.value);
   }
 
   // BUSINESS FORM SUBMIT (JUST TO CHANGE BUSINESS NAME FOR NOW)
@@ -211,33 +223,166 @@ export class BusinessComponent implements OnInit, OnDestroy {
       this.businessForm.updateValueAndValidity();
       console.log(this.businessForm.value);
       console.log(this.businessForm);
-      this.store.dispatch(
-        BusinessActions.POSTBusinessStart({
-          business: {
-            _id: null,
-            businessName: this.businessForm.value.businessName,
-            ownerId: this.userId,
-            businessPhoto: this.businessPhoto,
-            locations: [],
-          },
-        })
-      );
+
+      const formData = new FormData();
+      formData.append('_id', null);
+      formData.append('businessName', this.businessForm.value.businessName);
+      formData.append('ownerId', this.userId);
+      if (this.bizPhotoUpload) {
+        formData.append(
+          'businessPhoto',
+          this.businessForm.value.businessPhoto,
+          this.businessForm.value.businessName
+        );
+      }
+      formData.append('locations', null);
+
+      console.log(formData);
+      console.log('||| ^^^ appended form data ^^^ |||');
+
+      this.store.dispatch(BusinessActions.POSTBusinessStart());
+
+      this.http
+        .post<{
+          message: string;
+          business: Business;
+          businessId: string;
+          updatedUser: User;
+          updatedUserId: string;
+        }>(BACKEND_URL + '/create-business', formData)
+        .pipe(
+          map((resData) => {
+            console.log(resData);
+            if (resData.business) {
+              const storedBusiness = {
+                business: {
+                  _id: resData.businessId,
+                  businessName: resData.business.businessName,
+                  ownerId: resData.business.ownerId,
+                  locations: resData.business.locations,
+                },
+              };
+
+              localStorage.setItem(
+                'storedBusiness',
+                JSON.stringify(storedBusiness)
+              );
+            }
+
+            const userProfileData = {
+              userId: resData.updatedUserId,
+              email: resData.updatedUser.email,
+              userProfile: resData.updatedUser.userProfile,
+            };
+            localStorage.setItem(
+              'userProfileData',
+              JSON.stringify(userProfileData)
+            );
+
+            this.store.dispatch(
+              authSuccess({
+                user: {
+                  _id: resData.updatedUserId,
+                  userId: resData.updatedUserId,
+                  email: resData.updatedUser.email,
+                  password: resData.updatedUser.password,
+                  userProfile: resData.updatedUser.userProfile,
+                },
+              })
+            );
+
+            return BusinessActions.POSTBusinessSuccess({
+              business: {
+                _id: resData.businessId,
+                businessName: resData.business.businessName,
+                ownerId: resData.business.ownerId,
+                businessPhoto: resData.business.businessPhoto,
+                locations: [],
+              },
+            });
+          }),
+          catchError((errorRes) => {
+            return errorRes;
+          })
+        )
+        .subscribe((resData) => {
+          console.log(resData);
+          console.log('||| ^^^ sub data ^^^ |||');
+        });
+      this.businessSubmitMode = null;
     } else {
+      this.businessSubmitMode === 'update';
+      this.businessForm.updateValueAndValidity();
+      console.log(this.businessForm.value);
+      console.log(this.businessForm);
+
+      const formData = new FormData();
+      formData.append('businessId', this.businessId);
+      formData.append('businessName', this.businessForm.value.businessName);
+      formData.append('ownerId', this.userId);
+      if (this.bizPhotoUpload) {
+        formData.append(
+          'businessPhoto',
+          this.businessForm.value.businessPhoto,
+          this.businessForm.value.businessName + '_photo'
+        );
+      }
+      formData.append('locations', null);
+
+      console.log(formData);
+      console.log('||| ^^^ appended form data ^^^ |||');
+
+      this.store.dispatch(BusinessActions.PUTBusinessStart());
+
+      this.http
+        .put<{
+          message: string;
+          updatedBusiness: Business;
+          updatedBusinessId: string;
+        }>(BACKEND_URL + '/update-business/', formData)
+        .pipe(
+          map((resData) => {
+            console.log(resData);
+            const storedBusiness = {
+              business: resData.updatedBusiness,
+            };
+
+            localStorage.setItem(
+              'storedBusiness',
+              JSON.stringify(storedBusiness)
+            );
+
+            this.store.dispatch(
+              BusinessActions.PUTBusinessSuccess({
+                business: resData.updatedBusiness,
+              })
+            );
+          }),
+          catchError((errorRes) => {
+            this.store.dispatch(
+              BusinessActions.BusinessError({ errorMessage: errorRes })
+            );
+            return null;
+          })
+        )
+        .subscribe((resData) => {
+          console.log(resData);
+          console.log('||| ^^^ sub data ^^^ |||');
+        });
+
+      // this.store.dispatch(
+      //   BusinessActions.PUTBusinessStart({
+      //     business: {
+      //       _id: this.businessId,
+      //       businessName: this.businessForm.value.businessName,
+      //       ownerId: this.userId,
+      //       businessPhoto: this.businessPhoto,
+      //       locations: this.locations,
+      //     },
+      //   })
+      // );
+      this.businessSubmitMode = null;
     }
-    this.businessSubmitMode === 'update';
-    this.businessForm.updateValueAndValidity();
-    this.store.dispatch(
-      BusinessActions.PUTBusinessStart({
-        business: {
-          _id: this.businessId,
-          businessName: this.businessForm.value.businessName,
-          ownerId: this.userId,
-          businessPhoto: this.businessPhoto,
-          locations: this.locations,
-        },
-      })
-    );
-    this.businessSubmitMode = null;
   }
 
   // CREATE NEW LOCATION FOR BUSINESS SUBMIT
@@ -315,7 +460,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
       businessName: new FormControl(this.businessName, {
         validators: [Validators.required],
       }),
-      businessPhoto: new FormControl(null)
+      businessPhoto: new FormControl(null),
     });
   }
 

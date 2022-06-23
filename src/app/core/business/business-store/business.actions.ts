@@ -6,16 +6,14 @@ import { Location } from '../business-control/location.model';
 // BUSINESS ACTIONS = FOR OWNERS
 // BUSINESS ACTIONS = FOR OWNERS
 export const POSTBusinessStart = createAction(
-  '[Business] Add Business Start',
-  props<{ business: Business }>()
+  '[Business] Add Business Start'
 );
 export const POSTBusinessSuccess = createAction(
   '[Business] Add Business Success',
   props<{ business: Business }>()
 );
 export const PUTBusinessStart = createAction(
-  '[Business] Update Business Start',
-  props<{ business: Business }>()
+  '[Business] Update Business Start'
 );
 export const PUTBusinessSuccess = createAction(
   '[Business] Update Business Success',

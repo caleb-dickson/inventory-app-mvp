@@ -34,6 +34,7 @@
 
           button {
             height: 2.5rem;
+            margin-block-start: 1rem;
           }
 
           input[type="file"] {
@@ -41,6 +42,7 @@
           }
           img {
             margin-inline-start: -15rem;
+            clip-path: circle(50%);
           }
         }
 

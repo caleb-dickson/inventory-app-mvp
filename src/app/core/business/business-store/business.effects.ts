@@ -51,121 +51,121 @@ export class BusinessEffects {
     .pipe(map((authState) => authState.user))
     .subscribe((userAuth) => (this.user = userAuth));
 
-  addBusinessStart$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(BusinessActions.POSTBusinessStart),
-      concatMap((action) => {
-        console.warn('||| addBusinessStart$ effect called |||');
-        return this.http
-          .post<{
-            message: string;
-            business: Business;
-            businessId: string;
-            updatedUser: User;
-            updatedUserId: string;
-          }>(BACKEND_URL + '/create-business', {
-            businessName: action.business.businessName,
-            ownerId: action.business.ownerId,
-            locations: [],
-          })
-          .pipe(
-            map((resData) => {
-              console.log(resData)
-              if (resData.business) {
-                const storedBusiness = {
-                  business: {
-                    _id: resData.businessId,
-                    businessName: resData.business.businessName,
-                    ownerId: resData.business.ownerId,
-                    locations: resData.business.locations,
-                  },
-                };
+  // addBusinessStart$ = createEffect(() =>
+  //   this.actions$.pipe(
+  //     ofType(BusinessActions.POSTBusinessStart),
+  //     concatMap((action) => {
+  //       console.warn('||| addBusinessStart$ effect called |||');
+  //       return this.http
+  //         .post<{
+  //           message: string;
+  //           business: Business;
+  //           businessId: string;
+  //           updatedUser: User;
+  //           updatedUserId: string;
+  //         }>(BACKEND_URL + '/create-business', {
+  //           businessName: action.business.businessName,
+  //           ownerId: action.business.ownerId,
+  //           locations: [],
+  //         })
+  //         .pipe(
+  //           map((resData) => {
+  //             console.log(resData)
+  //             if (resData.business) {
+  //               const storedBusiness = {
+  //                 business: {
+  //                   _id: resData.businessId,
+  //                   businessName: resData.business.businessName,
+  //                   ownerId: resData.business.ownerId,
+  //                   locations: resData.business.locations,
+  //                 },
+  //               };
 
-                localStorage.setItem(
-                  'storedBusiness',
-                  JSON.stringify(storedBusiness)
-                );
-              }
+  //               localStorage.setItem(
+  //                 'storedBusiness',
+  //                 JSON.stringify(storedBusiness)
+  //               );
+  //             }
 
-              const userProfileData = {
-                userId: resData.updatedUserId,
-                email: resData.updatedUser.email,
-                userProfile: resData.updatedUser.userProfile,
-              };
-              localStorage.setItem(
-                'userProfileData',
-                JSON.stringify(userProfileData)
-              );
+  //             const userProfileData = {
+  //               userId: resData.updatedUserId,
+  //               email: resData.updatedUser.email,
+  //               userProfile: resData.updatedUser.userProfile,
+  //             };
+  //             localStorage.setItem(
+  //               'userProfileData',
+  //               JSON.stringify(userProfileData)
+  //             );
 
-              this.store.dispatch(
-                authSuccess({
-                  user: {
-                    _id: resData.updatedUserId,
-                    userId: resData.updatedUserId,
-                    email: resData.updatedUser.email,
-                    password: resData.updatedUser.password,
-                    userProfile: resData.updatedUser.userProfile,
-                  },
-                })
-              );
+  //             this.store.dispatch(
+  //               authSuccess({
+  //                 user: {
+  //                   _id: resData.updatedUserId,
+  //                   userId: resData.updatedUserId,
+  //                   email: resData.updatedUser.email,
+  //                   password: resData.updatedUser.password,
+  //                   userProfile: resData.updatedUser.userProfile,
+  //                 },
+  //               })
+  //             );
 
-              return BusinessActions.POSTBusinessSuccess({
-                business: {
-                  _id: resData.businessId,
-                  businessName: resData.business.businessName,
-                  ownerId: resData.business.ownerId,
-                  businessPhoto: resData.business.businessPhoto,
-                  locations: [],
-                },
-              });
-            }),
-            catchError((errorRes) => {
-              console.log(errorRes);
-              return handleError(errorRes);
-            })
-          );
-      })
-    )
-  );
+  //             return BusinessActions.POSTBusinessSuccess({
+  //               business: {
+  //                 _id: resData.businessId,
+  //                 businessName: resData.business.businessName,
+  //                 ownerId: resData.business.ownerId,
+  //                 businessPhoto: resData.business.businessPhoto,
+  //                 locations: [],
+  //               },
+  //             });
+  //           }),
+  //           catchError((errorRes) => {
+  //             console.log(errorRes);
+  //             return handleError(errorRes);
+  //           })
+  //         );
+  //     })
+  //   )
+  // );
 
-  updateBusinessStart$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(BusinessActions.PUTBusinessStart),
-      concatMap((action) => {
-        console.warn('||| updateBusinessStart$ effect called |||');
-        return this.http
-          .put<{
-            message: string;
-            updatedBusiness: Business;
-            updatedBusinessId: string;
-          }>(BACKEND_URL + '/update-business/', {
-            businessId: action.business._id,
-            updatedBusinessName: action.business.businessName,
-          })
-          .pipe(
-            map((resData) => {
-              console.log(resData)
-              const storedBusiness = {
-                business: resData.updatedBusiness,
-              };
+  // updateBusinessStart$ = createEffect(() =>
+  //   this.actions$.pipe(
+  //     ofType(BusinessActions.PUTBusinessStart),
+  //     concatMap((action) => {
+  //       console.warn('||| updateBusinessStart$ effect called |||');
+  //       return this.http
+  //         .put<{
+  //           message: string;
+  //           updatedBusiness: Business;
+  //           updatedBusinessId: string;
+  //         }>(BACKEND_URL + '/update-business/', {
+  //           businessId: action.business._id,
+  //           updatedBusinessName: action.business.businessName,
+  //         })
+  //         .pipe(
+  //           map((resData) => {
+  //             console.log(resData)
+  //             const storedBusiness = {
+  //               business: resData.updatedBusiness,
+  //             };
 
-              localStorage.setItem(
-                'storedBusiness',
-                JSON.stringify(storedBusiness)
-              );
+  //             localStorage.setItem(
+  //               'storedBusiness',
+  //               JSON.stringify(storedBusiness)
+  //             );
 
-              return BusinessActions.PUTBusinessSuccess({
-                business: resData.updatedBusiness,
-              });
-            }),
-            catchError((errorRes) => {
-              console.log(errorRes);
-              return handleError(errorRes);
-            })
-          );
-      })
-    )
-  );
+  //             return BusinessActions.PUTBusinessSuccess({
+  //               business: resData.updatedBusiness,
+  //             });
+  //           }),
+  //           catchError((errorRes) => {
+  //             console.log(errorRes);
+  //             return handleError(errorRes);
+  //           })
+  //         );
+  //     })
+  //   )
+  // );
 
   fetchBusiness$ = createEffect(() =>
     this.actions$.pipe(

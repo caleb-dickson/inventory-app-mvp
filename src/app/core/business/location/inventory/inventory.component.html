@@ -16,7 +16,7 @@
   </div>
 
   <div
-    *ngIf="inventoryDataPopulated && inventoryDataPopulated.length >= 1"
+    *ngIf="locationState.activeLocationInventories && locationState.activeLocationInventories.length > 0"
     class="inventory-main"
   >
     <mat-spinner
@@ -37,7 +37,7 @@
 
     <!-- PAST INVENTORY TABLE LIST START -->
     <mat-table
-      *ngFor="let inv of inventoryDataPopulated"
+      *ngFor="let inv of locationState.activeLocationInventories"
       mat-table
       matRipple
       [dataSource]="inv.inventory"

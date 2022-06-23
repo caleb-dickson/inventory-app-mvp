@@ -47,6 +47,10 @@
         input[type="file"] {
           visibility: hidden;
         }
+
+        img {
+          clip-path: circle(50%);
+        }
       }
     }
 

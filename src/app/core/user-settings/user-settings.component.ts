@@ -23,6 +23,7 @@ const BACKEND_URL = environment.apiUrl + '/user';
 export class UserSettingsComponent implements OnInit {
   userLoading: boolean;
   userProfileForm: FormGroup;
+  userPhoto: string;
   userPhotoUpload: Blob | null;
   imagePreview: string;
   mimeType: string;
@@ -56,6 +57,7 @@ export class UserSettingsComponent implements OnInit {
           this.userDept = userState.user.userProfile.department;
           this.themePref = userState.user.userProfile.themePref;
           this.userLoading = userState.loading;
+          this.userPhoto = userState.user.userProfile.userPhoto;
           console.log(this.user);
         }
       });
