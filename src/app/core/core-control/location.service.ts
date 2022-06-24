@@ -3,30 +3,28 @@ import { Injectable, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { Store } from '@ngrx/store';
-import * as fromAppStore from '../../../../app-store/app.reducer';
-import * as LocationActions from '../location-store/location.actions';
-import * as BusinessActions from '../../business-store/business.actions';
+import * as fromAppStore from '../../app-store/app.reducer';
+import * as LocationActions from '../business/location/location-store/location.actions';
+import * as BusinessActions from '../business/business-store/business.actions';
 
-import { Location } from '../../business-control/location.model';
-import { LocationIds } from '../../business-control/business.model';
-import { LocationState } from '../location-store/location.reducer';
-import { BusinessState } from '../../business-store/business.reducer';
-import { Product } from '../../business-control/product.model';
-import { Inventory } from '../../business-control/inventory.model';
+import { Location } from '../models/location.model';
+import { LocationIds } from '../models/business.model';
+import { LocationState } from '../business/location/location-store/location.reducer';
+import { BusinessState } from '../business/business-store/business.reducer';
+import { Product } from '../models/product.model';
+import { Inventory } from '../models/inventory.model';
 
 @Injectable({
   providedIn: 'root',
 })
-export class LocationService implements OnInit {
-  constructor(private _store: Store<fromAppStore.AppState>) {}
-
+export class LocationService {
   private _businessStoreSub: Subscription;
   private _locationStoreSub: Subscription;
 
   businessState: BusinessState;
   locationState: LocationState;
 
-  ngOnInit() {
+  constructor(private _store: Store<fromAppStore.AppState>) {
     this._locationStoreSub = this._store
       .select('location')
       .subscribe((locState) => {
@@ -49,15 +47,18 @@ export class LocationService implements OnInit {
       return;
     }
 
+    localStorage.removeItem('inventoryData')
+
     localStorage.setItem(
       'activatedLocation',
       JSON.stringify(activatedLocation)
     );
-    return this._store.dispatch(
+    this._store.dispatch(
       LocationActions.ActivateLocation({
         location: activatedLocation,
       })
     );
+    this.getPopulatedInventories(true);
   }
 
   getLocations(userId: string, userStringRole: string, userNumberRole: number) {
@@ -190,12 +191,12 @@ export class LocationService implements OnInit {
 
   // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
   getPopulatedInventories(
-    initLocInventories: boolean,
-    inventoryData: Inventory[],
-    activeLocationId: string
+    initLocInventories: boolean
   ) {
     // CHECK LOCALSTORAGE FOR ALREADY FETCHED INVENTORIES
-    const storedInv = JSON.parse(localStorage.getItem('inventoryData'));
+    const storedInv: Inventory[] = JSON.parse(
+      localStorage.getItem('inventoryData')
+    );
 
     if (storedInv) {
       // CHECK TO SEE IF ANY DRAFTS ARE IN THE INVs
@@ -206,28 +207,34 @@ export class LocationService implements OnInit {
         }
       }
       // SEND INV DATA AND ANY DRAFTS FOUND TO THE STORE
+      console.warn('||| populated inventories found in localStorage |||');
+      console.log(storedInv);
       this._store.dispatch(
         LocationActions.GETLocationInventoriesSuccess({
           inventoryData: storedInv,
           draft: draft,
         })
       );
-    // IF NONE FOUND IN LOCALSTORAGE, FETCH THE POPULATED INVENTORIES
+      // IF NONE FOUND IN LOCALSTORAGE, FETCH THE POPULATED INVENTORIES
     } else if (
       !storedInv &&
       initLocInventories &&
-      inventoryData &&
-      inventoryData.length > 0
+      this.locationState.activeLocation.inventoryData &&
+      this.locationState.activeLocation.inventoryData.length > 0
     ) {
       this._store.dispatch(
         LocationActions.GETLocationInventoriesStart({
-          locationId: activeLocationId,
+          locationId: this.locationState.activeLocation._id,
         })
       );
+    } else if (
+      !storedInv &&
+      initLocInventories &&
+      this.locationState.activeLocation.inventoryData &&
+      this.locationState.activeLocation.inventoryData.length === 0
+    ) {
+      console.log('||| NULL INV |||')
+      this._store.dispatch(LocationActions.GETLocationInventoriesNull());
     }
   }
-
-
-
-
 }

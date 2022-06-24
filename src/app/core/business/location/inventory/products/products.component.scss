@@ -1,3 +1,5 @@
+@use "../../../../../../sass/abstracts/variables" as var;
+
 .product {
   display: flex;
   flex-direction: column;
@@ -10,52 +12,61 @@
   }
 
   .location-name {
-    margin-inline-start: 2rem;
     margin-block-start: 2rem;
+    text-align: center;
   }
 
-  &-add-new {
-    width: max-content;
-    margin: 2rem;
-    margin-inline-start: 5rem;
-    &-form {
-      display: flex;
-      flex-direction: column;
+  &-add {
+    display: flex;
+    justify-content: center;
+    &-new {
+      width: max-content;
+      margin: 2rem;
+      &-form {
+        display: flex;
+        flex-direction: column;
 
-      mat-form-field {
-        width: 20rem;
-      }
-      .units-block, .pack-block, .par-block {
-        display: flex;
-        justify-content: center;
-      }
-      .short {
-        width: 10rem;
-      }
-      .unit-suffix {
-        transform: translateY(-0.5rem);
-      }
-      .align-end {
-        text-align: right;
-      }
-      .hint {
-        margin-block-end: 2rem;
-      }
-      .toggle {
-        display: flex;
-        justify-content: flex-end;
-        margin: 1rem
-      }
-      .underline {
-        text-decoration: underline;
-      }
-      .bold {
-        font-weight: 500;
+        mat-form-field {
+          width: 20rem;
+
+          .name {
+            margin-inline-start: 1rem;
+          }
+        }
+        .units-block,
+        .pack-block,
+        .par-block {
+          display: flex;
+          justify-content: center;
+        }
+        .short {
+          width: 10rem;
+        }
+        .unit-suffix {
+          transform: translateY(-0.5rem);
+        }
+        .align-end {
+          text-align: right;
+        }
+        .hint {
+          margin-block-end: 2rem;
+        }
+        .toggle {
+          display: flex;
+          justify-content: flex-end;
+          margin: 1rem;
+        }
+        .underline {
+          text-decoration: underline;
+        }
+        .bold {
+          font-weight: 500;
+        }
       }
     }
   }
 
-  .spinner  {
+  .spinner {
     display: flex;
     justify-content: center;
   }
@@ -63,6 +74,7 @@
   &-list {
     display: flex;
     align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
 
     &-cards {
@@ -73,7 +85,6 @@
         display: flex;
         flex-direction: column;
         margin-inline-start: 2rem;
-
       }
     }
   }
@@ -84,5 +95,103 @@
   &-clear {
     margin-inline-start: 1rem;
   }
+}
 
+// MOBILE STYLES
+@media only screen and (max-width: var.$bp-mobile) {
+  .product {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .no-active-location {
+      display: flex;
+      justify-content: center;
+      margin: 2rem;
+    }
+
+    .location-name {
+      margin-block-start: 2rem;
+      text-align: center;
+    }
+
+    &-add {
+      display: flex;
+      justify-content: center;
+      &-new {
+        width: max-content;
+        margin: 2rem;
+        &-form {
+          display: flex;
+          flex-direction: column;
+
+          mat-form-field {
+            width: min-content;
+          }
+          .units-block,
+          .pack-block,
+          .par-block {
+            display: flex;
+            justify-content: center;
+            mat-form-field {
+              width: 8rem;
+            }
+          }
+          .short {
+            width: 10rem;
+          }
+          .unit-suffix {
+            transform: translateY(-0.5rem);
+          }
+          .align-end {
+            text-align: right;
+          }
+          .hint {
+            margin-block-end: 2rem;
+          }
+          .toggle {
+            display: flex;
+            justify-content: flex-end;
+            margin: 1rem;
+          }
+          .underline {
+            text-decoration: underline;
+          }
+          .bold {
+            font-weight: 500;
+          }
+        }
+      }
+    }
+
+    .spinner {
+      display: flex;
+      justify-content: center;
+    }
+
+    &-list {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+
+      &-cards {
+        min-width: 15rem;
+        margin: 1rem;
+
+        mat-card-content {
+          display: flex;
+          flex-direction: column;
+          margin-inline-start: 2rem;
+        }
+      }
+    }
+
+    &-delete {
+      margin-inline-start: 2rem;
+    }
+    &-clear {
+      margin-inline-start: 1rem;
+    }
+  }
 }

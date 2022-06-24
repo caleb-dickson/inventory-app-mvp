@@ -67,6 +67,11 @@
 
       .sidenav-icon {
         margin-inline-end: 0.3rem;
+
+        &-check {
+          margin-inline-start: 1rem;
+          color: var.$color-green-light;
+        }
       }
 
       .no-locations {

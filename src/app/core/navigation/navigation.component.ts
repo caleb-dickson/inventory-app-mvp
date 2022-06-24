@@ -14,13 +14,12 @@ import { map, shareReplay, take } from 'rxjs/operators';
 
 import { User } from 'src/app/users/user-control/user.model';
 
-import { ThemeService } from 'src/app/theme.service';
-import {
-  Business,
-  LocationIds,
-} from '../business/business-control/business.model';
-import { Location } from '../business/business-control/location.model';
-import { LocationService } from '../business/location/location-control/location.service';
+import { ThemeService } from 'src/app/app-control/theme.service';
+import { Business, LocationIds } from '../models/business.model';
+import { Location } from '../models/location.model';
+import { LocationService } from '../core-control/location.service';
+import { Inventory } from '../models/inventory.model';
+import { Product } from '../models/product.model';
 
 @Component({
   selector: 'app-navigation',
@@ -29,45 +28,68 @@ import { LocationService } from '../business/location/location-control/location.
 })
 export class NavigationComponent implements OnInit {
   constructor(
-    private breakpointObserver: BreakpointObserver,
-    private themeService: ThemeService,
-    private locationService: LocationService,
-    private store: Store<fromAppStore.AppState>
+    private _breakpointObserver: BreakpointObserver,
+    private _themeService: ThemeService,
+    private _locationService: LocationService,
+    private _store: Store<fromAppStore.AppState>
   ) {}
 
-  private userAuthSub: Subscription;
-  private businessStoreSub: Subscription;
-  private locationStoreSub: Subscription;
-  private themeSub: Subscription;
+  // SUBS
+  private _userAuthSub: Subscription;
+  private _businessStoreSub: Subscription;
+  private _locationStoreSub: Subscription;
+  private _themeSub: Subscription;
 
+  // UI
   themeMode: string;
   sideNavOpen: boolean;
+  manageIcon: string;
+  manageRoute: string;
+  isHandset$: Observable<boolean> = this._breakpointObserver
+    .observe(Breakpoints.Handset)
+    .pipe(
+      map((result) => result.matches),
+      shareReplay()
+    );
 
+  // USER STATE
   isAuthenticated: boolean;
   user: User;
   userRole: string;
   userDept: string;
 
+  // BUSINESS STATE
   businessState: BusinessState;
   businessName: string;
   businessId: string;
+  // OWNER USER SPECIFIC
   singleBizLocationName: string;
   multiBizLocations: Location[];
 
+  // LOCATION STATE
   locationState: LocationState;
+  activeLocation: Location;
+  locationProducts: any[];
+  selectedProducts: Product[] = [];
+  activeProducts: Product[] = [];
+
+  inventoryData: any[];
+  inventoryDataPopulated: Inventory[];
+  workingInventory: any;
+  workingInventoryItems: any;
+  newInventoryProducts: any[] = [];
+  initInvProducts = true;
+  initLocInventories = true;
+  // NON-OWNER USER SPECIFIC
   singleUserLocation: Location;
   singleUserLocationName: string;
   multiUserLocations: Location[];
-  activatedLocation: Location;
-
-  manageIcon: string;
-  manageRoute: string;
 
   ngOnInit() {
     console.clear();
-    this.userAuthSub = this.store
+    this._userAuthSub = this._store
       .select('user')
-      .pipe(map((authState) => authState.user))
+      .pipe(map((userState) => userState.user))
       .subscribe((user) => {
         console.log(user);
         this.isAuthenticated = !!user;
@@ -91,35 +113,57 @@ export class NavigationComponent implements OnInit {
       });
 
     if (this.userRole === 'owner') {
-      this.checkBusiness();
+      // OWNER USERS GET ALL BUSINESS LOCATIONS
+      this.onGetBusiness();
     } else {
+      // NON-OWNER USERS ONLY GET LOCATIONS THEY'RE ADDED TO
       this.onGetLocations();
     }
 
-    this.locationStoreSub = this.store
+    this._locationStoreSub = this._store
       .select('location')
       .subscribe((locState) => {
         this.locationState = locState;
 
         this.multiUserLocations =
-          this.locationState.userLocations.length > 1
-            ? this.locationState.userLocations
-            : null;
+          locState.userLocations.length > 1 ? locState.userLocations : null;
 
         this.singleUserLocation =
-          this.locationState.userLocations.length === 1
-            ? this.locationState.userLocations[0]
+          locState.userLocations.length === 1
+            ? locState.userLocations[0]
             : null;
 
         this.singleUserLocationName =
-          this.locationState.userLocations.length === 1
-            ? this.locationState.userLocations[0].locationName
+          locState.userLocations.length === 1
+            ? locState.userLocations[0].locationName
             : null;
 
-        this.activatedLocation = locState.activeLocation;
+        this.activeLocation = locState.activeLocation;
+        this.activeProducts = locState.activeProducts;
+        this.workingInventory = locState.activeInventory;
+
+        // ONCE A LOCATION HAS BEEN ACTIVATED
+        if (
+          locState.activeLocation &&
+          locState.activeLocation.productList &&
+          locState.activeLocation.productList.length > 0
+        ) {
+          this.locationProducts = locState.activeLocation.productList;
+          this.inventoryData = locState.activeLocation.inventoryData;
+          this.inventoryDataPopulated = locState.activeLocationInventories;
+
+          // AND POPULATED INVENTORIES ARE NOT ALREADY FETCHED SINCE LAST RELOAD
+          if (
+            !locState.activeLocationInventories ||
+            (locState.activeLocationInventories.length === 0 &&
+              locState.activeLocation.inventoryData.length > 0)
+          ) {
+            this._onGetPopulatedInventories();
+          }
+        }
       });
 
-    this.businessStoreSub = this.store
+    this._businessStoreSub = this._store
       .select('business')
       .subscribe((bizState) => {
         this.businessState = bizState;
@@ -139,10 +183,12 @@ export class NavigationComponent implements OnInit {
         // console.log(bizState)
       });
 
-    this.themeSub = this.themeService.themeStatus.subscribe((themeModeData) => {
-      this.themeMode = themeModeData;
-    });
-    this.themeService.getThemeMode();
+    this._themeSub = this._themeService.themeStatus.subscribe(
+      (themeModeData) => {
+        this.themeMode = themeModeData;
+      }
+    );
+    this._themeService.getThemeMode();
 
     if (this.userRole === 'owner' || this.userDept === 'admin') {
       this.manageRoute = '/app/business';
@@ -161,17 +207,9 @@ export class NavigationComponent implements OnInit {
       this.sideNavOpen = !state;
     });
 
-    // if (this.userRole !== 'owner') {
-    //   if (this.multiUserLocations) {
-    //     this.locationService.getActivatedLocation();
-    //   } else if (this.singleUserLocationName) {
-    //     this.onActivateLocation(this.singleUserLocation)
-    //   }
-    // }
-
     if (this.userRole === 'owner') {
       if (this.multiBizLocations) {
-        this.locationService.getActivatedLocation();
+        this._locationService.getActivatedLocation();
       } else if (this.singleBizLocationName) {
         console.log(this.singleBizLocationName);
         this.onActivateLocation(this.businessState.businessLocations[0]);
@@ -180,43 +218,43 @@ export class NavigationComponent implements OnInit {
       // IF MANAGER HAS MULTIPLE AUTHORIZED LOCATIONS CHECK
       // IN LOCALSTORAGE WHICH IS ACTIVE
       if (this.locationState.userLocations.length > 1) {
-        this.locationService.getActivatedLocation();
+        this._locationService.getActivatedLocation();
         // IF USER ONLY HAS ONE AUTHORIZED LOCATION, ACTIVATE THAT ONE
       } else if (this.locationState.userLocations.length === 1) {
-        console.log('got');
         this.onActivateLocation(this.locationState.userLocations[0]);
       }
     }
+  }
+
+  // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
+  private _onGetPopulatedInventories() {
+    this._locationService.getPopulatedInventories(
+      this.initLocInventories
+    );
+    this.initLocInventories = false;
   }
 
   toggleSideNav() {
     this.sideNavOpen = !this.sideNavOpen;
   }
 
-  onActivateLocation(activatedLocation: Location) {
-    console.log(activatedLocation);
-    console.log(this.activatedLocation);
+  onActivateLocation(activeLocation: Location) {
+    console.log(activeLocation);
+    console.log(this.activeLocation);
 
-    this.locationService.activateLocation(activatedLocation);
+    this._locationService.activateLocation(activeLocation);
   }
 
   onLogout() {
-    this.store.dispatch(AuthActions.logout());
+    this._store.dispatch(AuthActions.logout());
   }
-
-  isHandset$: Observable<boolean> = this.breakpointObserver
-    .observe(Breakpoints.Handset)
-    .pipe(
-      map((result) => result.matches),
-      shareReplay()
-    );
 
   onThemeModeSwitched($event: any) {
     let theme = $event.checked ? 'theme-dark' : 'theme-light';
-    this.themeService.switchThemeMode(theme);
+    this._themeService.switchThemeMode(theme);
   }
 
-  checkBusiness() {
+  onGetBusiness() {
     const storedBusiness: {
       business: Business;
     } = JSON.parse(localStorage.getItem('storedBusiness'));
@@ -225,7 +263,7 @@ export class NavigationComponent implements OnInit {
       console.log('||| Business fetched from local storage |||');
       console.log(storedBusiness.business.locations);
       // this.setLocations(storedBusiness);
-      this.store.dispatch(
+      this._store.dispatch(
         BusinessActions.GETBusinessSuccess({
           business: {
             _id: storedBusiness.business._id,
@@ -239,21 +277,21 @@ export class NavigationComponent implements OnInit {
       this.onGetLocations();
     } else if (!storedBusiness) {
       console.log('||| Fetching business from DB |||');
-      this.store.dispatch(
+      this._store.dispatch(
         BusinessActions.GETBusinessStart({
           ownerId: this.user.userId,
         })
       );
     } else {
       console.log('||| checkBusiness error |||');
-      this.store.dispatch(
+      this._store.dispatch(
         BusinessActions.BusinessError({ errorMessage: 'No business found.' })
       );
     }
   }
 
   onGetLocations() {
-    this.locationService.getLocations(
+    this._locationService.getLocations(
       this.user.userId,
       this.userRole,
       this.user.userProfile.role
@@ -261,9 +299,9 @@ export class NavigationComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.userAuthSub.unsubscribe();
-    this.businessStoreSub.unsubscribe();
-    this.locationStoreSub.unsubscribe();
-    this.themeSub.unsubscribe();
+    this._userAuthSub.unsubscribe();
+    this._businessStoreSub.unsubscribe();
+    this._locationStoreSub.unsubscribe();
+    this._themeSub.unsubscribe();
   }
 }

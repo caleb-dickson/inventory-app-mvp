@@ -20,15 +20,15 @@ import * as LocationActions from '../../location-store/location.actions';
 
 import { map, Subscription } from 'rxjs';
 
-import { Location } from '../../../business-control/location.model';
-import { Product } from '../../../business-control/product.model';
+import { Location } from '../../../../models/location.model';
+import { Product } from '../../../../models/product.model';
 import { User } from 'src/app/users/user-control/user.model';
 import { Router } from '@angular/router';
-import { Inventory } from '../../../business-control/inventory.model';
+import { Inventory } from '../../../../models/inventory.model';
 
-import { LocationService } from '../../location-control/location.service';
-import { InventoryService } from '../inventory-control/inventory.service';
-import { BusinessInventoryPeriod } from '../../../business-control/business.model';
+import { LocationService } from '../../../../core-control/location.service';
+import { InventoryService } from '../../../../core-control/inventory.service';
+import { BusinessInventoryPeriod } from '../../../../models/business.model';
 
 @Injectable()
 export class RangeSelectionStrategy<D>
@@ -148,23 +148,19 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
           this.inventoryData = locState.activeLocation.inventoryData;
           this.inventoryDataPopulated = locState.activeLocationInventories;
 
-          // AND POPULATED INVENTORIES ARE NOT ALREADY FETCHED SINCE LAST RELOAD
-          if (this.initLocInventories) {
-            this._onGetPopulatedInventories();
-          }
+          // // AND POPULATED INVENTORIES ARE NOT ALREADY FETCHED SINCE LAST RELOAD
+          // if (this.initLocInventories) {
+          //   this._onGetPopulatedInventories();
+          // }
 
           // IF PRODUCTS ARE NEEDED AND USER ISN'T AN ADMIN
           if (this.initInvProducts && this.userDept !== 'admin') {
             // SET PRODUCTS TO ONLY USER'S DEPT PRODUCTS
-            this.setProductList();
+            this.setProductList(false);
           } else {
-            // OTHERWISE USER HAS ACCESS TO ALL LOCATION PRODUCTS
-            this.newInventoryProducts = locState.activeLocation.productList;
+            // OTHERWISE USER HAS ACCESS TO ALL ACTIVE LOCATION PRODUCTS
+            this.setProductList(true);
           }
-
-          // NOW WE CAN INITIALIZE THE NEW INV FORM HAVING DEFINED AN
-          // ACCURATE PRODUCT LIST
-          this._initNewInventoryForm();
 
           // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
           if (this.workingInventory) {
@@ -176,27 +172,41 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
         console.group('%cLocation State', 'font-size: 1rem', locState);
         console.groupEnd();
       });
+    console.log(this.newInventoryProducts);
   }
 
   // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
-  private _onGetPopulatedInventories() {
-    this._locationService.getPopulatedInventories(
-      this.initLocInventories,
-      this.inventoryData,
-      this.locationState.activeLocation._id
-    );
-    this.initLocInventories = false;
-  }
+  // private _onGetPopulatedInventories() {
+  //   this._locationService.getPopulatedInventories(
+  //     this.initLocInventories,
+  //     this.inventoryData
+  //   );
+  //   this.initLocInventories = false;
+  // }
 
-  setProductList() {
-    for (const product of this.locationState.activeLocation.productList) {
-      let productDept = product.product.department;
-      if (
-        productDept === this.user.userProfile.department &&
-        product.product.isActive
-      ) {
-        this.newInventoryProducts.push(product);
+  setProductList(isAdmin: boolean) {
+    if (isAdmin && this.initInvProducts) {
+      for (const product of this.locationState.activeLocation.productList) {
+        if (product.product.isActive) {
+          this.newInventoryProducts.push(product);
+        }
       }
+      // NOW WE CAN INITIALIZE THE NEW INV FORM HAVING DEFINED AN
+      // ACCURATE PRODUCT LIST
+      this._initNewInventoryForm();
+    } else if (!isAdmin && this.initInvProducts) {
+      for (const product of this.locationState.activeLocation.productList) {
+        let productDept = product.product.department;
+        if (
+          productDept === this.user.userProfile.department &&
+          product.product.isActive
+        ) {
+          this.newInventoryProducts.push(product);
+        }
+      }
+      // NOW WE CAN INITIALIZE THE NEW INV FORM HAVING DEFINED AN
+      // ACCURATE PRODUCT LIST
+      this._initNewInventoryForm();
     }
     this.initInvProducts = false;
   }
@@ -252,20 +262,8 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     beginDate = start.setDate(beginDate);
 
     let items = new FormArray([]);
-    let arr: any[] = [];
 
-    for (const product of this.locationProducts) {
-      let productDept = product.product.department;
-
-      if (
-        productDept === this.user.userProfile.department &&
-        product.product.isActive
-      ) {
-        arr.push(product);
-        this.newInventoryProducts = [...arr];
-      }
-    }
-
+    console.log(this.newInventoryProducts);
     for (const product of this.newInventoryProducts) {
       items.push(
         new FormGroup({

@@ -1,8 +1,8 @@
 import { createAction, props } from '@ngrx/store';
 
-import { Inventory } from 'src/app/core/business/business-control/inventory.model';
-import { Product } from 'src/app/core/business/business-control/product.model';
-import { Location } from '../../business-control/location.model';
+import { Inventory } from 'src/app/core/models/inventory.model';
+import { Product } from 'src/app/core/models/product.model';
+import { Location } from '../../../models/location.model';
 
 
 export const GETUserLocationsStart = createAction(
@@ -21,6 +21,9 @@ export const GETLocationInventoriesStart = createAction(
 export const GETLocationInventoriesSuccess = createAction(
   '[Location] Fetch a List of Location Inventories SUCCESS',
   props<{ inventoryData: Inventory[], draft: Inventory }>()
+);
+export const GETLocationInventoriesNull = createAction(
+  '[Location] Fetch a List of Location Inventories NULL Result'
 );
 
 

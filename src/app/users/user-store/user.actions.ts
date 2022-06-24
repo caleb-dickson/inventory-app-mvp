@@ -1,6 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 
-import { Location } from 'src/app/core/business/business-control/location.model';
+import { Location } from 'src/app/core/models/location.model';
 import { User } from '../user-control/user.model';
 
 export const loginStart = createAction(

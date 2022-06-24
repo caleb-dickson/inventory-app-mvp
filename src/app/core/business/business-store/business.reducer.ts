@@ -1,8 +1,8 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as BusinessActions from './business.actions';
 
-import { Business } from '../business-control/business.model';
-import { Location } from '../business-control/location.model';
+import { Business } from '../../models/business.model';
+import { Location } from '../../models/location.model';
 
 export interface BusinessState {
   business: Business;

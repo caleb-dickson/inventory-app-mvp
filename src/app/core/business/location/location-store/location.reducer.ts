@@ -1,9 +1,10 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as LocationActions from './location.actions';
 
-import { Inventory } from 'src/app/core/business/business-control/inventory.model';
-import { Product } from 'src/app/core/business/business-control/product.model';
-import { Location } from '../../business-control/location.model';
+import { Inventory } from 'src/app/core/models/inventory.model';
+import { Product } from 'src/app/core/models/product.model';
+import { Location } from '../../../models/location.model';
+import { state } from '@angular/animations';
 
 export interface LocationState {
   userLocations: Location[];
@@ -41,6 +42,7 @@ export function locationReducer(
     on(LocationActions.GETUserLocationsSuccess, (state, action) => ({
       ...state,
       loading: false,
+      locationError: null,
       userLocations: action.locations,
       activeLocation:
         action.locations.length === 1
@@ -55,8 +57,15 @@ export function locationReducer(
     on(LocationActions.GETLocationInventoriesSuccess, (state, action) => ({
       ...state,
       loading: false,
+      locationError: null,
       activeLocationInventories: [...action.inventoryData],
       activeInventory: action.draft,
+    })),
+    on(LocationActions.GETLocationInventoriesNull, (state) => ({
+      ...state,
+      loading: false,
+      activeLocationInventories: [],
+      activeInventory: null
     })),
 
     // UPDATE
@@ -67,6 +76,7 @@ export function locationReducer(
     on(LocationActions.PUTUpdateManagerLocationSuccess, (state, action) => ({
       ...state,
       loading: false,
+      locationError: null,
       userLocations: action.locations,
     })),
     on(LocationActions.PUTUpdateInventoryForLocationStart, (state) => ({
@@ -78,6 +88,7 @@ export function locationReducer(
       (state, action) => ({
         ...state,
         loading: false,
+        locationError: null,
         activeInventory: action.updatedInventory,
       })
     ),
@@ -90,6 +101,7 @@ export function locationReducer(
     on(LocationActions.POSTCreateProductForLocationSuccess, (state) => ({
       ...state,
       loading: false,
+      locationError: null,
     })),
     on(LocationActions.POSTCreateInventoryForLocationStart, (state) => ({
       ...state,
@@ -98,6 +110,7 @@ export function locationReducer(
     on(LocationActions.POSTCreateInventoryForLocationSuccess, (state) => ({
       ...state,
       loading: false,
+      locationError: null,
     })),
 
     // SELECT

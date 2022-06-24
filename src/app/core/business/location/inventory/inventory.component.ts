@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormGroup, NgForm } from '@angular/forms';
+import { FormControl, FormGroup, NgForm } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 
 import { Store } from '@ngrx/store';
@@ -9,15 +9,22 @@ import { LocationState } from '../location-store/location.reducer';
 
 import { map, Subscription } from 'rxjs';
 
-import { Location } from '../../business-control/location.model';
-import { Product } from '../../business-control/product.model';
+import { Location } from '../../../models/location.model';
+import { Product } from '../../../models/product.model';
 
-import { LocationService } from '../location-control/location.service';
+import { LocationService } from '../../../core-control/location.service';
 import { User } from 'src/app/users/user-control/user.model';
 import { Router } from '@angular/router';
-import { Inventory } from '../../business-control/inventory.model';
-import { InventoryService } from './inventory-control/inventory.service';
-import { BusinessInventoryPeriod } from '../../business-control/business.model';
+import { Inventory } from '../../../models/inventory.model';
+import { InventoryService } from '../../../core-control/inventory.service';
+import { BusinessInventoryPeriod } from '../../../models/business.model';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { MatDateRangePickerInput } from '@angular/material/datepicker/date-range-picker';
+
+interface DateRange {
+  dateStart: Date | null;
+  dateEnd: Date | null;
+}
 
 const inventoryColumns = [
   'category',
@@ -55,13 +62,15 @@ export class InventoryComponent implements OnInit, OnDestroy {
   locationStateError: string;
   activeLocation: Location;
   inventoryData: any[];
-  inventoryDataPopulated: Inventory[];
+  inventoryDataPopulatedSorted: Inventory[];
   needInvVal = true;
   inventoryPopulatedValue = [];
   workingInventory: any;
   workingInventoryItems: any;
 
   loading: boolean;
+
+  dateFilterForm: FormGroup;
 
   locationProducts: any[];
   newInventoryProducts: any[] = [];
@@ -113,6 +122,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
         this.activeProducts = locState.activeProducts;
         this.activeLocation = locState.activeLocation;
         this.workingInventory = locState.activeInventory;
+        this.inventoryDataPopulatedSorted = locState.activeLocationInventories;
 
         // IF USER HAS AT LEAST ONE ACTIVATED LOCATION
         if (
@@ -122,29 +132,13 @@ export class InventoryComponent implements OnInit, OnDestroy {
         ) {
           this.locationProducts = locState.activeLocation.productList;
           this.inventoryData = locState.activeLocation.inventoryData;
-          this.inventoryDataPopulated = locState.activeLocationInventories
-            .filter((inv) => inv.isFinal && (inv.department === this.userDept))
-            .sort((a, b) => (a.dateEnd < b.dateEnd ? 1 : -1));
+        }
 
-          // this.inventoryPopulatedValue
-          // if (this.needInvVal) {
-          //   this.getInventoriesValues();
-          // }
-
-          // AND POPULATED INVENTORIES ARE NOT ALREADY FETCHED SINCE LAST RELOAD
-          if (this.initLocInventories) {
-            console.log(this.initLocInventories);
-            this._onGetPopulatedInventories();
-          }
-
-          //   // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
-          //   if (this.workingInventory) {
-          //     this.workingInventoryItems = this.workingInventory.inventory;
-          //     // this._initPastInventoryUpdateForm();
-          //   }
-          //   if (locState.activeLocationInventories) {
-          //     this.inventoryDataPopulated = locState.activeLocationInventories;
-          //   }
+        if (
+          locState.activeLocationInventories &&
+          locState.activeLocationInventories.length > 0
+        ) {
+          this.onSortInventoryData();
         }
 
         console.group(
@@ -154,28 +148,67 @@ export class InventoryComponent implements OnInit, OnDestroy {
           locState
         );
         console.groupEnd();
-        console.log(this.inventoryDataPopulated);
-        console.log(this.locationState.activeLocationInventories);
+        console.log(this.inventoryDataPopulatedSorted);
       });
-    this.dataSource = new MatTableDataSource(this.inventoryDataPopulated);
-  }
-
-  // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
-  private _onGetPopulatedInventories() {
-    this._locationService.getPopulatedInventories(
-      this.initLocInventories,
-      this.inventoryData,
-      this.locationState.activeLocation._id
+    this.dataSource = new MatTableDataSource(
+      this.locationState.activeLocationInventories
     );
-    console.log(this.inventoryDataPopulated);
-    this.initLocInventories = false;
+    this._initDateFilterForm();
   }
 
   // WORKING
-  // applyFilter(event: Event) {
-  //   const filterValue = (event.target as HTMLInputElement).value;
-  //   this.dataSource.filter = filterValue.trim().toLowerCase();
-  // }
+  defineFilter() {
+    console.log(this.dateFilterForm.value);
+
+    let range: DateRange = {
+      dateStart: this.dateFilterForm.value.dateStart,
+      dateEnd: this.dateFilterForm.value.dateEnd,
+    };
+    console.log(range);
+
+    if (
+      this.dateFilterForm.value.dateStart &&
+      this.dateFilterForm.value.dateEnd
+    ) {
+      this.applyFilter(range);
+    }
+  }
+
+  private _initDateFilterForm() {
+    this.dateFilterForm = new FormGroup({
+      dateStart: new FormControl(null),
+      dateEnd: new FormControl(null),
+    });
+  }
+
+  applyFilter(range: DateRange) {
+    let arr = [];
+    let filteredInventories = this.inventoryDataPopulatedSorted;
+
+    console.log(range.dateEnd);
+
+    for (const inv of filteredInventories) {
+      if (
+        new Date(inv.dateEnd) >= range.dateStart &&
+        new Date(inv.dateEnd) <= range.dateEnd
+      ) {
+        arr.push(inv);
+      }
+      console.log(arr);
+    }
+    filteredInventories = arr;
+
+    console.log(filteredInventories);
+
+    this.inventoryDataPopulatedSorted = filteredInventories;
+    console.log(this.inventoryDataPopulatedSorted);
+  }
+
+  resetFilter() {
+    this.onSortInventoryData();
+    this._initDateFilterForm();
+    this.dateFilterForm.updateValueAndValidity();
+  }
 
   onSetInvProductList() {
     for (const product of this.locationState.activeLocation.productList) {
@@ -188,6 +221,31 @@ export class InventoryComponent implements OnInit, OnDestroy {
       }
     }
     this.initInvProducts = false;
+  }
+
+  onSortInventoryData() {
+    let arr = [];
+    let sortedInv = [...this.locationState.activeLocationInventories];
+    console.log(this.userRole)
+    if (this.userDept === 'admin') {
+      for (const inv of sortedInv) {
+        if (inv.isFinal) {
+          arr.push(inv);
+        }
+      }
+      arr.sort((a, b) => (a.dateEnd < b.dateEnd ? 1 : -1));
+
+    } else {
+      for (const inv of sortedInv) {
+        if (inv.isFinal && inv.department === this.userDept) {
+          arr.push(inv);
+        }
+      }
+      arr.sort((a, b) => (a.dateEnd < b.dateEnd ? 1 : -1));
+    }
+    sortedInv = arr;
+
+    this.inventoryDataPopulatedSorted = sortedInv;
   }
 
   // onResetInventoryForm() {

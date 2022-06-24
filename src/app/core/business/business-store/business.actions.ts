@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store';
 
-import { Business } from '../business-control/business.model';
-import { Location } from '../business-control/location.model';
+import { Business } from '../../models/business.model';
+import { Location } from '../../models/location.model';
 
 // BUSINESS ACTIONS = FOR OWNERS
 // BUSINESS ACTIONS = FOR OWNERS

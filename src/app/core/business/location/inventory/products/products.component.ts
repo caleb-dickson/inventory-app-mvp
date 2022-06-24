@@ -8,15 +8,15 @@ import { LocationState } from '../../location-store/location.reducer';
 
 import { map, Subscription } from 'rxjs';
 
-import { Location } from '../../../business-control/location.model';
+import { Location } from '../../../../models/location.model';
 import {
   defaultCategories,
   ProductCategories,
-} from './models/product-categories.model';
-import { defaultUnits, UnitsCategories } from './models/units-list.model';
-import { Product } from '../../../business-control/product.model';
+} from '../../../../models/product-categories.model';
+import { defaultUnits, UnitsCategories } from '../../../../models/units-list.model';
+import { Product } from '../../../../models/product.model';
 
-import { LocationService } from '../../location-control/location.service';
+import { LocationService } from '../../../../core-control/location.service';
 import { User } from 'src/app/users/user-control/user.model';
 
 @Component({

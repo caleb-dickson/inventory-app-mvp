@@ -19,8 +19,8 @@ import {
 } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import { Location } from '../../business-control/location.model';
-import { Inventory } from '../../business-control/inventory.model';
+import { Location } from '../../../models/location.model';
+import { Inventory } from '../../../models/inventory.model';
 
 const BACKEND_URL = environment.apiUrl + '/location';
 
@@ -200,43 +200,43 @@ export class LocationEffects {
   );
 
   updateLocationInventory$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(LocationActions.PUTUpdateInventoryForLocationStart),
-    withLatestFrom(this.store.select('user')),
-    exhaustMap(([action, authState]) => {
-      console.warn('||| updateLocationInventory$ effect called |||===');
-      console.log(action);
+    this.actions$.pipe(
+      ofType(LocationActions.PUTUpdateInventoryForLocationStart),
+      withLatestFrom(this.store.select('user')),
+      exhaustMap(([action, authState]) => {
+        console.warn('||| updateLocationInventory$ effect called |||===');
+        console.log(action);
 
-      return this.http
-        .put<{ updatedInventory: Inventory }>(
-          BACKEND_URL + '/update-inventory',
-          {
-            inventory: action.inventory,
-          }
-        )
-        .pipe(
-          map((resData) => {
-            console.log(resData);
-            console.log('||| ^^^ resData ^^^ |||');
-
-            if (resData.updatedInventory) {
-              return LocationActions.PUTUpdateInventoryForLocationSuccess({
-                updatedInventory: resData.updatedInventory,
-              });
+        return this.http
+          .put<{ updatedInventory: Inventory }>(
+            BACKEND_URL + '/update-inventory',
+            {
+              inventory: action.inventory,
             }
-            return LocationActions.GETUserLocationsStart({
-              userId: authState.user.userId,
-              userRole: authState.user.userProfile.role,
-            });
-          }),
-          catchError((errorRes) => {
-            console.warn(errorRes);
-            return handleError(errorRes);
-          })
-        );
-    })
-  )
-);
+          )
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              console.log('||| ^^^ resData ^^^ |||');
+
+              if (resData.updatedInventory) {
+                return LocationActions.PUTUpdateInventoryForLocationSuccess({
+                  updatedInventory: resData.updatedInventory,
+                });
+              }
+              return LocationActions.GETUserLocationsStart({
+                userId: authState.user.userId,
+                userRole: authState.user.userProfile.role,
+              });
+            }),
+            catchError((errorRes) => {
+              console.warn(errorRes);
+              return handleError(errorRes);
+            })
+          );
+      })
+    )
+  );
 
   fetchLocationInventories$ = createEffect(() =>
     this.actions$.pipe(
@@ -253,13 +253,13 @@ export class LocationEffects {
             map((resData) => {
               console.log(resData);
               console.log('||| ^^^ resData ^^^ |||');
+              const inventoryData = resData.fetchedInventories;
               if (
                 resData &&
                 resData.fetchedInventories &&
                 resData.fetchedInventories.length > 0
               ) {
                 let draft: Inventory = null;
-                const inventoryData = resData.fetchedInventories;
                 localStorage.setItem(
                   'inventoryData',
                   JSON.stringify(inventoryData)
@@ -275,10 +275,6 @@ export class LocationEffects {
                 return LocationActions.GETLocationInventoriesSuccess({
                   inventoryData: [...resData.fetchedInventories],
                   draft: draft,
-                });
-              } else {
-                return LocationActions.LocationError({
-                  errorMessage: 'No inventories found for this location.',
                 });
               }
             }),

@@ -1,15 +1,17 @@
 @use "../../../sass/abstracts/variables" as var;
 
+// DESKTOP STYLES
 .settings {
   display: flex;
   justify-content: center;
   // align-content: center;
 
-  &-owner {
+  mat-card {
     height: max-content;
-    width: calc(100% - 12rem);
+    width: 50vw;
     min-width: min-content;
     margin-block-start: 1rem;
+    margin-block-end: 1rem;
 
     // mat-card-title {}
     // mat-card-subtitle {}
@@ -54,8 +56,78 @@
       }
     }
 
-    // mat-card-actions {
-    //   button {}
-    // }
+    mat-card-actions {
+      margin-block-start: -1rem;
+      margin-block-end: 1rem;
+      // button {
+
+      // }
+    }
+  }
+}
+
+// MOBILE STYLES
+@media only screen and (max-width: var.$bp-mobile) {
+  .settings {
+    display: flex;
+    justify-content: center;
+    // align-content: center;
+
+    mat-card {
+      height: min-content;
+      width: 95vw;
+      margin-block-end: 1rem;
+
+      // mat-card-title {}
+      // mat-card-subtitle {}
+
+      mat-card-content {
+        .user-form {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          p {
+            font-size: 1.2rem;
+            font-weight: 415;
+            margin-top: 1rem;
+          }
+
+          mat-form-field {
+            padding-inline: 2rem;
+            width: 20rem;
+          }
+
+          .theme-toggle {
+            display: flex;
+            flex-direction: column;
+            margin-inline-start: 2rem;
+            margin-block-start: 1rem;
+            margin-block-end: 1.5rem;
+          }
+        }
+
+        .user-photo-upload {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          input[type="file"] {
+            visibility: hidden;
+          }
+
+          img {
+            clip-path: circle(50%);
+          }
+        }
+      }
+
+      mat-card-actions {
+        margin-block-start: -1rem;
+        margin-block-end: 1rem;
+        // button {
+
+        // }
+      }
+    }
   }
 }

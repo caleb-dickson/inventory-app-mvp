@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Subject } from 'rxjs';
-import { UserState } from './users/user-store/user.reducer';
+import { UserState } from '../users/user-store/user.reducer';
 
 @Injectable({
   providedIn: 'root',

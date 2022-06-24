@@ -11,11 +11,11 @@ import * as BusinessActions from '../business/business-store/business.actions';
 import { authSuccess } from '../../users/user-store/user.actions';
 
 import { User } from 'src/app/users/user-control/user.model';
-import { Location } from './business-control/location.model';
+import { Location } from '../models/location.model';
 import { UserState } from 'src/app/users/user-store/user.reducer';
 import { BusinessState } from './business-store/business.reducer';
 import { HttpClient } from '@angular/common/http';
-import { Business } from './business-control/business.model';
+import { Business } from '../models/business.model';
 
 const BACKEND_URL = environment.apiUrl + '/business';
 

@@ -1,4 +1,4 @@
-@use "../../../../../../sass/abstracts/variables" as inv;
+@use "../../../../../../sass/abstracts/variables" as var;
 
 .location {
   display: flex;
@@ -7,7 +7,12 @@
   margin: 2rem;
 }
 
-.spinner {
+mat-spinner {
+  display: flex;
+  justify-content: center;
+}
+
+.no-drafts {
   display: flex;
   justify-content: center;
 }
@@ -85,7 +90,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        background-color: inv.$color-grey-light;
+        background-color: var.$color-grey-light;
         margin-block: 1rem;
         width: 45vw;
         max-width: 25rem;
@@ -103,5 +108,123 @@
 
     // }
 
+  }
+}
+
+// MOBILE STYLES
+@media only screen and (max-width: var.$bp-mobile) {
+  .location {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2rem;
+  }
+
+  mat-spinner {
+    display: flex;
+    justify-content: center;
+  }
+
+  .no-drafts {
+    display: flex;
+    justify-content: center;
+  }
+
+  .new-inventory-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2rem;
+
+    .inventory {
+
+      &-expansion {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 70vw;
+        max-width: 40rem;
+
+        .new-inventory-icon {
+          margin-inline-end: 1rem;
+        }
+
+        &-new-main {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin: 2rem;
+        }
+
+        &-card {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 65vw;
+
+
+
+        }
+        .inventory-card-control {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+
+        .inventory-card-submit-status {
+          display: flex;
+          justify-content: center;
+
+          &-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 20rem;
+            padding-block: 1rem;
+            border: 1px solid #aeaeae;
+            border-radius: 0.5rem;
+
+            mat-radio-button {
+              margin: 1rem;
+            }
+          }
+        }
+
+        .inventory-card-submit-value {
+          display: flex;
+          justify-content: center;
+          text-align: center;
+          margin-block-end: 1rem;
+        }
+
+        .inventory-products-cards-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+
+          .inventory-products {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var.$color-grey-light;
+            margin-block: 1rem;
+            width: 95%;
+
+            &-input {
+              display: flex;
+              flex-direction: column;
+              width: 10rem;
+            }
+          }
+        }
+
+      }
+
+      // &-working {
+
+      // }
+
+    }
   }
 }

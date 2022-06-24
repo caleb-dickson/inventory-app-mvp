@@ -9,20 +9,20 @@
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content class="business">
-      <section class="business-info">
-        <h5 class="business-info-title">Business Profile</h5>
-        <h6 class="business-info-subtitle">Business Name</h6>
+      <section class="business-manage-info">
+        <h5 class="business-manage-info-title">Business Profile</h5>
+        <h6 class="business-manage-info-subtitle">Business Name</h6>
 
-        <p *ngIf="!businessSubmitMode && !loading" class="business-info-name">
+        <p *ngIf="!businessSubmitMode && !loading" class="business-manage-info-name">
           {{
             businessName ? businessName : "Add your business to get started."
           }}
           <button
             mat-raised-button
-            class="business-info-edit"
+            class="business-manage-info-edit"
             (click)="onEditBusiness(businessName ? 'update' : 'new')"
           >
-            <mat-icon *ngIf="businessName" class="business-info-name-edit"
+            <mat-icon *ngIf="businessName" class="business-manage-info-name-edit"
               >edit</mat-icon
             >
             <mat-icon *ngIf="!businessName">domain_add</mat-icon>
@@ -33,7 +33,7 @@
         <form
           [formGroup]="businessForm"
           (ngSubmit)="onBusinessSubmit()"
-          class="business-form"
+          class="business-manage-form"
         >
           <p *ngIf="!businessState && !businessName">Name Your Business</p>
           <div *ngIf="businessSubmitMode">
@@ -71,7 +71,7 @@
               >{{ businessError }}</mat-error
             >
           </div>
-          <div class="business-info-photo">
+          <div class="business-manage-info-photo">
             <button
               mat-stroked-button
               type="button"
@@ -113,7 +113,7 @@
         </button>
           <button
           *ngIf="businessForm.get('businessPhoto').value"
-          class="business-submit"
+          class="business-manage-info-submit"
           type="submit"
           mat-raised-button
           [disabled]="businessForm.invalid"
@@ -130,10 +130,10 @@
         <h6 class="business-info-subtitle">
           {{ locations ? "Manage Locations" : null }}
         </h6>
-        <div *ngFor="let location of locations" class="business-info-locations">
+        <div *ngFor="let location of locations" class="business-manage-info-locations">
           <a
             [href]="'/app/business#' + location._id"
-            class="business-info-locations-list"
+            class="business-manage-info-locations-list"
           >
             <mat-icon class="mat-tag">tag</mat-icon>{{ location.locationName }}
           </a>
@@ -152,7 +152,7 @@
       <br />
 
       <p *ngIf="!businessId">Add your business to create locations.</p>
-      <button *ngIf="businessId" mat-icon-button class="business-info-add">
+      <button *ngIf="businessId" mat-icon-button class="business-manage-info-add">
         <mat-icon *ngIf="!locationSubmitMode" (click)="onCreateLocation(true)"
           >add_business</mat-icon
         >
@@ -173,7 +173,7 @@
         *ngIf="locationSubmitMode"
         [formGroup]="newLocationForm"
         (ngSubmit)="onNewLocationSubmit()"
-        class="location-form"
+        class="business-manage-info-locations-form"
       >
         <mat-form-field>
           <mat-label>Location Name</mat-label>

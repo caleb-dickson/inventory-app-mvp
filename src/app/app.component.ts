@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { map, Subscription } from 'rxjs';
 import * as fromAppStore from './app-store/app.reducer';
 import * as AuthActions from './users/user-store/user.actions';
-import { ThemeService } from './theme.service';
+import { ThemeService } from './app-control/theme.service';
 
 @Component({
   selector: 'app-root',

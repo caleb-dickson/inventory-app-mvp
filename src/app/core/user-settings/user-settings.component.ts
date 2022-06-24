@@ -11,7 +11,7 @@ import * as UserActions from '../../users/user-store/user.actions';
 import { User } from 'src/app/users/user-control/user.model';
 
 import { environment } from 'src/environments/environment';
-import { ThemeService } from 'src/app/theme.service';
+import { ThemeService } from 'src/app/app-control/theme.service';
 
 const BACKEND_URL = environment.apiUrl + '/user';
 

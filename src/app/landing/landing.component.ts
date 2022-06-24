@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import * as fromAppStore from '../app-store/app.reducer';
 
 import { UserService } from '../users/user-control/user.service';
-import { ThemeService } from '../theme.service';
+import { ThemeService } from '../app-control/theme.service';
 import { NgForm } from '@angular/forms';
 
 @Component({

@@ -6,7 +6,8 @@
     locationState.activeLocation &&
     locationState.activeLocation.productList &&
     locationState.activeLocation.productList.length > 0 &&
-    !loading
+    !loading &&
+    newInventoryItemControls.length !== 0
   "
 >
   <h4>{{ activeLocation.locationName }}</h4>
@@ -26,16 +27,18 @@
 <div
   class="location"
   *ngIf="
-    locationState.activeLocation &&
-    locationState.activeLocation.productList &&
-    locationState.activeLocation.productList.length === 0
+    (locationState.activeLocation &&
+      locationState.activeLocation.productList &&
+      locationState.activeLocation.productList.length === 0) ||
+    newInventoryItemControls.length === 0
   "
 >
   <h4>
     Add
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }}
     products to the {{ locationState.activeLocation.locationName }} location to
-    start a new inventory.
+    start a new
+    {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory.
   </h4>
 </div>
 
@@ -44,7 +47,8 @@
   *ngIf="
     locationState.activeLocation &&
     locationState.activeLocation.productList &&
-    locationState.activeLocation.productList.length > 0
+    locationState.activeLocation.productList.length > 0 &&
+    newInventoryItemControls.length > 0
   "
   class="new-inventory-container"
 >
@@ -100,7 +104,7 @@
             </div>
 
             <!-- PRODUCT INVENTORY CARDS START -->
-            <div formArrayName="inventory">
+            <div formArrayName="inventory" class="inventory-products-cards-container">
               <mat-card
                 *ngFor="
                   let control of newInventoryItemControls;
@@ -111,7 +115,6 @@
                 [formGroupName]="i"
                 class="inventory-products"
               >
-                <p>{{ item.product.name }}</p>
                 <div class="inventory-products-input">
                   <h6>{{ item.product.name }}</h6>
                   <p>
@@ -229,8 +232,11 @@
 <!-- NEW INVENTORY MAIN END END END -->
 
 <!-- NO WORKING DRAFTS MESSAGE -->
-<div *ngIf="!workingInventory || !locationState.activeLocation">
-  <p>No working {{ userDept | uppercase }} inventory drafts found.</p>
+<div
+  *ngIf="!workingInventory || !locationState.activeLocation"
+  class="no-drafts"
+>
+  <p>No working {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory drafts found.</p>
 </div>
 
 <!-- WORKING INVENTORIES START -->

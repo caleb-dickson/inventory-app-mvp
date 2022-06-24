@@ -1,43 +1,73 @@
 <div class="inventory">
+  <div class="active-location-null" *ngIf="!locationState.activeLocation">
+    <h4>Select a location to start a new inventory.</h4>
+  </div>
   <!-- NO WORKING DRAFTS MESSAGE -->
   <div
     *ngIf="
-      !inventoryDataPopulated ||
-      (inventoryDataPopulated &&
-        inventoryDataPopulated.length === 0 &&
-        userDept !== 'admin')
+      !inventoryDataPopulatedSorted ||
+      (inventoryDataPopulatedSorted &&
+        inventoryDataPopulatedSorted.length === 0)
     "
-    class="inventory-message"
+    class="inventory-null-message"
   >
+<!-- "NO LOCATION ACTIVE" MESSAGE -->
     <p>
-      Past {{ userDept | uppercase }} inventories will show up here when
-      finalized.
+      Past
+      {{ userDept === "admin" ? null : (userDept | uppercase) }} inventories
+      will show up here when finalized.
     </p>
   </div>
 
   <div
-    *ngIf="locationState.activeLocationInventories && locationState.activeLocationInventories.length > 0"
+    *ngIf="
+      locationState.activeLocationInventories &&
+      locationState.activeLocationInventories.length > 0
+    "
     class="inventory-main"
   >
-    <mat-spinner
-      diameter="100"
-      strokeWidth="6"
-      *ngIf="loading"
-    ></mat-spinner>
+    <mat-spinner diameter="100" strokeWidth="6" *ngIf="loading"></mat-spinner>
+
     <!-- INVENTORY DATE FILTER -->
-    <mat-form-field appearance="standard">
-      <mat-label>Filter by date</mat-label>
-      <input
-        matInput
-        (keyup)="applyFilter($event)"
-        placeholder="Ex. 5/13/2023"
-        #input
-      />
-    </mat-form-field>
+    <form *ngIf="inventoryDataPopulatedSorted.length > 0" class="filter">
+      <mat-label>Filter by Inventory Ending Dates</mat-label>
+      <mat-form-field appearance="fill" class="filter-input">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input
+          [rangePicker]="picker"
+          [formGroup]="dateFilterForm"
+        >
+          <input
+            matStartDate
+            #dateStart
+            formControlName="dateStart"
+            placeholder="Earliest"
+          />
+          <input
+            matEndDate
+            #dateEnd
+            formControlName="dateEnd"
+            placeholder="Latest"
+            (dateInput)="defineFilter()"
+          />
+        </mat-date-range-input>
+        <mat-hint>MM/DD/YYYY - MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+      <button
+        *ngIf="dateFilterForm.dirty"
+        mat-raised-button
+        class="filter-reset"
+        (click)="resetFilter()"
+      >
+        Reset
+      </button>
+    </form>
 
     <!-- PAST INVENTORY TABLE LIST START -->
     <mat-table
-      *ngFor="let inv of locationState.activeLocationInventories"
+      *ngFor="let inv of inventoryDataPopulatedSorted"
       mat-table
       matRipple
       [dataSource]="inv.inventory"

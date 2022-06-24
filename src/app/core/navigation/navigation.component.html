@@ -51,7 +51,7 @@
         <mat-icon class="sidenav-icon">sell</mat-icon>Products
       </a>
       <a mat-list-item routerLink="/app/new-inventory" routerLinkActive="active">
-        <mat-icon class="sidenav-icon">addchart</mat-icon>Working Inventory
+        <mat-icon class="sidenav-icon">addchart</mat-icon>New/Current Inventory
       </a>
       <a
         *ngIf="userRole !== 'staff' || userDept === 'admin'"
@@ -99,16 +99,16 @@
         >
           <mat-label>
             {{
-              activatedLocation
-                ? activatedLocation.locationName + " selected"
+              activeLocation
+                ? activeLocation.locationName + " selected"
                 : "Select Location"
             }}
           </mat-label>
           <mat-select
-            [(ngModel)]="activatedLocation"
-            name="activatedLocation"
-            [selected]="activatedLocation ? activatedLocation : selected"
-            (selectionChange)="onActivateLocation(activatedLocation)"
+            [(ngModel)]="activeLocation"
+            name="activeLocation"
+            [selected]="activeLocation ? activeLocation : selected"
+            (selectionChange)="onActivateLocation(activeLocation)"
           >
             <mat-option
               class="location-select-dropdown"
@@ -119,7 +119,7 @@
               {{ location.locationName }}
             </mat-option>
           </mat-select>
-          <mat-hint>(Owner) Multiple locations detected.</mat-hint>
+          <mat-hint>Multiple locations detected.</mat-hint>
         </mat-form-field>
       </div>
 
@@ -135,16 +135,16 @@
         >
           <mat-label>
             {{
-              activatedLocation
-                ? activatedLocation.locationName + " selected"
+              activeLocation
+                ? activeLocation.locationName + " selected"
                 : "Select Location"
             }}
           </mat-label>
           <mat-select
-            [(ngModel)]="activatedLocation"
-            name="activatedLocation"
-            [selected]="activatedLocation ? activatedLocation : selected"
-            (selectionChange)="onActivateLocation(activatedLocation)"
+            [(ngModel)]="activeLocation"
+            name="activeLocation"
+            [selected]="activeLocation ? activeLocation : selected"
+            (selectionChange)="onActivateLocation(activeLocation)"
           >
             <mat-option
               class="location-select-dropdown"
@@ -169,7 +169,7 @@
       >
         <!-- [routerLink]="manageRoute" -->
         <mat-icon class="sidenav-icon">{{ manageIcon }}</mat-icon
-        >{{ singleUserLocationName }}
+        >{{ singleUserLocationName }} <mat-icon class="sidenav-icon-check">done</mat-icon>
       </a>
 
       <span class="spacer"></span>

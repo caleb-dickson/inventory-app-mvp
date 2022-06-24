@@ -24,7 +24,7 @@ import { environment } from 'src/environments/environment';
 import { UserService } from '../user-control/user.service';
 
 import { User } from '../user-control/user.model';
-import { Location } from '../../core/business/business-control/location.model';
+import { Location } from '../../core/models/location.model';
 
 import { MatDialog } from '@angular/material/dialog';
 
