@@ -1,4 +1,10 @@
-<mat-spinner diameter="100" strokeWidth="6" *ngIf="locLoading || bizLoading"></mat-spinner>
+<div class="spinner spinner-top">
+  <mat-spinner
+    diameter="100"
+    strokeWidth="6"
+    *ngIf="locLoading || bizLoading"
+  ></mat-spinner>
+</div>
 <div *ngIf="!locLoading && !bizLoading" class="product">
   <h4 *ngIf="!activeLocation" class="no-active-location">
     Select a location to access products.
@@ -142,7 +148,14 @@
             <div class="par-block">
               <mat-form-field appearance="outline" class="hint">
                 <mat-label>Packs PAR</mat-label>
-                <input ngModel matInput required type="number" name="par" #par />
+                <input
+                  ngModel
+                  matInput
+                  required
+                  type="number"
+                  name="par"
+                  #par
+                />
                 <mat-icon
                   matSuffix
                   matTooltip="Periodic Automatic Replacement (PAR).
@@ -155,10 +168,16 @@
               </mat-form-field>
             </div>
 
-            <p *ngIf="newProductForm.value.unitsPerPack <= 1" class="text-center">
+            <p
+              *ngIf="newProductForm.value.unitsPerPack <= 1"
+              class="text-center"
+            >
               Case Info
             </p>
-            <p *ngIf="newProductForm.value.unitsPerPack > 1" class="text-center">
+            <p
+              *ngIf="newProductForm.value.unitsPerPack > 1"
+              class="text-center"
+            >
               How many packs per case?
             </p>
 
@@ -228,13 +247,15 @@
           >
             Reset
           </button>
-          <mat-spinner
-            diameter="70"
-            strokeWidth="5"
-            *ngIf="locationState.loading"
-          ></mat-spinner>
+          <div class="spinner">
+            <mat-spinner
+              diameter="40"
+              strokeWidth="6"
+              *ngIf="locLoading || bizLoading"
+            ></mat-spinner>
+          </div>
           <button
-            *ngIf="!locationState.loading"
+            *ngIf="!locLoading"
             mat-raised-button
             type="submit"
             [disabled]="newProductForm.invalid"
@@ -249,9 +270,9 @@
 
   <div class="spinner">
     <mat-spinner
-      diameter="70"
-      strokeWidth="5"
-      *ngIf="locationState.loading || bizLoading"
+      diameter="100"
+      strokeWidth="6"
+      *ngIf="locLoading || bizLoading"
     ></mat-spinner>
   </div>
 
@@ -261,6 +282,14 @@
   >
     Product List
   </h5>
+
+  <h6
+    *ngIf="locationState.activeLocation.productList.length === 0"
+    class="products-null-message"
+  >
+    Products stocked at this location will appear below. <br>
+    Create new products to get started.
+  </h6>
 
   <div>
     <button

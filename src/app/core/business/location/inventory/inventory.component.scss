@@ -1,5 +1,14 @@
 @use "../../../../../sass/abstracts/variables" as var;
 
+.spinner {
+  display: flex;
+  justify-content: center;
+
+  &-top {
+    margin-block-start: 2rem;
+  }
+}
+
 .inventory {
 
   .active-location-null {

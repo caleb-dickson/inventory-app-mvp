@@ -1,5 +1,17 @@
 @use "../../../../../../sass/abstracts/variables" as var;
 
+
+// DESKTOP STYLES
+
+.spinner {
+  display: flex;
+  justify-content: center;
+
+  &-top {
+    margin-block-start: 2rem;
+  }
+}
+
 .product {
   display: flex;
   flex-direction: column;
@@ -66,9 +78,8 @@
     }
   }
 
-  .spinner {
-    display: flex;
-    justify-content: center;
+  .products-null-message {
+    text-align: center;
   }
 
   &-list {

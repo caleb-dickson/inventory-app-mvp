@@ -7,9 +7,13 @@
   margin: 2rem;
 }
 
-mat-spinner {
+.spinner {
   display: flex;
   justify-content: center;
+
+  &-top {
+    margin-block-start: 2rem;
+  }
 }
 
 .no-drafts {

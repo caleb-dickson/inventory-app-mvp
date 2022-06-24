@@ -11,12 +11,12 @@
     "
     class="inventory-null-message"
   >
-<!-- "NO LOCATION ACTIVE" MESSAGE -->
-    <p>
+    <!-- "NO LOCATION ACTIVE" MESSAGE -->
+    <h4 *ngIf="locationState.activeLocation.inventoryData.length === 0">
       Past
       {{ userDept === "admin" ? null : (userDept | uppercase) }} inventories
       will show up here when finalized.
-    </p>
+    </h4>
   </div>
 
   <div
@@ -26,10 +26,21 @@
     "
     class="inventory-main"
   >
-    <mat-spinner diameter="100" strokeWidth="6" *ngIf="loading"></mat-spinner>
-
+    <div class="spinner spinner-top">
+      <mat-spinner
+        diameter="100"
+        strokeWidth="4"
+        *ngIf="locLoading"
+      ></mat-spinner>
+    </div>
     <!-- INVENTORY DATE FILTER -->
-    <form *ngIf="inventoryDataPopulatedSorted.length > 0" class="filter">
+    <form
+      *ngIf="
+        (!locLoading && inventoryDataPopulatedSorted.length > 0) ||
+        inventoryData.length > 0
+      "
+      class="filter"
+    >
       <mat-label>Filter by Inventory Ending Dates</mat-label>
       <mat-form-field appearance="fill" class="filter-input">
         <mat-label>Enter a date range</mat-label>

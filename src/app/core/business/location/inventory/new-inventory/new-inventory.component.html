@@ -1,12 +1,14 @@
 <!-- TITLE BLOCK -->
-<mat-spinner diameter="100" strokeWidth="6" *ngIf="loading"></mat-spinner>
+<div class="spinner spinner-top">
+  <mat-spinner diameter="100" strokeWidth="6" *ngIf="locLoading"></mat-spinner>
+</div>
 <div
   class="location"
   *ngIf="
     locationState.activeLocation &&
     locationState.activeLocation.productList &&
     locationState.activeLocation.productList.length > 0 &&
-    !loading &&
+    !locLoading &&
     newInventoryItemControls.length !== 0
   "
 >
@@ -17,10 +19,6 @@
 <!-- "NO LOCATION ACTIVE" MESSAGE -->
 <div class="location" *ngIf="!locationState.activeLocation">
   <h4>Select a location to start a new inventory.</h4>
-</div>
-
-<div class="spinner">
-  <mat-spinner *ngIf="loading"></mat-spinner>
 </div>
 
 <!-- "NO DEPARTMENT PRODUCTS IN LOCATION" MESSAGE -->
@@ -104,7 +102,10 @@
             </div>
 
             <!-- PRODUCT INVENTORY CARDS START -->
-            <div formArrayName="inventory" class="inventory-products-cards-container">
+            <div
+              formArrayName="inventory"
+              class="inventory-products-cards-container"
+            >
               <mat-card
                 *ngFor="
                   let control of newInventoryItemControls;
@@ -188,8 +189,17 @@
           <mat-error *ngIf="newInventoryForm.dirty && newInventoryForm.invalid">
             Please complete all fields to save.
           </mat-error>
+          <div class="spinner">
+            <mat-spinner
+              diameter="30"
+              strokeWidth="4"
+              *ngIf="locLoading"
+            ></mat-spinner>
+          </div>
           <button
-            *ngIf="userRole !== 'staff' || userDept === 'admin'"
+            *ngIf="
+              !locLoading && (userRole !== 'staff' || userDept === 'admin')
+            "
             mat-raised-button
             #invSubmit
             type="submit"
@@ -203,7 +213,7 @@
             }}
           </button>
           <button
-            *ngIf="userRole === 'staff' && userDept !== 'admin'"
+            *ngIf="!locLoading && userRole === 'staff' && userDept !== 'admin'"
             mat-raised-button
             type="button"
             color="accent"
@@ -236,7 +246,12 @@
   *ngIf="!workingInventory || !locationState.activeLocation"
   class="no-drafts"
 >
-  <p>No working {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory drafts found.</p>
+
+  <p *ngIf="locationState.activeLocation.inventoryData.length > 0">
+    No working
+    {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory
+    drafts found.
+  </p>
 </div>
 
 <!-- WORKING INVENTORIES START -->

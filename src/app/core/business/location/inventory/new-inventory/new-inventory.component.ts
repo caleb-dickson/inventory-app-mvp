@@ -88,7 +88,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
   workingInventory: any;
   workingInventoryItems: any;
 
-  loading: boolean;
+  locLoading: boolean;
 
   locationProducts: any[];
   newInventoryProducts: any[] = [];
@@ -132,7 +132,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
       .select('location')
       .subscribe((locState) => {
         this.locationState = locState;
-        this.loading = locState.loading;
+        this.locLoading = locState.loading;
         this.locationStateError = locState.locationError;
         this.activeProducts = locState.activeProducts;
         this.activeLocation = locState.activeLocation;

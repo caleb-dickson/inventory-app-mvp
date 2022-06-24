@@ -18,8 +18,6 @@ import { Router } from '@angular/router';
 import { Inventory } from '../../../models/inventory.model';
 import { InventoryService } from '../../../core-control/inventory.service';
 import { BusinessInventoryPeriod } from '../../../models/business.model';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
-import { MatDateRangePickerInput } from '@angular/material/datepicker/date-range-picker';
 
 interface DateRange {
   dateStart: Date | null;
@@ -63,12 +61,9 @@ export class InventoryComponent implements OnInit, OnDestroy {
   activeLocation: Location;
   inventoryData: any[];
   inventoryDataPopulatedSorted: Inventory[];
-  needInvVal = true;
-  inventoryPopulatedValue = [];
   workingInventory: any;
-  workingInventoryItems: any;
 
-  loading: boolean;
+  locLoading: boolean;
 
   dateFilterForm: FormGroup;
 
@@ -117,7 +112,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
       .select('location')
       .subscribe((locState) => {
         this.locationState = locState;
-        this.loading = locState.loading;
+        this.locLoading = locState.loading;
         this.locationStateError = locState.locationError;
         this.activeProducts = locState.activeProducts;
         this.activeLocation = locState.activeLocation;
@@ -185,8 +180,6 @@ export class InventoryComponent implements OnInit, OnDestroy {
     let arr = [];
     let filteredInventories = this.inventoryDataPopulatedSorted;
 
-    console.log(range.dateEnd);
-
     for (const inv of filteredInventories) {
       if (
         new Date(inv.dateEnd) >= range.dateStart &&
@@ -194,14 +187,10 @@ export class InventoryComponent implements OnInit, OnDestroy {
       ) {
         arr.push(inv);
       }
-      console.log(arr);
     }
     filteredInventories = arr;
 
-    console.log(filteredInventories);
-
     this.inventoryDataPopulatedSorted = filteredInventories;
-    console.log(this.inventoryDataPopulatedSorted);
   }
 
   resetFilter() {
@@ -226,7 +215,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
   onSortInventoryData() {
     let arr = [];
     let sortedInv = [...this.locationState.activeLocationInventories];
-    console.log(this.userRole)
+    console.log(this.userRole);
     if (this.userDept === 'admin') {
       for (const inv of sortedInv) {
         if (inv.isFinal) {
@@ -234,7 +223,6 @@ export class InventoryComponent implements OnInit, OnDestroy {
         }
       }
       arr.sort((a, b) => (a.dateEnd < b.dateEnd ? 1 : -1));
-
     } else {
       for (const inv of sortedInv) {
         if (inv.isFinal && inv.department === this.userDept) {
