@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
-import * as AuthActions from '../user-store/user.actions';
+import * as UserActions from '../user-store/user.actions';
 
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../auth/login/login.component';
@@ -30,7 +30,7 @@ export class UserService {
         ' minutes remaining until auto-logout.'
     );
     this.tokenExpirationTimer = setTimeout(() => {
-      this.store.dispatch(AuthActions.logout());
+      this.store.dispatch(UserActions.logout());
     }, expirationDuration);
   }
 
@@ -60,7 +60,7 @@ export class UserService {
         minHeight: 700
       });
     }
-    this.store.dispatch(AuthActions.clearError());
+    this.store.dispatch(UserActions.clearError());
   }
 
 }

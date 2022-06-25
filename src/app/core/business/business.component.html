@@ -1,7 +1,8 @@
 <div class="business-manage">
   <mat-card>
     <mat-card-header>
-      <img mat-card-avatar [src]="businessPhoto" alt="Business photo" />
+      <mat-icon *ngIf="!businessState.business" mat-card-avatar>business</mat-icon>
+      <img *ngIf="businessState.business" mat-card-avatar [src]="businessPhoto" alt="Business photo" />
       <mat-card-title>Manage Business</mat-card-title>
       <mat-card-subtitle>
         {{ user.userProfile.firstName + " " + user.userProfile.lastName }} -
@@ -35,7 +36,6 @@
           (ngSubmit)="onBusinessSubmit()"
           class="business-manage-form"
         >
-          <p *ngIf="!businessState && !businessName">Name Your Business</p>
           <div *ngIf="businessSubmitMode">
             <mat-form-field class="business-info-form">
               <!-- <mat-label>Business Name</mat-label> -->
@@ -71,13 +71,13 @@
               >{{ businessError }}</mat-error
             >
           </div>
-          <div class="business-manage-info-photo">
+          <div *ngIf="businessSubmitMode" class="business-manage-info-photo">
             <button
               mat-stroked-button
               type="button"
               (click)="filePicker.click()"
             >
-              Change Business Photo
+              Upload Business Photo
             </button>
             <input
               #filePicker

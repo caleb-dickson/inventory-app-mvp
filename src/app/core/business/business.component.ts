@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { catchError, concatMap, map, Subscription } from 'rxjs';
+import { catchError, map, Subscription } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
 
@@ -91,9 +91,11 @@ export class BusinessComponent implements OnInit, OnDestroy {
     this.businessStoreSub = this.store
       .select('business')
       .subscribe((bizState) => {
+        console.log(bizState)
         this.businessState = bizState;
         this.loading = bizState.loading;
         this.businessError = bizState.businessError;
+        this._initBusinessForm();
         if (bizState.business && bizState.business._id) {
           this.businessName = bizState.business.businessName;
           this.businessId = bizState.business._id;
@@ -102,9 +104,12 @@ export class BusinessComponent implements OnInit, OnDestroy {
           this.locationEditSelector = bizState.locationSelected;
           this.businessPhoto = bizState.business.businessPhoto;
 
-          this._initBusinessForm();
-          this._initNewLocationForm();
-          this._initUpdateLocationForm();
+          if (bizState.business) {
+            this._initNewLocationForm();
+          }
+          if (bizState.business.locations.length > 0) {
+            this._initUpdateLocationForm();
+          }
 
           if (
             this.locationAddUserSelector &&
@@ -291,7 +296,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
               })
             );
 
-            return BusinessActions.POSTBusinessSuccess({
+            this.store.dispatch(BusinessActions.POSTBusinessSuccess({
               business: {
                 _id: resData.businessId,
                 businessName: resData.business.businessName,
@@ -299,7 +304,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
                 businessPhoto: resData.business.businessPhoto,
                 locations: [],
               },
-            });
+            }));
           }),
           catchError((errorRes) => {
             return errorRes;

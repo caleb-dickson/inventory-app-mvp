@@ -3,7 +3,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
-import * as AuthActions from '../../users/user-store/user.actions';
+import * as UserActions from '../../users/user-store/user.actions';
 import * as BusinessActions from '../business/business-store/business.actions';
 import * as LocationActions from '../business/location/location-store/location.actions';
 import { BusinessState } from '../business/business-store/business.reducer';
@@ -246,7 +246,7 @@ export class NavigationComponent implements OnInit {
   }
 
   onLogout() {
-    this._store.dispatch(AuthActions.logout());
+    this._store.dispatch(UserActions.logout());
   }
 
   onThemeModeSwitched($event: any) {

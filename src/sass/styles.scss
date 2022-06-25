@@ -42,7 +42,7 @@ $theme-colors: (
 );
 
 $custom-colors: (
-  "accent": $inv-accent,
+  "accent": $inv-accent
 );
 
 $theme-colors: map-merge($theme-colors, $custom-colors);

@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
-import * as AuthActions from '../../../users/user-store/user.actions';
+import * as UserActions from '../../../users/user-store/user.actions';
 
 import { UserService } from '../../../users/user-control/user.service';
 import { ThemeService } from 'src/app/app-control/theme.service';
@@ -68,7 +68,7 @@ export class HeaderComponent implements OnInit {
     }
 
     onLogout() {
-      this.store.dispatch(AuthActions.logout());
+      this.store.dispatch(UserActions.logout());
       this.userAuthSub.unsubscribe();
     }
 

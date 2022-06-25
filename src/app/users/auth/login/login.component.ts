@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
-import * as AuthActions from '../../user-store/user.actions';
+import * as UserActions from '../../user-store/user.actions';
 
 @Component({
   templateUrl: './login.component.html',
@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     this.store.dispatch(
-      AuthActions.loginStart({
+      UserActions.loginStart({
         email: form.value.email,
         password: form.value.password,
       })

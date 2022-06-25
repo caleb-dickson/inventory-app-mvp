@@ -1,4 +1,4 @@
-import { Component, OnInit, /* Inject, Renderer2 */ } from '@angular/core';
+import { Component, OnInit /* Inject, Renderer2 */ } from '@angular/core';
 // import { DOCUMENT } from '@angular/common';
 
 import { Subscription } from 'rxjs';
@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../app-store/app.reducer';
+import * as UserActions from '../users/user-store/user.actions';
 
 import { UserService } from '../users/user-control/user.service';
 import { ThemeService } from '../app-control/theme.service';
@@ -22,6 +23,7 @@ export class LandingComponent implements OnInit {
   isAuthenticated = false;
   displayName: string;
   error: string;
+  userLoading: boolean;
 
   private _userSub: Subscription;
   private _themeSub: Subscription;
@@ -37,29 +39,62 @@ export class LandingComponent implements OnInit {
   ngOnInit() {
     this._userSub = this.store
       .select('user')
-      .pipe(map((authState) => authState.user))
-      .subscribe((userAuth) => {
-        this.isAuthenticated = !!userAuth;
+      .pipe(map((userState) => userState))
+      .subscribe((userState) => {
+        this.isAuthenticated = !!userState.user;
+        this.userLoading = userState.loading;
         if (this.isAuthenticated) {
-          this.displayName = userAuth.userProfile.firstName + ' ' + userAuth.userProfile.lastName;
+          this.displayName =
+            userState.user.userProfile.firstName +
+            ' ' +
+            userState.user.userProfile.lastName;
         }
       });
 
-    this._themeSub = this.themeService.themeStatus.subscribe((themeModeData) => {
-      this.themeMode = themeModeData;
-    });
+    this._themeSub = this.themeService.themeStatus.subscribe(
+      (themeModeData) => {
+        this.themeMode = themeModeData;
+      }
+    );
     this.themeService.getThemeMode();
   }
 
   getTheme() {
-    return this.themeMode  == 'theme-dark' ? 'mode-dark' : 'mode-light'
+    return this.themeMode == 'theme-dark' ? 'mode-dark' : 'mode-light';
   }
 
-  onConsultSubmit(consultationForm: NgForm) {
-
-  }
+  onConsultSubmit(consultationForm: NgForm) {}
 
   onOpenAuth(mode: string) {
     this.userService.openAuthForm(mode);
+  }
+
+  onPreviewLogin(accType: string) {
+    switch (accType) {
+      case 'owner':
+        this.store.dispatch(
+          UserActions.loginStart({
+            email: 'owner@ownerUser.com',
+            password: 'testPass',
+          })
+        );
+        break;
+      case 'manager':
+        this.store.dispatch(
+          UserActions.loginStart({
+            email: 'manager@managerUser.com',
+            password: 'testPass',
+          })
+        );
+        break;
+      case 'staff':
+        this.store.dispatch(
+          UserActions.loginStart({
+            email: 'staff@staffUser.com',
+            password: 'testPass',
+          })
+        );
+        break;
+    }
   }
 }

@@ -52,11 +52,11 @@ export function businessReducer(
     // LOCATION ACTIONS = OWNER
     on(BusinessActions.POSTLocationStart, (state) => ({
       ...state,
-      businessError: null,
       loading: true,
     })),
     on(BusinessActions.POSTLocationSuccess, (state) => ({
       ...state,
+      businessError: null,
       loading: false
     })),
     on(BusinessActions.PUTLocationStart, (state) => ({
@@ -65,6 +65,7 @@ export function businessReducer(
     })),
     on(BusinessActions.PUTLocationSuccess, (state) => ({
       ...state,
+      businessError: null,
       loading: false
     })),
     on(BusinessActions.PUTUserToLocationStart, (state) => ({
@@ -73,6 +74,7 @@ export function businessReducer(
     })),
     on(BusinessActions.PUTUserToLocationSuccess, (state, action) => ({
       ...state,
+      businessError: null,
       loading: false,
       locationSelected: action.location
     })),
@@ -85,21 +87,21 @@ export function businessReducer(
     // FETCH ACTIONS = OWNER
     on(BusinessActions.GETBusinessStart, (state) => ({
       ...state,
-      businessError: null,
       loading: true,
     })),
     on(BusinessActions.GETBusinessSuccess, (state, action) => ({
       ...state,
+      businessError: null,
       loading: false,
       business: action.business
     })),
     on(BusinessActions.GETBusinessLocationsStart, (state) => ({
       ...state,
-      businessError: null,
       loading: true,
     })),
     on(BusinessActions.GETBusinessLocationsSuccess, (state, action) => ({
       ...state,
+      businessError: null,
       loading: false,
       businessLocations: action.locations
     })),

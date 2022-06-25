@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
-import * as AuthActions from '../../user-store/user.actions';
+import * as UserActions from '../../user-store/user.actions';
 
 import { UserService } from '../../user-control/user.service';
 
@@ -48,7 +48,7 @@ export class SignupComponent implements OnInit, OnDestroy {
       : signupForm.value.themePref;
 
     this.store.dispatch(
-      AuthActions.signupStart({
+      UserActions.signupStart({
         newUser: {
           _id: null,
           userId: null,

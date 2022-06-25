@@ -44,7 +44,7 @@
       <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
         <mat-icon class="sidenav-icon">dashboard</mat-icon>Dashboard
       </a>
-      <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
+      <a mat-list-item routerLink="/app/dashboard">
         <mat-icon class="sidenav-icon">trending_up</mat-icon>Insights
       </a>
       <a *ngIf="userRole !== 'staff' || userDept === 'admin'" mat-list-item routerLink="/app/products" routerLinkActive="active">

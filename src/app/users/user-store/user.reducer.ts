@@ -27,11 +27,16 @@ export function userReducer(
 ) {
   return createReducer(
     initialState,
-    on(UserActions.loginStart, UserActions.signupStart, (state) => ({
-      ...state,
-      authError: null,
-      loading: true,
-    })),
+    on(
+      UserActions.loginStart,
+      UserActions.signupStart,
+      UserActions.loginPreviewStart,
+      (state) => ({
+        ...state,
+        authError: null,
+        loading: true,
+      })
+    ),
     on(UserActions.authSuccess, (state, action) => ({
       ...state,
       authError: null,
@@ -59,16 +64,16 @@ export function userReducer(
 
     on(UserActions.PUTUpdateUserStart, (state) => ({
       ...state,
-      loading: true
+      loading: true,
     })),
     on(UserActions.PUTUpdateUserSuccess, (state, action) => ({
       ...state,
       loading: false,
-      user: action.user
+      user: action.user,
     })),
 
     on(UserActions.logout, (state) => ({
-      ...state = initialState
+      ...(state = initialState),
     })),
     on(UserActions.userError, (state, action) => ({
       ...state,
