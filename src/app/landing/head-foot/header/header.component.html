@@ -24,31 +24,13 @@
       id="navbarSupportedContent"
     >
       <ul class="nav navbar-nav mb-2 mb-lg-0 ms-auto align-items-center">
-        <li class="nav-item">
+        <li *ngIf="isAuthenticated" class="nav-item">
           <a
             class="nav-link"
-            href="#"
+            routerLink="/app/dashboard"
             [ngClass]="getTheme()"
             (click)="toggleCollapsedHeader()"
-            >Home</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            href="#"
-            [ngClass]="getTheme()"
-            (click)="toggleCollapsedHeader()"
-            >Link 1</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            href="#"
-            [ngClass]="getTheme()"
-            (click)="toggleCollapsedHeader()"
-            >Link 2</a
+            >Back to App</a
           >
         </li>
         <li class="nav-item theme theme-control" hidden>
@@ -64,7 +46,7 @@
           *ngIf="!isAuthenticated"
           mat-stroked-button
           color="primary"
-          class="navbar-btn"
+          class="navbar-btn login"
           (click)="onOpenAuth('login'); toggleCollapsedHeader()"
         >
           Log In
@@ -73,7 +55,7 @@
           *ngIf="isAuthenticated"
           mat-stroked-button
           color="primary"
-          class="navbar-btn"
+          class="navbar-btn logout"
           (click)="onLogout(); toggleCollapsedHeader()"
         >
           Log Out

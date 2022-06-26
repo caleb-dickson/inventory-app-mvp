@@ -12,7 +12,6 @@ import * as NotificationsActions from '../notifications/notifications-store/noti
 import { UserService } from '../users/user-control/user.service';
 import { ThemeService } from '../app-control/theme.service';
 import { NgForm } from '@angular/forms';
-import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-landing',
@@ -35,13 +34,13 @@ export class LandingComponent implements OnInit {
   constructor(
     // @Inject(DOCUMENT) private document: Document,
     // private renderer: Renderer2,
-    private userService: UserService,
-    private themeService: ThemeService,
-    private store: Store<fromAppStore.AppState>
+    private _userService: UserService,
+    private _themeService: ThemeService,
+    private _store: Store<fromAppStore.AppState>
   ) {}
 
   ngOnInit() {
-    this._userSub = this.store
+    this._userSub = this._store
       .select('user')
       .pipe(map((userState) => userState))
       .subscribe((userState) => {
@@ -55,15 +54,15 @@ export class LandingComponent implements OnInit {
         }
       });
 
-    this._themeSub = this.themeService.themeStatus.subscribe(
+    this._themeSub = this._themeService.themeStatus.subscribe(
       (themeModeData) => {
         this.themeMode = themeModeData;
       }
     );
-    this.themeService.getThemeMode();
+    this._themeService.getThemeMode();
 
     if (this.showPreviewReminder && !this.isAuthenticated) {
-      this.store.dispatch(
+      this._store.dispatch(
         NotificationsActions.showConfirmMessage({
           message: "Welcome to Inventory. Don't forget to preview the App!",
           notificationAction: 'Close',
@@ -78,7 +77,7 @@ export class LandingComponent implements OnInit {
   }
 
   showMessage(message: string) {
-    this.store.dispatch(
+    this._store.dispatch(
       NotificationsActions.showConfirmMessage({
         message: message,
         notificationAction: 'Close',
@@ -88,11 +87,13 @@ export class LandingComponent implements OnInit {
   }
 
   onOpenAuth(mode: string) {
-    this.userService.openAuthForm(mode);
+    this._store.dispatch(NotificationsActions.hideSnackBar());
+    this._store.dispatch(UserActions.logout());
+    this._userService.openAuthForm(mode);
   }
 
   onOpenPreview() {
-    this.userService.openPreviewSelect();
+    this._userService.openPreviewSelect();
   }
 
   onConsultSubmit(consultationForm: NgForm) {}

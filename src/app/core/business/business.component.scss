@@ -47,8 +47,7 @@
       &-name {
         margin-top: 0.8rem;
 
-        // &-edit {
-        // }
+        // &-edit {}
       }
 
       &-form {
@@ -85,12 +84,10 @@
         }
       }
 
-      // &-edit {
-      // }
+      // &-edit {}
     }
 
-    // &-form {
-    // }
+    // &-form {}
   }
 }
 
@@ -188,14 +185,11 @@
     // display: flex;
     // justify-content: center;
     mat-card {
-      height: min-content;
-      width: min-content;
-      min-width: min-content;
+      height: max-content;
+      width: max-content;
+      min-width: 20rem;
 
-      // &-header {
-      // }
-      // max-width: 40rem;
-      // margin-block-start: 1rem;
+      // &-header {}
       // mat-card-header {}
       // mat-card-subtitle {}
     }

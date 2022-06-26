@@ -1,6 +1,6 @@
 <div class="inventory">
   <div class="active-location-null" *ngIf="!locationState.activeLocation">
-    <h4>Select a location to start a new inventory.</h4>
+    <h4>Select a location to view inventory</h4>
   </div>
   <!-- NO WORKING DRAFTS MESSAGE -->
   <div
@@ -17,7 +17,7 @@
     locationState.activeLocation.inventoryData.length === 0">
       Past
       {{ userDept === "admin" ? null : (userDept | uppercase) }} inventories
-      will show up here when finalized.
+      will show up here when finalized
     </h4>
   </div>
 

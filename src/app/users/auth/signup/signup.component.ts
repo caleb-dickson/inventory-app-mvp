@@ -17,7 +17,7 @@ import { UserService } from '../../user-control/user.service';
 export class SignupComponent implements OnInit, OnDestroy {
   isLoading: boolean;
   error: string;
-  private storeSub: Subscription;
+  private _userStoreSub: Subscription;
 
   constructor(
     public userService: UserService,
@@ -25,7 +25,7 @@ export class SignupComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.storeSub = this.store.select('user').subscribe((authState) => {
+    this._userStoreSub = this.store.select('user').subscribe((authState) => {
       this.isLoading = authState.loading;
       this.error = authState.authError;
     });
@@ -70,8 +70,8 @@ export class SignupComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.storeSub) {
-      this.storeSub.unsubscribe();
+    if (this._userStoreSub) {
+      this._userStoreSub.unsubscribe();
     }
   }
 }

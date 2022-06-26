@@ -9,3 +9,7 @@ export const showConfirmMessage = createAction(
   '[Notifications] Show Action Message',
   props<{ message: string; notificationAction: string, duration: number }>()
 );
+
+export const hideSnackBar = createAction(
+  '[Notifications] Hide Snackbar'
+);

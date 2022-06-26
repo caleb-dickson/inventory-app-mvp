@@ -32,7 +32,7 @@
   "
 >
   <!-- OWNERS, MANAGEMENT AND ADMINS -->
-  <h4 *ngIf="userRole !== 'staff'">
+  <h4 *ngIf="userRole !== 'staff' && locationState.activeLocation">
     Add
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }}
     products to the
@@ -45,7 +45,7 @@
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory.
   </h4>
   <!-- JUNIOR STAFF -->
-  <h4 *ngIf="userRole === 'staff'">
+  <h4 *ngIf="userRole === 'staff' && locationState.activeLocation">
     No
     {{ userDept | uppercase }}
     products found for the

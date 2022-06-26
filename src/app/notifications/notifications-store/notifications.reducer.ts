@@ -25,13 +25,19 @@ export function notificationsReducer(
     on(NotificationsActions.showTimeMessage, (state, action) => ({
       ...state,
       message: action.message,
-      duration: action.duration
+      duration: action.duration,
+      isOpen: true
     })),
     on(NotificationsActions.showConfirmMessage, (state, action) => ({
       ...state,
       message: action.message,
       notificationAction: action.notificationAction,
-      duration: action.duration
-    }))
+      duration: action.duration,
+      isOpen: true
+    })),
+    on(NotificationsActions.hideSnackBar, (state) => ({
+      ...state,
+      isOpen: false
+    })),
   ) (notificationsState, notificationsAction);
 }
