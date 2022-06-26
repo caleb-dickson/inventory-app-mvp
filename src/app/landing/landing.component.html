@@ -37,12 +37,14 @@
               Sign Up
             </button>
             <button
+              *ngIf="!isAuthenticated"
               mat-raised-button
               color="primary"
               type="button"
               class="login"
+              (click)="onOpenPreview()"
             >
-              Learn More
+              Preview the App
             </button>
           </div>
         </div>
@@ -62,42 +64,6 @@
     [ngClass]="getTheme()"
     id="icon-grid"
   >
-    <p *ngIf="!userLoading && !isAuthenticated" class="landing-hero-text-auth-preview-text">
-      Preview the App as:
-    </p>
-    <div
-      *ngIf="!userLoading"
-      [ngClass]="getTheme()"
-      class="d-grid gap-2 landing-hero-text-auth-preview mt-1"
-    >
-      <button
-        *ngIf="!isAuthenticated"
-        mat-raised-button
-        color="primary"
-        class="btn btn-secondary owner-preview"
-        (click)="onPreviewLogin('an Owner')"
-      >
-        Owner
-      </button>
-      <button
-        *ngIf="!isAuthenticated"
-        mat-raised-button
-        color="accent"
-        class="btn btn-secondary manager-preview"
-        (click)="onPreviewLogin('a Manager')"
-      >
-        Manager
-      </button>
-      <button
-        *ngIf="!isAuthenticated"
-        mat-raised-button
-        class="btn btn-secondary staff-preview"
-        (click)="onPreviewLogin('a Junior Staff Member')"
-      >
-        Junior Staff
-      </button>
-    </div>
-
     <h2 class="landing-features-1-title pb-2">App Features</h2>
 
     <div class="row row-cols-1 row-cols-lg-3 g-4 py-5">

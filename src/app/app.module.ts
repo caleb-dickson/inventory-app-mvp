@@ -27,6 +27,7 @@ import { LandingComponent } from './landing/landing.component';
 import { FooterComponent } from './landing/head-foot/footer/footer.component';
 import { HeaderComponent } from './landing/head-foot/header/header.component';
 import { SimpleNotificationComponent } from './notifications/simple-notification.component';
+import { PreviewComponent } from './users/auth/preview/preview.component';
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import { SimpleNotificationComponent } from './notifications/simple-notification
     LandingComponent,
     HeaderComponent,
     FooterComponent,
-    SimpleNotificationComponent
+    SimpleNotificationComponent,
+    PreviewComponent
   ],
   imports: [
     BrowserModule,

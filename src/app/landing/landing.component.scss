@@ -56,32 +56,7 @@
         height: 2.5rem;
       }
 
-      &-auth-preview {
-        display: flex !important;
-        justify-content: center;
-        margin-block-end: 3rem;
 
-        &-text {
-          text-align: center;
-          margin-block-start: -5rem;
-        }
-        &-text.mode-light {
-          color: var.$mode-txt-dark;
-        }
-
-        // .owner-preview {
-        // }
-        // .manager-preview {
-        // }
-        .staff-preview {
-          background-color: var.$mode-txt-dark;
-          color: black;
-        }
-        button {
-          width: 7rem;
-
-        }
-      }
 
     }
   }

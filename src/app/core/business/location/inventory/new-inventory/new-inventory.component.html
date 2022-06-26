@@ -31,7 +31,8 @@
     !newInventoryItemControls
   "
 >
-  <h4>
+  <!-- OWNERS, MANAGEMENT AND ADMINS -->
+  <h4 *ngIf="userRole !== 'staff'">
     Add
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }}
     products to the
@@ -43,6 +44,22 @@
     location to start a new
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory.
   </h4>
+  <!-- JUNIOR STAFF -->
+  <h4 *ngIf="userRole === 'staff'">
+    No
+    {{ userDept | uppercase }}
+    products found for the
+    {{
+      locationState.activeLocation
+        ? locationState.activeLocation.locationName
+        : null
+    }}
+    location.
+  </h4>
+  <p *ngIf="userRole === 'staff'">
+    Once management has added products you can start a new
+    {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory.
+  </p>
 </div>
 
 <!-- NEW INVENTORY MAIN START -->
@@ -251,9 +268,12 @@
   *ngIf="!workingInventory || !locationState.activeLocation"
   class="no-drafts"
 >
-  <p *ngIf="
-  locationState.activeLocation &&
-  locationState.activeLocation.inventoryData.length > 0">
+  <p
+    *ngIf="
+      locationState.activeLocation &&
+      locationState.activeLocation.inventoryData.length > 0
+    "
+  >
     No working
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory
     drafts found.

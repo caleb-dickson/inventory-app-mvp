@@ -1,0 +1,28 @@
+<div
+class="d-grid gap-2 auth-preview mt-1"
+>
+<p class="auth-preview-text">Preview App as:</p>
+<button
+  mat-raised-button
+  color="accent"
+  class="btn btn-secondary owner-preview"
+  (click)="onPreviewLogin('an Owner')"
+>
+  Owner
+</button>
+<button
+  mat-raised-button
+  color="primary"
+  class="btn btn-secondary manager-preview"
+  (click)="onPreviewLogin('a Manager')"
+>
+  Manager
+</button>
+<button
+  mat-raised-button
+  class="btn btn-secondary staff-preview"
+  (click)="onPreviewLogin('a Junior Staff Member')"
+>
+  Junior Staff
+</button>
+</div>

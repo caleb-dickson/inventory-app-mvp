@@ -91,41 +91,8 @@ export class LandingComponent implements OnInit {
     this.userService.openAuthForm(mode);
   }
 
-  onPreviewLogin(accType: string) {
-    switch (accType) {
-      case 'an Owner':
-        this.store.dispatch(
-          UserActions.loginStart({
-            email: 'owner@ownerUser.com',
-            password: 'testPass',
-          })
-        );
-        break;
-      case 'a Manager':
-        this.store.dispatch(
-          UserActions.loginStart({
-            email: 'manager@managerUser.com',
-            password: 'testPass',
-          })
-        );
-        break;
-      case 'a Junior Staff Member':
-        this.store.dispatch(
-          UserActions.loginStart({
-            email: 'staff@staffUser.com',
-            password: 'testPass',
-          })
-        );
-        break;
-    }
-    this.store.dispatch(
-      NotificationsActions.showConfirmMessage({
-        message: 'You are previewing the App as ' + accType,
-        notificationAction: 'Close',
-        duration: Infinity,
-      })
-    );
-    this.showPreviewReminder = false;
+  onOpenPreview() {
+    this.userService.openPreviewSelect();
   }
 
   onConsultSubmit(consultationForm: NgForm) {}

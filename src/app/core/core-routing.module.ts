@@ -20,7 +20,7 @@ const appCoreRoutes: Routes = [
     path: '',
     canActivate: [AuthGuard],
     children: [
-      { path: 'dashboard', component: DashboardComponent },
+      { path: 'dashboard', component: DashboardComponent, canActivate: [ManagerGuard], },
       { path: 'settings', component: UserSettingsComponent },
       {
         path: 'business',

@@ -39,7 +39,7 @@ export class ManagerGuard implements CanActivate {
           return true;
         }
         console.log(isMgr);
-        return this.router.createUrlTree(['/app/dashboard']);
+        return this.router.createUrlTree(['/app/new-inventory']);
       })
     );
   }

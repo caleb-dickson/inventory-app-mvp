@@ -1,0 +1,54 @@
+@use '../../../../sass/abstracts/variables' as var;
+
+
+// DESKTOP STYLES
+.auth-preview {
+
+  &-text {
+    text-align: center;
+  }
+  &-text.mode-light {
+    color: var.$mode-txt-dark;
+  }
+
+  // .owner-preview {
+  // }
+  // .manager-preview {
+  // }
+  .staff-preview {
+    background-color: var.$mode-txt-dark;
+    color: black;
+  }
+  button {
+    margin-block: 0.5rem;
+
+  }
+}
+
+// MOBILE STYLES
+
+@media only screen and (max-width: var.$bp-mobile) {
+  .auth-preview {
+
+    &-text {
+      text-align: center;
+    }
+    &-text.mode-light {
+      color: var.$mode-txt-dark;
+    }
+
+    // .owner-preview {
+    // }
+    // .manager-preview {
+    // }
+    .staff-preview {
+      background-color: var.$mode-txt-dark;
+      color: black;
+    }
+    button {
+      margin-block: 0.5rem;
+
+    }
+  }
+}
+

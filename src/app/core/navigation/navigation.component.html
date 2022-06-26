@@ -9,13 +9,9 @@
     [opened]="(isHandset$ | async) === false"
   >
     <mat-toolbar-row>
-      <img
-      [src]="user.userProfile.userPhoto"
-      alt="Your profile photo"
-    />
+      <img [src]="user.userProfile.userPhoto" alt="Your profile photo" />
     </mat-toolbar-row>
     <mat-toolbar-row>
-
       <!-- **OWNER** -->
       <span *ngIf="userRole === 'owner'" class="sidenav-owner-name">
         {{
@@ -41,16 +37,34 @@
       >Dark Mode</mat-slide-toggle
     >
     <mat-nav-list>
-      <a mat-list-item routerLink="/app/dashboard" routerLinkActive="active">
+      <a
+        *ngIf="userRole !== 'staff' || userDept === 'admin'"
+        mat-list-item
+        routerLink="/app/dashboard"
+        routerLinkActive="active"
+      >
         <mat-icon class="sidenav-icon">dashboard</mat-icon>Dashboard
       </a>
-      <a mat-list-item routerLink="/app/dashboard">
+      <a
+        *ngIf="userRole !== 'staff' || userDept === 'admin'"
+        mat-list-item
+        routerLink="/app/dashboard"
+      >
         <mat-icon class="sidenav-icon">trending_up</mat-icon>Insights
       </a>
-      <a *ngIf="userRole !== 'staff' || userDept === 'admin'" mat-list-item routerLink="/app/products" routerLinkActive="active">
+      <a
+        *ngIf="userRole !== 'staff' || userDept === 'admin'"
+        mat-list-item
+        routerLink="/app/products"
+        routerLinkActive="active"
+      >
         <mat-icon class="sidenav-icon">sell</mat-icon>Products
       </a>
-      <a mat-list-item routerLink="/app/new-inventory" routerLinkActive="active">
+      <a
+        mat-list-item
+        routerLink="/app/new-inventory"
+        routerLinkActive="active"
+      >
         <mat-icon class="sidenav-icon">addchart</mat-icon>New/Current Inventory
       </a>
       <a
@@ -62,28 +76,8 @@
         <mat-icon class="sidenav-icon">history</mat-icon>Past Inventory
       </a>
 
-      <!-- **OWNER** -->
-      <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **OWNER** BUSINESS ONLY HAS ONE LOCATION -->
-      <a
-        *ngIf="
-          userRole === 'owner' && businessState.businessLocations.length === 1
-        "
-        mat-list-item
-        routerLinkActive="active"
-      >
-        <mat-icon class="sidenav-icon">store</mat-icon
-        >{{ singleBizLocationName }}
-      </a>
-
-      <!-- SHOW 'MANAGE BUSINESS' LINK IF USER IS OWNER -->
-      <a
-        *ngIf="userRole === 'owner'"
-        mat-list-item
-        routerLink="/app/business"
-        routerLinkActive="active"
-      >
-        <mat-icon class="sidenav-icon">business</mat-icon>Manage Business
-      </a>
+      <!-- SPACER -->
+      <span [ngClass]="setNavSpacer()"></span>
 
       <!-- MULTI-LOCATION SELECT - FOR OWNER -->
       <div
@@ -167,16 +161,38 @@
         mat-list-item
         (click)="onActivateLocation(locationState.userLocations[0])"
       >
-        <!-- [routerLink]="manageRoute" -->
         <mat-icon class="sidenav-icon">{{ manageIcon }}</mat-icon
-        >{{ singleUserLocationName }} <mat-icon class="sidenav-icon-check">done</mat-icon>
+        >{{ singleUserLocationName }}
+        <mat-icon class="sidenav-icon-check">done</mat-icon>
       </a>
-
-      <span class="spacer"></span>
 
       <mat-error *ngIf="locationState.locationError" class="no-locations">
         {{ locationState.locationError }}
       </mat-error>
+
+            <!-- **OWNER** -->
+      <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **OWNER** BUSINESS ONLY HAS ONE LOCATION -->
+      <a
+        *ngIf="
+          userRole === 'owner' && businessState.businessLocations.length === 1
+        "
+        mat-list-item
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">store</mat-icon
+        >{{ singleBizLocationName }}
+      </a>
+
+      <!-- SHOW 'MANAGE BUSINESS' LINK IF USER IS OWNER -->
+      <a
+        *ngIf="userRole === 'owner'"
+        class="manage-business"
+        mat-list-item
+        routerLink="/app/business"
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">business</mat-icon>Manage Business
+      </a>
 
       <a mat-list-item routerLink="/app/settings" routerLinkActive="active">
         <mat-icon class="sidenav-icon settings">settings</mat-icon>User Settings

@@ -92,7 +92,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
       .pipe(map((authState) => authState.user))
       .subscribe((user) => {
         this.user = user;
-        if (!!user) {
+        if (user) {
           switch (user.userProfile.role) {
             case 3:
               this.userRole = 'owner';

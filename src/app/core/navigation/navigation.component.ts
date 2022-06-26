@@ -34,7 +34,7 @@ export class NavigationComponent implements OnInit {
   ) {}
 
   // SUBS
-  private _userAuthSub: Subscription;
+  private _userStoreSub: Subscription;
   private _businessStoreSub: Subscription;
   private _locationStoreSub: Subscription;
   private _themeSub: Subscription;
@@ -44,6 +44,7 @@ export class NavigationComponent implements OnInit {
   sideNavOpen: boolean;
   manageIcon: string;
   manageRoute: string;
+  navSpacer: string;
   isHandset$: Observable<boolean> = this._breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(
@@ -86,7 +87,8 @@ export class NavigationComponent implements OnInit {
 
   ngOnInit() {
     console.clear();
-    this._userAuthSub = this._store
+
+    this._userStoreSub = this._store
       .select('user')
       .pipe(map((userState) => userState.user))
       .subscribe((user) => {
@@ -187,14 +189,6 @@ export class NavigationComponent implements OnInit {
     );
     this._themeService.getThemeMode();
 
-    if (this.userRole === 'owner' || this.userDept === 'admin') {
-      this.manageRoute = '/app/business';
-    } else if (this.userRole === 'manager') {
-      this.manageRoute = '/app/location';
-    } else {
-      this.manageRoute = null;
-    }
-
     this.manageIcon =
       this.userRole === 'owner' || this.userDept === 'admin'
         ? 'business'
@@ -202,6 +196,8 @@ export class NavigationComponent implements OnInit {
 
     this.isHandset$.subscribe((state) => {
       this.sideNavOpen = !state;
+      console.log(state);
+      this.setNavSpacer(state);
     });
 
     if (this.userRole === 'owner') {
@@ -212,7 +208,7 @@ export class NavigationComponent implements OnInit {
           '%cUser Location: ',
           `font-size: 1rem;
             color: lightgreen;`,
-            this.singleBizLocationName
+          this.singleBizLocationName
         );
         this.onActivateLocation(this.businessState.businessLocations[0]);
       }
@@ -225,6 +221,21 @@ export class NavigationComponent implements OnInit {
       } else if (this.locationState.userLocations.length === 1) {
         this.onActivateLocation(this.locationState.userLocations[0]);
       }
+    }
+    console.log(this.setNavSpacer())
+  }
+
+  setNavSpacer(state?: boolean) {
+
+    switch (this.userRole) {
+      case 'owner':
+        return 'spacer-owner';
+      case 'manager':
+        return 'spacer-mgr';
+      case 'staff':
+        return 'spacer-staff';
+      default:
+        return;
     }
   }
 
@@ -239,7 +250,6 @@ export class NavigationComponent implements OnInit {
   }
 
   onActivateLocation(activeLocation: Location) {
-
     this._locationService.activateLocation(activeLocation);
   }
 
@@ -300,7 +310,7 @@ export class NavigationComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this._userAuthSub.unsubscribe();
+    this._userStoreSub.unsubscribe();
     this._businessStoreSub.unsubscribe();
     this._locationStoreSub.unsubscribe();
     this._themeSub.unsubscribe();
