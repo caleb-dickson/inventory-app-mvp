@@ -85,7 +85,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.activeLocation = locState.activeLocation;
         this.activeProducts = locState.activeProducts;
         this.locLoading = locState.loading;
-        console.group('%cLocation State', 'font-size: 1rem', locState);
+        console.group(
+          '%cLocation State',
+          `font-size: 1rem;
+            color: lightgreen;`,
+          locState
+        );
         console.groupEnd();
       });
 

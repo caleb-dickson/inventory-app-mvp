@@ -206,6 +206,10 @@
   <mat-spinner diameter="150" strokeWidth="10"></mat-spinner>
 </div>
 
+<div class="locations-title">
+  <h5> {{ businessName ? businessName : null }} Locations </h5>
+</div>
+
 <div class="locations" *ngFor="let location of locations">
   <mat-card *ngIf="!loading">
     <mat-card-header>
@@ -285,7 +289,7 @@
         </p>
         <p
           *ngFor="let manager of location.managers; let i = index"
-          class="border-bottom"
+          class="location-managers"
         >
           {{
             i +
@@ -340,7 +344,7 @@
           </p>
           <p
             *ngFor="let staff of location.staff; let i = index"
-            class="border-bottom"
+            class="location-staff"
           >
             {{
               i +

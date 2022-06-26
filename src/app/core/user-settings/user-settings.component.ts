@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -11,6 +10,7 @@ import * as UserActions from '../../users/user-store/user.actions';
 import { User } from 'src/app/users/user-control/user.model';
 
 import { environment } from 'src/environments/environment';
+
 import { ThemeService } from 'src/app/app-control/theme.service';
 
 const BACKEND_URL = environment.apiUrl + '/user';
@@ -43,11 +43,12 @@ export class UserSettingsComponent implements OnInit {
   constructor(
     private store: Store<fromAppStore.AppState>,
     private http: HttpClient,
-    private router: Router,
     private themeService: ThemeService
   ) {}
 
   ngOnInit() {
+    console.clear();
+
     this._userSub = this.store
       .select('user')
       .pipe(map((userState) => userState))
@@ -59,6 +60,13 @@ export class UserSettingsComponent implements OnInit {
           this.userLoading = userState.loading;
           this.userPhoto = userState.user.userProfile.userPhoto;
           console.log(this.user);
+          console.group(
+            '%cUser State',
+            `font-size: 1rem;
+              color: lightgreen;`,
+              userState
+          );
+          console.groupEnd();
         }
       });
 
@@ -89,8 +97,6 @@ export class UserSettingsComponent implements OnInit {
       return;
     }
     userProfileForm.updateValueAndValidity();
-    console.log(userProfileForm.value);
-    console.log(this.userProfileForm.get('userPhoto').value);
 
     const formData = new FormData();
     formData.append('userId', this.user._id ? this.user._id : this.user.userId);
@@ -102,7 +108,6 @@ export class UserSettingsComponent implements OnInit {
     formData.append('phoneNumber', userProfileForm.value.phoneNumber);
     formData.append('themePref', userProfileForm.value.themePref);
     if (this.userPhotoUpload) {
-      console.log('file');
       formData.append(
         'userPhoto',
         this.userProfileForm.value.userPhoto,
@@ -116,15 +121,13 @@ export class UserSettingsComponent implements OnInit {
       );
     }
 
-    console.log(formData);
-    console.log('||| ^^^ appended form data ^^^ |||');
-
     this.store.dispatch(UserActions.PUTUpdateUserStart());
 
     this.http
       .put<{ updatedUser: User }>(BACKEND_URL + '/update-user', formData)
       .subscribe((resData) => {
         console.log(resData);
+        console.warn('||| ^^^ Update response ^^^ |||')
         this.store.dispatch(
           UserActions.PUTUpdateUserSuccess({ user: resData.updatedUser })
         );
@@ -143,7 +146,6 @@ export class UserSettingsComponent implements OnInit {
   }
 
   onDepartmentSelect(dept: Event) {
-    console.log(dept);
     this.userProfileForm.get('department').setValue(dept);
     this.userProfileForm.updateValueAndValidity();
   }
@@ -199,7 +201,6 @@ export class UserSettingsComponent implements OnInit {
 
     this.userProfileForm.get('userPhoto').updateValueAndValidity();
     reader.readAsDataURL(this.userPhotoUpload);
-    console.log(this.userProfileForm.value);
   }
 
   private _initUserProfileForm() {
@@ -230,6 +231,5 @@ export class UserSettingsComponent implements OnInit {
       }),
       userPhoto: new FormControl(null),
     });
-    console.log(this.userProfileForm.value);
   }
 }

@@ -277,17 +277,25 @@
   </div>
 
   <h5
-    *ngIf="activeLocation && activeLocation.productList.length > 0"
+    *ngIf="
+      activeLocation &&
+      activeLocation.productList &&
+      activeLocation.productList.length > 0
+    "
     class="text-center"
   >
     Product List
   </h5>
 
   <h6
-    *ngIf="locationState.activeLocation.productList.length === 0"
+    *ngIf="
+    activeLocation &&
+    activeLocation.productList &&
+    activeLocation.productList.length === 0
+  "
     class="products-null-message"
   >
-    Products stocked at this location will appear below. <br>
+    Products stocked at this location will appear below. <br />
     Create new products to get started.
   </h6>
 

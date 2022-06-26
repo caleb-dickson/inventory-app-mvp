@@ -190,7 +190,7 @@
     mat-card {
       height: min-content;
       width: min-content;
-      min-width: min-content;
+      min-width: max-content;
 
       // &-header {
       // }
@@ -296,10 +296,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    &-title {
+      display: flex;
+      justify-content: center;
+      margin-block-start: 2rem;
+    }
+
     mat-card {
       height: min-content;
       width: 70vw;
       min-width: 20rem;
+      margin-block-end: 4rem;
       mat-card-header {
         mat-card-title {
           .store-icon {
