@@ -17,41 +17,64 @@
     >
       <mat-icon color="accent" class="toggler-icon">menu</mat-icon>
     </button>
-    <div class="collapse navbar-collapse" [ngClass]="this.navbarCollapsed ? null : 'show'" id="navbarToggler" id="navbarSupportedContent">
+    <div
+      class="collapse navbar-collapse"
+      [ngClass]="this.navbarCollapsed ? null : 'show'"
+      id="navbarToggler"
+      id="navbarSupportedContent"
+    >
       <ul class="nav navbar-nav mb-2 mb-lg-0 ms-auto align-items-center">
         <li class="nav-item">
-          <a class="nav-link" href="#" [ngClass]="getTheme()" (click)="toggleCollapsedHeader()">Home</a>
+          <a
+            class="nav-link"
+            href="#"
+            [ngClass]="getTheme()"
+            (click)="toggleCollapsedHeader()"
+            >Home</a
+          >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" [ngClass]="getTheme()" (click)="toggleCollapsedHeader()">Link 1</a>
+          <a
+            class="nav-link"
+            href="#"
+            [ngClass]="getTheme()"
+            (click)="toggleCollapsedHeader()"
+            >Link 1</a
+          >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" [ngClass]="getTheme()" (click)="toggleCollapsedHeader()">Link 2</a>
+          <a
+            class="nav-link"
+            href="#"
+            [ngClass]="getTheme()"
+            (click)="toggleCollapsedHeader()"
+            >Link 2</a
+          >
         </li>
-        <li
-          class="nav-item theme theme-control"
-        >
-          <mat-slide-toggle (change)="onThemeModeSwitched($event)" [checked]="themeMode === 'theme-dark' ? true : false"
+        <li class="nav-item theme theme-control" hidden>
+          <mat-slide-toggle
+            (change)="onThemeModeSwitched($event)"
+            [checked]="themeMode === 'theme-dark' ? true : false"
             ><mat-icon class="theme-icon" color="accent"
               >settings_brightness</mat-icon
             ></mat-slide-toggle
           >
         </li>
         <button
-        *ngIf="!isAuthenticated"
-        mat-stroked-button
-        color="primary"
-        class="navbar-btn"
-        (click)="onOpenAuth('login'); toggleCollapsedHeader()"
+          *ngIf="!isAuthenticated"
+          mat-stroked-button
+          color="primary"
+          class="navbar-btn"
+          (click)="onOpenAuth('login'); toggleCollapsedHeader()"
         >
           Log In
         </button>
         <button
-        *ngIf="isAuthenticated"
-        mat-stroked-button
-        color="primary"
-        class="navbar-btn"
-        (click)="onLogout(); toggleCollapsedHeader()"
+          *ngIf="isAuthenticated"
+          mat-stroked-button
+          color="primary"
+          class="navbar-btn"
+          (click)="onLogout(); toggleCollapsedHeader()"
         >
           Log Out
         </button>

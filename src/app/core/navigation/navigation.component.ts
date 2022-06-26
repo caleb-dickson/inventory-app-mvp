@@ -5,17 +5,16 @@ import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
 import * as UserActions from '../../users/user-store/user.actions';
 import * as BusinessActions from '../business/business-store/business.actions';
-import * as LocationActions from '../business/location/location-store/location.actions';
 import { BusinessState } from '../business/business-store/business.reducer';
 import { LocationState } from '../business/location/location-store/location.reducer';
 
 import { Observable, Subscription } from 'rxjs';
-import { map, shareReplay, take } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 
 import { User } from 'src/app/users/user-control/user.model';
 
 import { ThemeService } from 'src/app/app-control/theme.service';
-import { Business, LocationIds } from '../models/business.model';
+import { Business } from '../models/business.model';
 import { Location } from '../models/location.model';
 import { LocationService } from '../core-control/location.service';
 import { Inventory } from '../models/inventory.model';
@@ -91,7 +90,6 @@ export class NavigationComponent implements OnInit {
       .select('user')
       .pipe(map((userState) => userState.user))
       .subscribe((user) => {
-        console.log(user);
         this.isAuthenticated = !!user;
         if (this.isAuthenticated) {
           this.user = user;
@@ -180,7 +178,6 @@ export class NavigationComponent implements OnInit {
               ? bizState.businessLocations[0].locationName
               : null;
         }
-        // console.log(bizState)
       });
 
     this._themeSub = this._themeService.themeStatus.subscribe(
@@ -211,7 +208,12 @@ export class NavigationComponent implements OnInit {
       if (this.multiBizLocations) {
         this._locationService.getActivatedLocation();
       } else if (this.singleBizLocationName) {
-        console.log(this.singleBizLocationName);
+        console.log(
+          '%cUser Location: ',
+          `font-size: 1rem;
+            color: lightgreen;`,
+            this.singleBizLocationName
+        );
         this.onActivateLocation(this.businessState.businessLocations[0]);
       }
     } else {
@@ -228,9 +230,7 @@ export class NavigationComponent implements OnInit {
 
   // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
   private _onGetPopulatedInventories() {
-    this._locationService.getPopulatedInventories(
-      this.initLocInventories
-    );
+    this._locationService.getPopulatedInventories(this.initLocInventories);
     this.initLocInventories = false;
   }
 
@@ -239,8 +239,6 @@ export class NavigationComponent implements OnInit {
   }
 
   onActivateLocation(activeLocation: Location) {
-    console.log(activeLocation);
-    console.log(this.activeLocation);
 
     this._locationService.activateLocation(activeLocation);
   }
@@ -260,9 +258,12 @@ export class NavigationComponent implements OnInit {
     } = JSON.parse(localStorage.getItem('storedBusiness'));
 
     if (storedBusiness) {
-      console.log('||| Business fetched from local storage |||');
-      console.log(storedBusiness.business.locations);
-      // this.setLocations(storedBusiness);
+      console.log(
+        '%cStored Business',
+        `font-size: 1rem;
+          color: lightgreen;`,
+        storedBusiness.business
+      );
       this._store.dispatch(
         BusinessActions.GETBusinessSuccess({
           business: {
@@ -276,14 +277,14 @@ export class NavigationComponent implements OnInit {
       );
       this.onGetLocations();
     } else if (!storedBusiness) {
-      console.log('||| Fetching business from DB |||');
+      console.warn('||| Fetching business from DB |||');
       this._store.dispatch(
         BusinessActions.GETBusinessStart({
           ownerId: this.user.userId,
         })
       );
     } else {
-      console.log('||| checkBusiness error |||');
+      console.error('||| checkBusiness error |||');
       this._store.dispatch(
         BusinessActions.BusinessError({ errorMessage: 'No business found.' })
       );

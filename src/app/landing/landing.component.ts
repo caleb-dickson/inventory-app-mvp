@@ -7,10 +7,12 @@ import { map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../app-store/app.reducer';
 import * as UserActions from '../users/user-store/user.actions';
+import * as NotificationsActions from '../notifications/notifications-store/notifications.actions';
 
 import { UserService } from '../users/user-control/user.service';
 import { ThemeService } from '../app-control/theme.service';
 import { NgForm } from '@angular/forms';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-landing',
@@ -18,6 +20,9 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./landing.component.scss'],
 })
 export class LandingComponent implements OnInit {
+  private _userSub: Subscription;
+  private _themeSub: Subscription;
+
   themeMode: string;
 
   isAuthenticated = false;
@@ -25,8 +30,7 @@ export class LandingComponent implements OnInit {
   error: string;
   userLoading: boolean;
 
-  private _userSub: Subscription;
-  private _themeSub: Subscription;
+  showPreviewReminder = true;
 
   constructor(
     // @Inject(DOCUMENT) private document: Document,
@@ -57,13 +61,31 @@ export class LandingComponent implements OnInit {
       }
     );
     this.themeService.getThemeMode();
+
+    if (this.showPreviewReminder && !this.isAuthenticated) {
+      this.store.dispatch(
+        NotificationsActions.showConfirmMessage({
+          message: "Welcome to Inventory. Don't forget to preview the App!",
+          notificationAction: 'Close',
+          duration: 5000,
+        })
+      );
+    }
   }
 
   getTheme() {
     return this.themeMode == 'theme-dark' ? 'mode-dark' : 'mode-light';
   }
 
-  onConsultSubmit(consultationForm: NgForm) {}
+  showMessage(message: string) {
+    this.store.dispatch(
+      NotificationsActions.showConfirmMessage({
+        message: message,
+        notificationAction: 'Close',
+        duration: 1250,
+      })
+    );
+  }
 
   onOpenAuth(mode: string) {
     this.userService.openAuthForm(mode);
@@ -71,7 +93,7 @@ export class LandingComponent implements OnInit {
 
   onPreviewLogin(accType: string) {
     switch (accType) {
-      case 'owner':
+      case 'an Owner':
         this.store.dispatch(
           UserActions.loginStart({
             email: 'owner@ownerUser.com',
@@ -79,7 +101,7 @@ export class LandingComponent implements OnInit {
           })
         );
         break;
-      case 'manager':
+      case 'a Manager':
         this.store.dispatch(
           UserActions.loginStart({
             email: 'manager@managerUser.com',
@@ -87,7 +109,7 @@ export class LandingComponent implements OnInit {
           })
         );
         break;
-      case 'staff':
+      case 'a Junior Staff Member':
         this.store.dispatch(
           UserActions.loginStart({
             email: 'staff@staffUser.com',
@@ -96,5 +118,15 @@ export class LandingComponent implements OnInit {
         );
         break;
     }
+    this.store.dispatch(
+      NotificationsActions.showConfirmMessage({
+        message: 'You are previewing the App as ' + accType,
+        notificationAction: 'Close',
+        duration: Infinity,
+      })
+    );
+    this.showPreviewReminder = false;
   }
+
+  onConsultSubmit(consultationForm: NgForm) {}
 }

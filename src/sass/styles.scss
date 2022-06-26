@@ -12,6 +12,8 @@
 @import "./base/utilities";
 @import "./base/animations";
 
+
+
 mat-sidenav-container {
   img {
     width: 13rem;
@@ -47,10 +49,13 @@ $custom-colors: (
 
 $theme-colors: map-merge($theme-colors, $custom-colors);
 
-
-
 .theme-dark {
   background-color: $mode-bg-dark;
+
+  .snackbar {
+    background: $mode-bg-light !important;
+    color: $mode-txt-light !important;
+  }
 
   &::-webkit-scrollbar {
     background-color: $inv-accent;
@@ -65,4 +70,9 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 
 .theme-light {
   background-color: $mode-bg-light;
+
+  .snackbar {
+    background: $mode-bg-dark !important;
+    color: $mode-txt-dark !important;
+  }
 }

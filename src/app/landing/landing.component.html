@@ -62,7 +62,7 @@
     [ngClass]="getTheme()"
     id="icon-grid"
   >
-    <p *ngIf="!userLoading" class="landing-hero-text-auth-preview-text">
+    <p *ngIf="!userLoading && !isAuthenticated" class="landing-hero-text-auth-preview-text">
       Preview the App as:
     </p>
     <div
@@ -75,7 +75,7 @@
         mat-raised-button
         color="primary"
         class="btn btn-secondary owner-preview"
-        (click)="onPreviewLogin('owner')"
+        (click)="onPreviewLogin('an Owner')"
       >
         Owner
       </button>
@@ -84,7 +84,7 @@
         mat-raised-button
         color="accent"
         class="btn btn-secondary manager-preview"
-        (click)="onPreviewLogin('manager')"
+        (click)="onPreviewLogin('a Manager')"
       >
         Manager
       </button>
@@ -92,11 +92,12 @@
         *ngIf="!isAuthenticated"
         mat-raised-button
         class="btn btn-secondary staff-preview"
-        (click)="onPreviewLogin('staff')"
+        (click)="onPreviewLogin('a Junior Staff Member')"
       >
         Junior Staff
       </button>
     </div>
+
     <h2 class="landing-features-1-title pb-2">App Features</h2>
 
     <div class="row row-cols-1 row-cols-lg-3 g-4 py-5">

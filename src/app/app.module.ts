@@ -9,6 +9,7 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import * as fromAppStore from './app-store/app.reducer'
 import { UserEffects } from './users/user-store/user.effects';
+import { NotificationsEffects } from './notifications/notifications-store/notifications.effects';
 import { BusinessEffects } from './core/business/business-store/business.effects';
 import { LocationEffects } from './core/business/location/location-store/location.effects';
 
@@ -25,6 +26,7 @@ import { ErrorComponent } from './error/error.component';
 import { LandingComponent } from './landing/landing.component';
 import { FooterComponent } from './landing/head-foot/footer/footer.component';
 import { HeaderComponent } from './landing/head-foot/header/header.component';
+import { SimpleNotificationComponent } from './notifications/simple-notification.component';
 
 
 @NgModule({
@@ -33,7 +35,8 @@ import { HeaderComponent } from './landing/head-foot/header/header.component';
     ErrorComponent,
     LandingComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    SimpleNotificationComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +48,7 @@ import { HeaderComponent } from './landing/head-foot/header/header.component';
     UserModule,
     AppCoreModule,
     StoreModule.forRoot(fromAppStore.appReducer),
-    EffectsModule.forRoot([UserEffects, BusinessEffects, LocationEffects]),
+    EffectsModule.forRoot([UserEffects, NotificationsEffects, BusinessEffects, LocationEffects]),
     LayoutModule
   ],
   providers: [

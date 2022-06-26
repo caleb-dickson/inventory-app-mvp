@@ -85,7 +85,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
   displayedColumns = inventoryColumns;
 
   ngOnInit(): void {
-    // console.clear();
+    console.clear();
 
     this._userAuthSub = this._store
       .select('user')
@@ -143,7 +143,6 @@ export class InventoryComponent implements OnInit, OnDestroy {
           locState
         );
         console.groupEnd();
-        console.log(this.inventoryDataPopulatedSorted);
       });
     this.dataSource = new MatTableDataSource(
       this.locationState.activeLocationInventories

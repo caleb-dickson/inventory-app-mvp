@@ -7,10 +7,6 @@ export const loginStart = createAction(
   '[User] Login Start',
   props<{ email: string; password: string }>()
 );
-export const loginPreviewStart = createAction(
-  '[User] Login Preview User Start',
-  props<{ email: string; password: string }>()
-);
 export const signupStart = createAction(
   '[User] Signup Start',
   props<{ newUser: User }>()

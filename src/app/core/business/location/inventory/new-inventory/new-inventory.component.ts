@@ -169,10 +169,14 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
           }
         }
 
-        console.group('%cLocation State', 'font-size: 1rem', locState);
+        console.group(
+          '%cLocation State',
+          `font-size: 1rem;
+            color: lightgreen;`,
+          locState
+        );
         console.groupEnd();
       });
-    console.log(this.newInventoryProducts);
   }
 
   // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
@@ -317,14 +321,14 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
       ),
       inventory: items,
     });
-    console.log(this.draftInventoryForm.value);
-    console.log(this.draftInventoryItemControls);
   }
 
   // GETS AND HOLDS THE LIST OF NEWInventoryForm CONTROLS
   get newInventoryItemControls() {
-    return (<FormArray>this.newInventoryForm.get('inventory')).controls;
-  }
+      if (this.newInventoryForm) {
+      return (<FormArray>this.newInventoryForm.get('inventory')).controls;
+    }
+    }
 
   // GETS AND HOLDS THE LIST OF DRAFTInventoryItemControls CONTROLS
   get draftInventoryItemControls() {

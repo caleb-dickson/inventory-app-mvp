@@ -28,26 +28,22 @@ export class LocationService {
     this._locationStoreSub = this._store
       .select('location')
       .subscribe((locState) => {
-        console.log(locState);
         this.locationState = locState;
       });
 
     this._businessStoreSub = this._store
       .select('business')
       .subscribe((bizState) => {
-        console.log(bizState);
         this.businessState = bizState;
       });
   }
 
   activateLocation(activatedLocation: Location) {
-    console.log(activatedLocation);
-    console.log(this.locationState);
     if (!activatedLocation) {
       return;
     }
 
-    localStorage.removeItem('inventoryData')
+    localStorage.removeItem('inventoryData');
 
     localStorage.setItem(
       'activatedLocation',
@@ -81,8 +77,12 @@ export class LocationService {
       } = JSON.parse(localStorage.getItem('storedBusiness'));
 
       if (businessLocations) {
-        console.log(businessLocations);
-        console.log('||| locations fetched from local storage |||');
+        console.log(
+          '%cBusiness Locations',
+          `font-size: 1rem;
+              color: lightgreen;`,
+          businessLocations
+        );
         this._store.dispatch(
           BusinessActions.GETBusinessLocationsSuccess({
             locations: businessLocations,
@@ -94,8 +94,8 @@ export class LocationService {
             })
           );
       } else if (!businessLocations) {
-        console.log('||| getting locations from DB |||');
         console.log(storedBusiness);
+        console.warn('||| Fetching locations from DB |||');
         this._store.dispatch(
           BusinessActions.GETBusinessLocationsStart({
             businessId: storedBusiness.business._id,
@@ -109,14 +109,14 @@ export class LocationService {
     } else if (userStringRole !== 'owner') {
       if (userLocations) {
         console.log(userLocations);
-        console.log('||| userLocations fetched from local storage |||');
+        console.warn('||| userLocations found in local storage |||');
         this._store.dispatch(
           LocationActions.GETUserLocationsSuccess({
             locations: userLocations,
           })
         );
       } else if (!userLocations) {
-        console.log('||| getting userLocations from DB |||');
+        console.warn('||| Fetching userLocations from DB |||');
         console.log(userId);
         this._store.dispatch(
           LocationActions.GETUserLocationsStart({
@@ -150,7 +150,7 @@ export class LocationService {
         })
       );
     } else {
-      console.log('||| No active location found. |||');
+      console.warn('||| No active location found. |||');
     }
   }
 
@@ -190,9 +190,7 @@ export class LocationService {
   }
 
   // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
-  getPopulatedInventories(
-    initLocInventories: boolean
-  ) {
+  getPopulatedInventories(initLocInventories: boolean) {
     // CHECK LOCALSTORAGE FOR ALREADY FETCHED INVENTORIES
     const storedInv: Inventory[] = JSON.parse(
       localStorage.getItem('inventoryData')
@@ -233,7 +231,7 @@ export class LocationService {
       this.locationState.activeLocation.inventoryData &&
       this.locationState.activeLocation.inventoryData.length === 0
     ) {
-      console.log('||| NULL INV |||')
+      console.warn('||| NULL INV |||');
       this._store.dispatch(LocationActions.GETLocationInventoriesNull());
     }
   }

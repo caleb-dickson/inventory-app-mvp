@@ -40,6 +40,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
   user: User;
   userId: string;
   userRole: string;
+  userDept: string;
   authError: string;
 
   // Business State
@@ -75,6 +76,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.clear();
+
     // USER STORE
     this.userAuthSub = this.store
       .select('user')
@@ -84,6 +86,7 @@ export class BusinessComponent implements OnInit, OnDestroy {
         if (authState && authState.user) {
           this.user = authState.user;
           this.userId = authState.user.userId;
+          this.userDept = authState.user.userProfile.department;
         }
       });
 
@@ -91,7 +94,6 @@ export class BusinessComponent implements OnInit, OnDestroy {
     this.businessStoreSub = this.store
       .select('business')
       .subscribe((bizState) => {
-        console.log(bizState)
         this.businessState = bizState;
         this.loading = bizState.loading;
         this.businessError = bizState.businessError;
@@ -131,6 +133,15 @@ export class BusinessComponent implements OnInit, OnDestroy {
       case 1:
         this.userRole = 'Staff';
         break;
+    }
+    if (this.userRole === 'Owner' || this.userDept === 'admin') {
+      console.group(
+        '%cBusiness State',
+        `font-size: 1rem;
+          color: yellow;`,
+        this.businessState
+      );
+      console.groupEnd();
     }
   }
 

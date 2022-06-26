@@ -12,7 +12,9 @@
     class="inventory-null-message"
   >
     <!-- "NO LOCATION ACTIVE" MESSAGE -->
-    <h4 *ngIf="locationState.activeLocation.inventoryData.length === 0">
+    <h4 *ngIf="
+    locationState.activeLocation &&
+    locationState.activeLocation.inventoryData.length === 0">
       Past
       {{ userDept === "admin" ? null : (userDept | uppercase) }} inventories
       will show up here when finalized.

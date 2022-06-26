@@ -29,7 +29,8 @@ export class ThemeService {
       console.log('||| Theme data found in guestUserData |||');
     } else if (userProfileData) {
       this.themeStatus.next(userProfileData.userProfile.themePref)
-      console.log('||| Theme data found in userProfileData |||');
+      console.warn('||| Theme data found in userProfileData |||');
+
     } else {
       console.log('||| No theme data found in localstorage |||');
     }

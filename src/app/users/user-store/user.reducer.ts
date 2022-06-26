@@ -30,7 +30,6 @@ export function userReducer(
     on(
       UserActions.loginStart,
       UserActions.signupStart,
-      UserActions.loginPreviewStart,
       (state) => ({
         ...state,
         authError: null,

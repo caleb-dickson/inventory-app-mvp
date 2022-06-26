@@ -82,14 +82,21 @@
 
         }
       }
+
     }
+  }
+
+  .test {
+    display: flex;
+    justify-content: center;
+    margin-block: 2rem;
   }
 
   .user-spinner {
     display: flex;
     justify-content: center;
   }
-  
+
   &-features-1 {
     &-title {
       text-align: center;
