@@ -29,241 +29,13 @@
         </mat-card-subtitle>
 
         <mat-card-content>
-          <form #newProductForm="ngForm" class="product-add-new-form">
-            <div>
-              <mat-form-field appearance="outline">
-                <mat-label>Product Category</mat-label>
-                <mat-select
-                  ngModel
-                  #category
-                  required
-                  name="category"
-                  type="text"
-                >
-                  <!-- <mat-option [value]="null">Select a Category</mat-option> -->
-                  <mat-optgroup
-                    *ngFor="let category of productCategories.categories"
-                    [label]="category.name"
-                  >
-                    <mat-option
-                      *ngFor="let subCat of category.subCategories"
-                      [value]="subCat"
-                    >
-                      {{ subCat }}
-                    </mat-option>
-                  </mat-optgroup>
-                </mat-select>
-                <mat-error>Please enter a category.</mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="name">
-                <mat-label>Name</mat-label>
-                <input
-                  ngModel
-                  matInput
-                  required
-                  type="text"
-                  name="name"
-                  #name
-                  (focusout)="onProductNameInput(newProductForm.value.name)"
-                />
-                <mat-error>Please enter a name.</mat-error>
-              </mat-form-field>
-            </div>
-
-            <p *ngIf="!productName" class="text-center">
-              Individual Item Info
-              <mat-icon
-                matTooltip="Enter the amount and unit of measure of each individual item."
-                >help_outline</mat-icon
-              >
-            </p>
-            <p *ngIf="productName" class="text-center">
-              Individual {{ productName }} Size
-            </p>
-
-            <div class="units-block">
-              <mat-form-field appearance="outline" class="hint align-end short">
-                <mat-label>Item Size</mat-label>
-                <input
-                  ngModel
-                  matInput
-                  required
-                  type="number"
-                  name="unitSize"
-                  #unitSize
-                />
-                <!-- <span matSuffix class="unit-suffix"> {{ unit ? unit.value : null }} </span> -->
-                <mat-error>Please enter the item's size.</mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="short">
-                <mat-label>Unit of Measure</mat-label>
-                <mat-select ngModel #unit required name="unit" type="text">
-                  <!-- <mat-option [value]="null">Select a Category</mat-option> -->
-                  <mat-optgroup
-                    *ngFor="let unitCategory of defaultUnits.categories"
-                    [label]="unitCategory.category"
-                  >
-                    <mat-option
-                      *ngFor="let units of unitCategory.units"
-                      [value]="units"
-                    >
-                      {{ units.plural }}
-                    </mat-option>
-                  </mat-optgroup>
-                </mat-select>
-                <mat-error>Please enter a valid unit of measure.</mat-error>
-              </mat-form-field>
-            </div>
-
-            <p *ngIf="!productName" class="text-center">
-              Pack Info
-              <mat-icon
-                matTooltip="If each case is subdivided into smaller packs,
-                enter how many individual items per pack. If not multiple
-                packs just enter 1 here and enter the total items per case in the 'Case' field."
-                >help_outline</mat-icon
-              >
-            </p>
-            <p *ngIf="productName" class="text-center">
-              How many {{ productName }} per pack?
-            </p>
-
-            <div class="pack-block">
-              <mat-form-field appearance="outline">
-                <mat-label>Pack Size</mat-label>
-                <input
-                  ngModel
-                  matInput
-                  required
-                  type="number"
-                  name="unitsPerPack"
-                  #unitsPerPack
-                />
-                <mat-error>Please enter a valid pack size.</mat-error>
-              </mat-form-field>
-            </div>
-
-            <div class="par-block">
-              <mat-form-field appearance="outline" class="hint">
-                <mat-label>Packs PAR</mat-label>
-                <input
-                  ngModel
-                  matInput
-                  required
-                  type="number"
-                  name="par"
-                  #par
-                />
-                <mat-icon
-                  matSuffix
-                  matTooltip="Periodic Automatic Replacement (PAR).
-                  This is weekly usage, PLUS buffer stock DIVIDED by deliveries each inventory period.
-                  If case not divided into packs just enter number of cases.
-                  (You can update this number for each inventory)"
-                  >help_outline</mat-icon
-                >
-                <mat-error>Please enter a par.</mat-error>
-              </mat-form-field>
-            </div>
-
-            <p
-              *ngIf="newProductForm.value.unitsPerPack <= 1"
-              class="text-center"
-            >
-              Case Info
-            </p>
-            <p
-              *ngIf="newProductForm.value.unitsPerPack > 1"
-              class="text-center"
-            >
-              How many packs per case?
-            </p>
-
-            <div>
-              <mat-form-field appearance="outline" class="hint">
-                <mat-label>Case Size</mat-label>
-                <input
-                  ngModel
-                  matInput
-                  required
-                  type="number"
-                  name="packsPerCase"
-                  #packsPerCase
-                />
-                <mat-icon
-                  matSuffix
-                  matTooltip="If not subdivided into multiple packs, just enter how many
-                  individual items overall in the case."
-                  >help_outline</mat-icon
-                >
-                <mat-error>Please enter a valid case size.</mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="ms-2">
-                <mat-label>Case Price</mat-label>
-                <span matPrefix>$&nbsp;</span>
-                <input
-                  ngModel
-                  matInput
-                  required
-                  type="number"
-                  name="casePrice"
-                  #casePrice
-                />
-                <mat-error>Please enter a valid case price.</mat-error>
-              </mat-form-field>
-            </div>
-
-            <div class="toggle">
-              <br />
-              <mat-slide-toggle
-                matInput
-                #isActive
-                name="isActive"
-                (change)="onProductStatusSelect($event.checked)"
-                [checked]="productStatusInput === 'Active' ? true : false"
-                [value]="productStatusInput === 'Active' ? true : false"
-              >
-                {{ productStatusInput }}
-                <mat-icon
-                  matTooltip="Sets the inventory status of this product.
-                  Set to 'Inactive' if you don't immediately plan to track
-                  this product in this location's inventory. Set to
-                  'Actve' to include in the following inventory."
-                  >help_outline</mat-icon
-                >
-              </mat-slide-toggle>
-            </div>
-          </form>
+          <app-product-form
+            (productFormSubmitted)="onNewProductSubmit($event)"
+          >
+          </app-product-form>
         </mat-card-content>
 
-        <mat-card-actions align="end">
-          <button
-            mat-raised-button
-            type="button"
-            (click)="onResetForm(newProductForm)"
-          >
-            Reset
-          </button>
-          <div class="spinner">
-            <mat-spinner
-              diameter="40"
-              strokeWidth="6"
-              *ngIf="locLoading || bizLoading"
-            ></mat-spinner>
-          </div>
-          <button
-            *ngIf="!locLoading"
-            mat-raised-button
-            type="submit"
-            [disabled]="newProductForm.invalid"
-            (click)="onNewProductSubmit(newProductForm)"
-          >
-            Submit
-          </button>
-        </mat-card-actions>
+        <mat-card-actions align="end"> </mat-card-actions>
       </mat-card>
     </mat-expansion-panel>
   </div>
@@ -276,18 +48,15 @@
     ></mat-spinner>
   </div>
 
-  <h5
-    *ngIf="activeLocation && activeLocation.productList.length > 0"
-    class="text-center"
-  >
+  <h5 *ngIf="activeLocation?.productList.length > 0" class="text-center">
     Product List
   </h5>
 
   <h6
-    *ngIf="locationState.activeLocation && locationState.activeLocation.productList.length === 0"
+    *ngIf="locationState.activeLocation?.productList.length === 0"
     class="products-null-message"
   >
-    Products stocked at this location will appear below. <br>
+    Products stocked at this location will appear below. <br />
     Create new products to get started.
   </h6>
 
@@ -303,10 +72,7 @@
     </button>
   </div>
 
-  <div
-    class="product-list"
-    *ngIf="activeLocation && activeLocation.productList.length > 0"
-  >
+  <div class="product-list" *ngIf="activeLocation?.productList.length > 0">
     <mat-card
       *ngFor="let product of activeLocation.productList; let i = index"
       class="product-list-cards"
@@ -353,12 +119,17 @@
           {{ product.product.par > 1 ? "packs" : "pack" }}
         </p>
       </mat-card-content>
+      <mat-card-actions align="center">
+        <button mat-raised-button (click)="onEditProduct(product.product)">
+          Edit
+        </button>
+      </mat-card-actions>
     </mat-card>
   </div>
 
   <div>
     <button
-      *ngIf="activeProducts && activeProducts.length > 0"
+      *ngIf="activeProducts?.length > 0"
       mat-raised-button
       color="primary"
       type="button"

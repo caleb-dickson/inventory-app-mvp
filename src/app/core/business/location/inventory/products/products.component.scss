@@ -16,6 +16,21 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+
+  &-add {
+    width: 60vw;
+    max-width: 40rem;
+
+    // mat-card {
+    //   justify-content: center;
+    //   align-items: center;
+
+    //   // app-product-form {
+    //   //   width: 40vw;
+    //   // }
+    // }
+  }
 
   .no-active-location {
     display: flex;
@@ -26,56 +41,6 @@
   .location-name {
     margin-block-start: 2rem;
     text-align: center;
-  }
-
-  &-add {
-    display: flex;
-    justify-content: center;
-    &-new {
-      width: max-content;
-      margin: 2rem;
-      &-form {
-        display: flex;
-        flex-direction: column;
-
-        mat-form-field {
-          width: 20rem;
-
-          .name {
-            margin-inline-start: 1rem;
-          }
-        }
-        .units-block,
-        .pack-block,
-        .par-block {
-          display: flex;
-          justify-content: center;
-        }
-        .short {
-          width: 10rem;
-        }
-        .unit-suffix {
-          transform: translateY(-0.5rem);
-        }
-        .align-end {
-          text-align: right;
-        }
-        .hint {
-          margin-block-end: 2rem;
-        }
-        .toggle {
-          display: flex;
-          justify-content: flex-end;
-          margin: 1rem;
-        }
-        .underline {
-          text-decoration: underline;
-        }
-        .bold {
-          font-weight: 500;
-        }
-      }
-    }
   }
 
   .products-null-message {
@@ -131,47 +96,8 @@
       justify-content: center;
       &-new {
         width: max-content;
+        min-width: 23rem;
         margin: 2rem;
-        &-form {
-          display: flex;
-          flex-direction: column;
-
-          mat-form-field {
-            width: min-content;
-          }
-          .units-block,
-          .pack-block,
-          .par-block {
-            display: flex;
-            justify-content: center;
-            mat-form-field {
-              width: 8rem;
-            }
-          }
-          .short {
-            width: 10rem;
-          }
-          .unit-suffix {
-            transform: translateY(-0.5rem);
-          }
-          .align-end {
-            text-align: right;
-          }
-          .hint {
-            margin-block-end: 2rem;
-          }
-          .toggle {
-            display: flex;
-            justify-content: flex-end;
-            margin: 1rem;
-          }
-          .underline {
-            text-decoration: underline;
-          }
-          .bold {
-            font-weight: 500;
-          }
-        }
       }
     }
 

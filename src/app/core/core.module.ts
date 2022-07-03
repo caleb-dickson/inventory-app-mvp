@@ -17,6 +17,9 @@ import { InventoryComponent } from './business/location/inventory/inventory.comp
 import { ProductsComponent } from './business/location/inventory/products/products.component';
 import { LocationComponent } from './business/location/location.component';
 import { NewInventoryComponent } from './business/location/inventory/new-inventory/new-inventory.component';
+import { ProductFormComponent } from './business/location/inventory/products/product-form/product-form.component';
+import { InventoryFormComponent } from './business/location/inventory/inventory-form/inventory-form.component';
+import { ProductEditComponent } from './dialog/product-edit/product-edit.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +32,9 @@ import { NewInventoryComponent } from './business/location/inventory/new-invento
     ProductsComponent,
     LocationComponent,
     NewInventoryComponent,
+    ProductFormComponent,
+    InventoryFormComponent,
+    ProductEditComponent,
   ],
   imports: [
     CommonModule,

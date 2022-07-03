@@ -5,9 +5,7 @@
 <div
   class="location"
   *ngIf="
-    locationState.activeLocation &&
-    locationState.activeLocation.productList &&
-    locationState.activeLocation.productList.length > 0 &&
+    locationState.activeLocation?.productList.length > 0 &&
     !locLoading &&
     newInventoryItemControls.length !== 0
   "
@@ -25,9 +23,7 @@
 <div
   class="location"
   *ngIf="
-    (locationState.activeLocation &&
-      locationState.activeLocation.productList &&
-      locationState.activeLocation.productList.length === 0) ||
+    locationState.activeLocation?.productList.length === 0 ||
     !newInventoryItemControls
   "
 >
@@ -65,9 +61,7 @@
 <!-- NEW INVENTORY MAIN START -->
 <div
   *ngIf="
-    locationState.activeLocation &&
-    locationState.activeLocation.productList &&
-    locationState.activeLocation.productList.length > 0 &&
+    locationState.activeLocation?.productList.length > 0 &&
     newInventoryItemControls.length > 0
   "
   class="new-inventory-container"
@@ -83,9 +77,7 @@
     <div
       class="inventory-new-main"
       *ngIf="
-        locationState.activeLocation &&
-        locationState.activeLocation.productList &&
-        locationState.activeLocation.productList.length > 0
+        locationState.activeLocation?.productList.length > 0
       "
     >
       <mat-card class="inventory-card">
@@ -270,8 +262,7 @@
 >
   <p
     *ngIf="
-      locationState.activeLocation &&
-      locationState.activeLocation.inventoryData.length > 0
+      locationState.activeLocation?.inventoryData.length > 0
     "
   >
     No working

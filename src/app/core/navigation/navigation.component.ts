@@ -196,7 +196,6 @@ export class NavigationComponent implements OnInit {
 
     this.isHandset$.subscribe((state) => {
       this.sideNavOpen = !state;
-      console.log(state);
       this.setNavSpacer(state);
     });
 
@@ -222,7 +221,6 @@ export class NavigationComponent implements OnInit {
         this.onActivateLocation(this.locationState.userLocations[0]);
       }
     }
-    console.log(this.setNavSpacer())
   }
 
   setNavSpacer(state?: boolean) {

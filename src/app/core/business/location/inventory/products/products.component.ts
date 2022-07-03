@@ -6,18 +6,15 @@ import * as fromAppStore from '../../../../../app-store/app.reducer';
 import * as LocationActions from '../../location-store/location.actions';
 import { LocationState } from '../../location-store/location.reducer';
 
-import { map, Subscription } from 'rxjs';
+import { map, Observable, Subject, Subscription } from 'rxjs';
 
 import { Location } from '../../../../models/location.model';
-import {
-  defaultCategories,
-  ProductCategories,
-} from '../../../../models/product-categories.model';
-import { defaultUnits, UnitsCategories } from '../../../../models/units-list.model';
+
 import { Product } from '../../../../models/product.model';
 
 import { LocationService } from '../../../../core-control/location.service';
 import { User } from 'src/app/users/user-control/user.model';
+import { ProductsService } from './products.service';
 
 @Component({
   selector: 'app-products',
@@ -27,12 +24,15 @@ import { User } from 'src/app/users/user-control/user.model';
 export class ProductsComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<fromAppStore.AppState>,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private _productsService: ProductsService
   ) {}
 
   private _userAuthSub: Subscription;
   private _locationStoreSub: Subscription;
   private _businessStoreLoadingSub: Subscription;
+  private _updateProductSub: Subscription;
+  private _productFormModeSub: Subscription;
 
   user: User;
   userRole: string;
@@ -41,22 +41,33 @@ export class ProductsComponent implements OnInit, OnDestroy {
   locLoading: boolean;
 
   newProductForm: NgForm;
+  productFormMode: string = 'new';
+  updateProduct: Product;
+
+  productUpdateForm: NgForm;
 
   locationState: LocationState;
   activeLocation: Location;
   activeProducts: Product[] = [];
 
-  productCategories: ProductCategories;
-  defaultUnits: UnitsCategories;
-
   productName: string = null;
-  productStatusInput = 'Active';
 
   ngOnInit() {
     console.clear();
 
-    this.productCategories = defaultCategories;
-    this.defaultUnits = defaultUnits;
+    this._updateProductSub = this._productsService.$updateProduct.subscribe(
+      (product) => {
+        this.updateProduct = product;
+        console.log(this.updateProduct);
+      }
+    );
+
+    this._productFormModeSub = this._productsService.$productFormMode.subscribe(
+      (mode) => {
+        this.productFormMode = mode;
+        console.log(this.productFormMode);
+      }
+    );
 
     this._userAuthSub = this.store
       .select('user')
@@ -100,50 +111,39 @@ export class ProductsComponent implements OnInit, OnDestroy {
       .subscribe((loading) => (this.bizLoading = loading));
   }
 
-  onProductNameInput(name: string) {
-    console.log(name);
-    this.productName = name;
-  }
-
-  onProductStatusSelect(checked: boolean) {
-    checked
-      ? (this.productStatusInput = 'Active')
-      : (this.productStatusInput = 'Inactive');
-  }
-
-  onResetForm(form: NgForm) {
-    form.reset();
-  }
-
-  onNewProductSubmit(newProductForm: NgForm) {
+  onNewProductSubmit(newProductForm: any) {
     console.log(newProductForm);
-    console.log(newProductForm.value);
-    console.log(this.productStatusInput);
+    console.log(newProductForm?.value);
 
     if (!newProductForm.valid) {
       return;
     }
 
-    this.store.dispatch(
-      LocationActions.POSTCreateProductForLocationStart({
-        product: {
-          _id: null,
-          parentOrg: this.activeLocation._id,
-          isActive: this.productStatusInput === 'Active' ? true : false,
-          department: this.user.userProfile.department,
-          category: newProductForm.value.category,
-          name: newProductForm.value.name,
-          unitSize: newProductForm.value.unitSize,
-          unitMeasure: newProductForm.value.unit,
-          unitsPerPack: newProductForm.value.unitsPerPack,
-          packsPerCase: newProductForm.value.packsPerCase,
-          casePrice: newProductForm.value.casePrice,
-          par: newProductForm.value.par,
-        },
-        locationId: this.activeLocation._id,
-      })
-    );
-    newProductForm.reset();
+    // this.store.dispatch(
+    //   LocationActions.POSTCreateProductForLocationStart({
+    //     product: {
+    //       _id: null,
+    //       parentOrg: this.activeLocation._id,
+    //       isActive: this.productStatusInput === 'Active' ? true : false,
+    //       department: this.user.userProfile.department,
+    //       category: newProductForm.value.category,
+    //       name: newProductForm.value.name,
+    //       unitSize: newProductForm.value.unitSize,
+    //       unitMeasure: newProductForm.value.unit,
+    //       unitsPerPack: newProductForm.value.unitsPerPack,
+    //       packsPerCase: newProductForm.value.packsPerCase,
+    //       casePrice: newProductForm.value.casePrice,
+    //       par: newProductForm.value.par,
+    //     },
+    //     locationId: this.activeLocation._id,
+    //   })
+    // );
+    // newProductForm.reset();
+  }
+
+  onProductUpdateSubmit(productUpdateForm: NgForm) {
+    console.log(productUpdateForm);
+    console.log(productUpdateForm.value);
   }
 
   onProductSelect(checked: boolean, product: Product) {
@@ -157,14 +157,20 @@ export class ProductsComponent implements OnInit, OnDestroy {
     console.log(this.locationState.activeProducts); // STORE DATA
   }
 
+  onEditProduct(product: Product) {
+    this._productsService.editProduct();
+    console.log(product);
+    this._productsService.setFormMode('update');
+    this._productsService.setUpdateProduct(product);
+  }
+
   // onDeleteSelectedProducts() {
   //   this.selectedProducts = [];
   // }
 
   ngOnDestroy(): void {
-      this._businessStoreLoadingSub.unsubscribe();
-      this._locationStoreSub.unsubscribe();
-      this._userAuthSub.unsubscribe();
+    this._businessStoreLoadingSub.unsubscribe();
+    this._locationStoreSub.unsubscribe();
+    this._userAuthSub.unsubscribe();
   }
-
 }

@@ -6,15 +6,12 @@
   <div
     *ngIf="
       !inventoryDataPopulatedSorted ||
-      (inventoryDataPopulatedSorted &&
-        inventoryDataPopulatedSorted.length === 0)
+      inventoryDataPopulatedSorted?.length === 0
     "
     class="inventory-null-message"
   >
     <!-- "NO LOCATION ACTIVE" MESSAGE -->
-    <h4 *ngIf="
-    locationState.activeLocation &&
-    locationState.activeLocation.inventoryData.length === 0">
+    <h4 *ngIf="locationState.activeLocation?.inventoryData.length === 0">
       Past
       {{ userDept === "admin" ? null : (userDept | uppercase) }} inventories
       will show up here when finalized
@@ -22,10 +19,7 @@
   </div>
 
   <div
-    *ngIf="
-      locationState.activeLocationInventories &&
-      locationState.activeLocationInventories.length > 0
-    "
+    *ngIf="locationState.activeLocationInventories?.length > 0"
     class="inventory-main"
   >
     <div class="spinner spinner-top">

@@ -1,0 +1,140 @@
+@use "../../../../../../../sass/abstracts/variables" as var;
+
+.product-add-new-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+
+  mat-form-field {
+    width: 20vw;
+    min-width: 10rem
+
+    // .name {
+    //   margin-inline-start: 1rem;
+    // }
+  }
+
+  .units-block,
+  .pack-block,
+  .par-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .case-info {
+    text-align: center;
+  }
+
+  .short {
+    width: 10vw;
+    min-width: 7rem;
+  }
+
+  .align-end {
+    text-align: right;
+  }
+  .hint {
+    margin-block-end: 2rem;
+  }
+
+  .underline {
+    text-decoration: underline;
+  }
+  .bold {
+    font-weight: 500;
+  }
+}
+
+.toggle {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin: 1rem;
+  margin-inline-end: 1.5rem;
+
+  .null-value {
+    color: #f44336;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  margin: 1rem;
+
+  button {
+    margin: 0.3rem;
+  }
+}
+
+// MOBILE STYLES
+@media only screen and (max-width: var.$bp-mobile) {
+  .product-add-new-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+
+    mat-form-field {
+      width: 20vw;
+
+      // .name {
+      //   margin-inline-start: 1rem;
+      // }
+    }
+
+    .units-block,
+    .pack-block,
+    .par-block {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .case-info {
+      text-align: center;
+    }
+
+    .short {
+      width: 10vw;
+    }
+
+    .align-end {
+      text-align: right;
+    }
+    .hint {
+      margin-block-end: 2rem;
+    }
+
+    .underline {
+      text-decoration: underline;
+    }
+    .bold {
+      font-weight: 500;
+    }
+  }
+
+  .toggle {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    margin: 1rem;
+    margin-inline-end: 1.5rem;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    margin: 1rem;
+
+    button {
+      margin: 0.3rem;
+    }
+  }
+}
