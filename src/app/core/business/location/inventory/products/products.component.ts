@@ -33,9 +33,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
   private _businessStoreLoadingSub: Subscription;
   private _updateProductSub: Subscription;
   private _productFormModeSub: Subscription;
+  private _productEditDialogStatus: Subscription;
 
   user: User;
   userRole: string;
+  userDept: string;
 
   bizLoading: boolean;
   locLoading: boolean;
@@ -69,11 +71,17 @@ export class ProductsComponent implements OnInit, OnDestroy {
       }
     );
 
+    this._productEditDialogStatus =
+      this._productsService.$productEditDialogStatus.subscribe((status) => {
+
+      });
+
     this._userAuthSub = this.store
       .select('user')
       .pipe(map((authState) => authState.user))
       .subscribe((user) => {
         this.user = user;
+        this.userDept = user.userProfile?.department;
         if (!!user) {
           switch (user.userProfile.role) {
             case 3:
@@ -172,5 +180,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this._businessStoreLoadingSub.unsubscribe();
     this._locationStoreSub.unsubscribe();
     this._userAuthSub.unsubscribe();
+    this._productEditDialogStatus.unsubscribe();
+    this._productFormModeSub.unsubscribe();
+    this._updateProductSub.unsubscribe();
   }
 }

@@ -67,15 +67,13 @@ export class ProductFormComponent implements OnInit {
     this._updateProductSub = this._productsService.$updateProduct.subscribe(
       (product) => {
         this.updateProduct = product;
-        console.log(this.updateProduct);
       }
     );
 
     this._productFormModeSub = this._productsService.$productFormMode.subscribe(
       (mode) => {
         this.productFormMode = mode;
-        this.initProductForm();
-        console.log(this.productFormMode);
+        this._initProductForm();
       }
     );
 
@@ -117,7 +115,6 @@ export class ProductFormComponent implements OnInit {
   }
 
   onProductNameInput(name: string) {
-    console.log(name);
     this.productName = name;
   }
 
@@ -125,19 +122,41 @@ export class ProductFormComponent implements OnInit {
     checked
       ? (this.productStatusText = 'Active')
       : (this.productStatusText = 'Inactive');
-    this.productStatus = checked;
     this.productForm.get('isActive').setValue(this.productStatus);
-    console.log(this.productForm.invalid);
-    console.log(this.productForm.value);
+    this.productStatus = checked;
+
+
+    // IN UPDATE MODE, SET FORM STATUS TO ENABLE SUBMIT BUTTON ON
+    // PRODUCT STATUS CHANGE FROM ORIGINAL DOC
+    if (
+      this.productFormMode === 'update' &&
+      !this.productForm.dirty &&
+      this.productStatus !== this.updateProduct.isActive
+      ) {
+        this.productForm.markAsTouched();
+        this.productForm.markAsDirty();
+      } else {
+        this.productForm.markAsPristine();
+        this.productForm.markAsUntouched();
+      }
+
+
+      // IN NEW PRODUCT MODE, SET FORM STATUS TO ENABLE THE RESET BUTTON
+      if (this.productFormMode === 'new') {
+        this.productForm.markAsTouched();
+        this.productForm.markAsDirty();
+      }
+    console.log(this.productForm.dirty)
   }
 
   onResetForm() {
-    this._productsService.setFormMode('new');
-    this._productsService.setUpdateProduct(null);
-    this.productForm.reset();
-    this.productStatusText = 'Active';
-    this.productStatus = true;
-    console.log(this.productStatus);
+    if (this.productFormMode === 'new') {
+      this.productForm.reset();
+      this.onProductStatusSelect(true);
+    } else if (this.productFormMode === 'update') {
+      this._initProductForm();
+      this.onProductStatusSelect(this.updateProduct.isActive);
+    }
   }
 
   onProductSubmit() {
@@ -145,10 +164,10 @@ export class ProductFormComponent implements OnInit {
     console.log(this.productForm.valid);
     console.log(this.productForm.value);
     this.productFormSubmitted.emit(this.productForm);
-    this.initProductForm();
+    this._initProductForm();
   }
 
-  initProductForm() {
+  private _initProductForm() {
     if (this.productFormMode === 'new') {
       this.productForm = new FormGroup({
         _id: new FormControl(null),
@@ -169,39 +188,42 @@ export class ProductFormComponent implements OnInit {
       console.log(this.updateProduct);
 
       this.productForm = new FormGroup({
-        _id: new FormControl(this.updateProduct._id),
-        parentOrg: new FormControl(this.updateProduct.parentOrg),
+        _id: new FormControl(this.updateProduct?._id, Validators.required),
+        parentOrg: new FormControl(
+          this.updateProduct?.parentOrg,
+          Validators.required
+        ),
         isActive: new FormControl(
-          this.updateProduct.isActive,
+          this.updateProduct?.isActive,
           Validators.required
         ),
-        department: new FormControl(this.updateProduct.department),
+        department: new FormControl(this.updateProduct?.department),
         category: new FormControl(
-          this.updateProduct.category,
+          this.updateProduct?.category,
           Validators.required
         ),
-        name: new FormControl(this.updateProduct.name, Validators.required),
+        name: new FormControl(this.updateProduct?.name, Validators.required),
         unitSize: new FormControl(
-          this.updateProduct.unitSize,
+          this.updateProduct?.unitSize,
           Validators.required
         ),
         unitMeasure: new FormControl(
-          this.updateProduct.unitMeasure,
+          this.updateProduct?.unitMeasure,
           Validators.required
         ),
         unitsPerPack: new FormControl(
-          this.updateProduct.unitsPerPack,
+          this.updateProduct?.unitsPerPack,
           Validators.required
         ),
         packsPerCase: new FormControl(
-          this.updateProduct.packsPerCase,
+          this.updateProduct?.packsPerCase,
           Validators.required
         ),
         casePrice: new FormControl(
-          this.updateProduct.casePrice,
+          this.updateProduct?.casePrice,
           Validators.required
         ),
-        par: new FormControl(this.updateProduct.par, Validators.required),
+        par: new FormControl(this.updateProduct?.par, Validators.required),
       });
     }
   }

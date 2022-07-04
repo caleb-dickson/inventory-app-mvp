@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { ProductsService } from '../../business/location/inventory/products/products.service';
 import { Product } from '../../models/product.model';
@@ -7,11 +8,13 @@ import { Product } from '../../models/product.model';
 @Component({
   selector: 'app-product-edit',
   templateUrl: './product-edit.component.html',
-  styleUrls: ['./product-edit.component.scss']
+  styleUrls: ['./product-edit.component.scss'],
 })
 export class ProductEditComponent implements OnInit {
-
-  constructor(private _productsService: ProductsService) { }
+  constructor(
+    private _productsService: ProductsService,
+    private _dialog: MatDialog
+  ) {}
 
   private _updateProductSub: Subscription;
   private _productFormModeSub: Subscription;
@@ -40,4 +43,7 @@ export class ProductEditComponent implements OnInit {
     console.log(productForm.value);
   }
 
+  onCloseDialog() {
+    this._dialog.closeAll();
+  }
 }

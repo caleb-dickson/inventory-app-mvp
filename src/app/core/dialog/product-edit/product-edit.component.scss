@@ -1,0 +1,58 @@
+@use '../../../../sass/abstracts/variables' as var;
+
+.product-edit {
+
+  &-title {
+    display: flex;
+    justify-content: center;
+
+    .spacer {
+      flex: auto;
+    }
+
+    &-close {
+      transform: translateY(-1rem) translateX(0.5rem);
+    }
+  }
+
+  &-close {
+    display: flex;
+    justify-content: flex-end;
+    margin-inline-end: 1rem;
+
+  }
+
+  app-product-form {
+    padding: 2rem;
+  }
+}
+
+// MOBILE STYLES
+@media only screen and (max-width: var.$bp-mobile) {
+  .product-edit {
+
+    &-title {
+      display: flex;
+      justify-content: center;
+
+      .spacer {
+        flex: auto;
+      }
+
+      &-icon {
+        transform: translateY(-1rem) translateX(1rem);
+      }
+    }
+
+    &-close {
+      display: flex;
+      justify-content: flex-end;
+      margin-inline-end: 1rem;
+
+    }
+
+    app-product-form {
+      padding: 0rem;
+    }
+  }
+}

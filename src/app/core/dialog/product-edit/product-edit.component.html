@@ -1,1 +1,8 @@
-<app-product-form (productFormSubmitted)="onProductUpdateSubmit($event)"></app-product-form>
+<h5 mat-dialog-title align="center">Edit Product</h5>
+<app-product-form
+  mat-dialog-content
+  (productFormSubmitted)="onProductUpdateSubmit($event)"
+></app-product-form>
+<span class="product-edit-close" mat-dialog-actions
+  ><button mat-icon-button (click)="onCloseDialog()">Close</button></span
+>
