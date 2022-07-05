@@ -50,7 +50,6 @@ export class LocationEffects {
       ofType(LocationActions.GETUserLocationsStart),
       switchMap((action) => {
         console.warn('||| fetchUserLocations$ effect called |||===');
-        console.log(action);
         return this.http
           .get<{ fetchedLocations: Location[] }>(
             BACKEND_URL +
@@ -61,7 +60,6 @@ export class LocationEffects {
           )
           .pipe(
             map((resData) => {
-              console.log(resData);
               if (
                 resData &&
                 resData.fetchedLocations &&
@@ -98,8 +96,6 @@ export class LocationEffects {
       withLatestFrom(this.store.select('user')),
       concatMap(([action, authState]) => {
         console.warn('||| addProductToLocation$ effect called |||===');
-        console.log(action);
-        console.log(authState.user.userId);
         return this.http
           .post<{ message: string; updatedActiveLocation: Location }>(
             BACKEND_URL + '/new-product',
@@ -110,8 +106,6 @@ export class LocationEffects {
           )
           .pipe(
             map((resData) => {
-              console.log(resData);
-              console.log(resData.message);
 
               if (resData && resData.updatedActiveLocation) {
                 localStorage.setItem(
@@ -149,9 +143,6 @@ export class LocationEffects {
       withLatestFrom(this.store.select('user')),
       concatMap(([action, authState]) => {
         console.warn('||| addProductToLocation$ effect called |||===');
-        console.log(action);
-        console.log('||| ^^^ action ^^^ |||');
-
         return this.http
           .post<{
             message: string;
@@ -166,8 +157,6 @@ export class LocationEffects {
           })
           .pipe(
             map((resData) => {
-              console.log(resData);
-              console.log('||| ^^^ resData ^^^ |||');
 
               if (resData && resData.updatedLocation) {
                 localStorage.setItem(
@@ -205,7 +194,6 @@ export class LocationEffects {
       withLatestFrom(this.store.select('user')),
       exhaustMap(([action, authState]) => {
         console.warn('||| updateLocationInventory$ effect called |||===');
-        console.log(action);
 
         return this.http
           .put<{ updatedInventory: Inventory }>(
@@ -216,8 +204,6 @@ export class LocationEffects {
           )
           .pipe(
             map((resData) => {
-              console.log(resData);
-              console.log('||| ^^^ resData ^^^ |||');
 
               if (resData.updatedInventory) {
                 return LocationActions.PUTUpdateInventoryForLocationSuccess({
@@ -243,7 +229,6 @@ export class LocationEffects {
       ofType(LocationActions.GETLocationInventoriesStart),
       switchMap((action) => {
         console.warn('||| fetchLocationInventories$ effect called |||===');
-        console.log(action);
 
         return this.http
           .get<{ fetchedInventories: Inventory[]; message: string }>(
@@ -251,8 +236,6 @@ export class LocationEffects {
           )
           .pipe(
             map((resData) => {
-              console.log(resData);
-              console.log('||| ^^^ resData ^^^ |||');
               const inventoryData = resData.fetchedInventories;
               if (
                 resData &&
@@ -270,7 +253,9 @@ export class LocationEffects {
                     draft = inv;
                   }
                 }
-                console.log(draft);
+                if (draft) {
+                  console.log(draft);
+                }
 
                 return LocationActions.GETLocationInventoriesSuccess({
                   inventoryData: [...resData.fetchedInventories],

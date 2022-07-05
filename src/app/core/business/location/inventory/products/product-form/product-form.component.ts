@@ -29,6 +29,11 @@ export class ProductFormComponent implements OnInit {
     private _productsService: ProductsService
   ) {}
 
+  @Output('productFormSubmitted') productFormSubmitted =
+    new EventEmitter<FormGroup>();
+  // @Output('productStatusSubmit') productStatusSubmit =
+  //   new EventEmitter<string>();
+
   private _userAuthSub: Subscription;
   private _locationStoreSub: Subscription;
   private _updateProductSub: Subscription;
@@ -43,10 +48,6 @@ export class ProductFormComponent implements OnInit {
   productForm: FormGroup;
   productFormMode: string = 'new';
   updateProduct: Product;
-  @Output('productFormSubmitted') productFormSubmitted =
-    new EventEmitter<FormGroup>();
-  @Output('productStatusSubmit') productStatusSubmit =
-    new EventEmitter<string>();
 
   locationState: LocationState;
   activeLocation: Location;
@@ -125,28 +126,26 @@ export class ProductFormComponent implements OnInit {
     this.productForm.get('isActive').setValue(this.productStatus);
     this.productStatus = checked;
 
-
     // IN UPDATE MODE, SET FORM STATUS TO ENABLE SUBMIT BUTTON ON
     // PRODUCT STATUS CHANGE FROM ORIGINAL DOC
     if (
       this.productFormMode === 'update' &&
       !this.productForm.dirty &&
       this.productStatus !== this.updateProduct.isActive
-      ) {
-        this.productForm.markAsTouched();
-        this.productForm.markAsDirty();
-      } else {
-        this.productForm.markAsPristine();
-        this.productForm.markAsUntouched();
-      }
+    ) {
+      this.productForm.markAsTouched();
+      this.productForm.markAsDirty();
+    } else {
+      this.productForm.markAsPristine();
+      this.productForm.markAsUntouched();
+    }
 
-
-      // IN NEW PRODUCT MODE, SET FORM STATUS TO ENABLE THE RESET BUTTON
-      if (this.productFormMode === 'new') {
-        this.productForm.markAsTouched();
-        this.productForm.markAsDirty();
-      }
-    console.log(this.productForm.dirty)
+    // IN NEW PRODUCT MODE, SET FORM STATUS TO ENABLE THE RESET BUTTON
+    if (this.productFormMode === 'new') {
+      this.productForm.markAsTouched();
+      this.productForm.markAsDirty();
+    }
+    console.log(this.productForm.dirty);
   }
 
   onResetForm() {

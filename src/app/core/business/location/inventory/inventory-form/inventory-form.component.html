@@ -1,1 +1,141 @@
-<p>inventory-form works!</p>
+<form *ngIf="formDept" [formGroup]="inventoryForm">
+  <div class="inventory-card-control">
+    <!-- INVENTORY DATE RANGE PICKER -->
+    <mat-form-field appearance="fill">
+      <mat-label>Select a {{ inventoryPeriod + 1 }} day date range</mat-label>
+      <mat-date-range-input [rangePicker]="picker">
+        <input
+          matInput
+          matStartDate
+          required
+          placeholder="Start date"
+          formControlName="dateStart"
+        />
+        <input
+          matInput
+          matEndDate
+          required
+          placeholder="End date"
+          formControlName="dateEnd"
+        />
+      </mat-date-range-input>
+      <mat-hint>MM/DD/YYYY - MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matSuffix [for]="picker"> </mat-datepicker-toggle>
+      <mat-date-range-picker #picker>
+        <mat-icon>date_range</mat-icon>
+      </mat-date-range-picker>
+    </mat-form-field>
+    <!-- INVENTORY DATE RANGE PICKER END ^^^ -->
+  </div>
+
+  <!-- PRODUCT INVENTORY CARDS START -->
+  <div formArrayName="inventory" class="inventory-products-cards-container">
+    <mat-card
+      *ngFor="
+        let control of inventoryItemControls;
+        let item;
+        of: inventoryProducts;
+        let i = index
+      "
+      [formGroupName]="i"
+      class="inventory-products"
+    >
+      <div class="inventory-products-input">
+        <h6>{{ item.product.name }}</h6>
+        <p>
+          {{
+            item.product.unitSize +
+              " " +
+              (item.product.unitSize > 1
+                ? item.product.unitMeasure.plural
+                : item.product.unitMeasure.singular)
+          }}
+          {{ " x " + item.product.unitsPerPack * item.product.packsPerCase }}
+          per case
+        </p>
+        <p>How many {{ item.product.unitMeasure.plural }} in stock?</p>
+        <mat-form-field appearance="outline" hidden>
+          <input matInput type="text" #product formControlName="product" />
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Enter Quantity</mat-label>
+          <input matInput type="number" #quantity formControlName="quantity" />
+        </mat-form-field>
+        <p *ngIf="quantity.value">
+          Value:
+          {{
+            (item.product.casePrice /
+              (item.product.unitSize *
+                item.product.unitsPerPack *
+                item.product.packsPerCase)) *
+              quantity.value | currency
+          }}
+        </p>
+      </div>
+    </mat-card>
+  </div>
+  <div *ngIf="user.userProfile.role > 1" class="inventory-card-submit-status">
+    <mat-label>Save as:</mat-label>
+    <mat-radio-group
+      required
+      #isFinal
+      formControlName="isFinal"
+      [value]="selected"
+    >
+      <mat-radio-button [value]="true">Final</mat-radio-button>
+      <mat-radio-button [value]="false">Draft</mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <mat-card-actions align="center">
+    <mat-error *ngIf="locationStateError">
+      {{ locationStateError }}
+    </mat-error>
+    <mat-error *ngIf="inventoryForm.dirty && inventoryForm.invalid">
+      Please complete all fields to save.
+    </mat-error>
+    <div class="spinner">
+      <mat-spinner
+        diameter="30"
+        strokeWidth="4"
+        *ngIf="locLoading"
+      ></mat-spinner>
+    </div>
+    <button
+      *ngIf="!locLoading && (userRole !== 'staff' || userDept === 'admin')"
+      mat-raised-button
+      #invSubmit
+      type="submit"
+      (click)="onInventorySubmit(inventoryForm, true)"
+      [disabled]="inventoryForm.invalid"
+    >
+      {{
+        inventoryForm.value.isFinal
+          ? "Finalize and Submit"
+          : "Save Working Draft"
+      }}
+    </button>
+    <button
+      *ngIf="!locLoading && userRole === 'staff' && userDept !== 'admin'"
+      mat-raised-button
+      type="button"
+      color="accent"
+      (click)="onInventorySubmit(inventoryForm, true)"
+      [disabled]="inventoryForm.invalid"
+    >
+      Save
+    </button>
+
+    <br />
+    <br />
+    <button
+      mat-raised-button
+      type="button"
+      color="primary"
+      (click)="onResetInventoryForm()"
+      [disabled]="!inventoryForm.touched"
+    >
+      Reset
+    </button>
+  </mat-card-actions>
+</form>

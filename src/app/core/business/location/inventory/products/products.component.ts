@@ -60,14 +60,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this._updateProductSub = this._productsService.$updateProduct.subscribe(
       (product) => {
         this.updateProduct = product;
-        console.log(this.updateProduct);
       }
     );
 
     this._productFormModeSub = this._productsService.$productFormMode.subscribe(
       (mode) => {
         this.productFormMode = mode;
-        console.log(this.productFormMode);
       }
     );
 
@@ -81,7 +79,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       .pipe(map((authState) => authState.user))
       .subscribe((user) => {
         this.user = user;
-        this.userDept = user.userProfile?.department;
+        this.userDept = user?.userProfile?.department;
         if (!!user) {
           switch (user.userProfile.role) {
             case 3:

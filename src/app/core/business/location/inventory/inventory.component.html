@@ -74,11 +74,11 @@
 
     <!-- PAST INVENTORY TABLE LIST START -->
     <mat-table
-      *ngFor="let inv of inventoryDataPopulatedSorted"
-      mat-table
-      matRipple
-      [dataSource]="inv.inventory"
-      class="mat-elevation-z8"
+    *ngFor="let inv of inventoryDataPopulatedSorted"
+    mat-table
+    matRipple
+    [dataSource]="inv.inventory"
+    class="mat-elevation-z8"
     >
       <!-- Table Title Header Row -->
       <ng-container matColumnDef="dateStart">
@@ -88,6 +88,14 @@
           {{ inv.dateEnd | date: "shortDate" }}
         </mat-cell>
       </ng-container>
+
+      <!-- Table Department Header Row -->
+      <!-- <ng-container matColumnDef="dept"> -->
+      <!-- <mat-cell mat-cell *matHeaderCellDef class="inventory-table-title"> -->
+      <!-- <mat-icon>insert_chart_outlined</mat-icon> -->
+      <!-- {{ inv.department | uppercase }} -->
+      <!-- </mat-cell> -->
+      <!-- </ng-container> -->
 
       <!-- Prod Category Column -->
       <ng-container matColumnDef="category">
@@ -197,6 +205,10 @@
         mat-header-row
         *matHeaderRowDef="['dateStart']"
       ></mat-header-row>
+      <!-- <mat-header-row
+        mat-header-row
+        *matHeaderRowDef="['dept']"
+      ></mat-header-row> -->
       <mat-header-row
         mat-header-row
         *matHeaderRowDef="displayedColumns"

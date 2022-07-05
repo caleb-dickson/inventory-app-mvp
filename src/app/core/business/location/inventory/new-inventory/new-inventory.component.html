@@ -2,13 +2,10 @@
 <div class="spinner spinner-top">
   <mat-spinner diameter="100" strokeWidth="6" *ngIf="locLoading"></mat-spinner>
 </div>
+
 <div
   class="location"
-  *ngIf="
-    locationState.activeLocation?.productList.length > 0 &&
-    !locLoading &&
-    newInventoryItemControls.length !== 0
-  "
+  *ngIf="locationState.activeLocation?.productList.length > 0 && !locLoading"
 >
   <h4>{{ activeLocation.locationName }}</h4>
   <h5>{{ userDept | uppercase }}</h5>
@@ -22,21 +19,14 @@
 <!-- "NO DEPARTMENT PRODUCTS IN LOCATION" MESSAGE -->
 <div
   class="location"
-  *ngIf="
-    locationState.activeLocation?.productList.length === 0 ||
-    !newInventoryItemControls
-  "
+  *ngIf="locationState.activeLocation?.productList.length === 0"
 >
   <!-- OWNERS, MANAGEMENT AND ADMINS -->
   <h4 *ngIf="userRole !== 'staff' && locationState.activeLocation">
     Add
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }}
     products to the
-    {{
-      locationState.activeLocation
-        ? locationState.activeLocation.locationName
-        : null
-    }}
+    {{ locationState.activeLocation?.locationName }}
     location to start a new
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory.
   </h4>
@@ -60,11 +50,8 @@
 
 <!-- NEW INVENTORY MAIN START -->
 <div
-  *ngIf="
-    locationState.activeLocation?.productList.length > 0 &&
-    newInventoryItemControls.length > 0
-  "
   class="new-inventory-container"
+  *ngIf="locationState.activeLocation?.productList.length > 0"
 >
   <mat-expansion-panel class="inventory-expansion">
     <mat-expansion-panel-header>
@@ -76,179 +63,53 @@
 
     <div
       class="inventory-new-main"
-      *ngIf="
-        locationState.activeLocation?.productList.length > 0
-      "
+      *ngIf="locationState.activeLocation?.productList.length > 0"
     >
       <mat-card class="inventory-card">
         <mat-card-content>
-          <form [formGroup]="newInventoryForm">
-            <div class="inventory-card-control">
-              <!-- INVENTORY DATE RANGE PICKER -->
-              <mat-form-field appearance="fill">
-                <mat-label
-                  >Select a {{ inventoryPeriod + 1 }} day date range</mat-label
-                >
-                <mat-date-range-input [rangePicker]="picker">
-                  <input
-                    matInput
-                    matStartDate
-                    required
-                    placeholder="Start date"
-                    formControlName="dateStart"
-                  />
-                  <input
-                    matInput
-                    matEndDate
-                    required
-                    placeholder="End date"
-                    formControlName="dateEnd"
-                  />
-                </mat-date-range-input>
-                <mat-hint>MM/DD/YYYY - MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matSuffix [for]="picker">
-                </mat-datepicker-toggle>
-                <mat-date-range-picker #picker>
-                  <mat-icon>date_range</mat-icon>
-                </mat-date-range-picker>
-              </mat-form-field>
-              <!-- INVENTORY DATE RANGE PICKER END ^^^ -->
-            </div>
-
-            <!-- PRODUCT INVENTORY CARDS START -->
-            <div
-              formArrayName="inventory"
-              class="inventory-products-cards-container"
+          <div
+            *ngIf="userDept === 'admin'"
+            class="inventory-card-submit-status"
+          >
+            <mat-label>Department: </mat-label>
+            <mat-radio-group
+              required
+              #isFinal
+              formControlName="isFinal"
+              [value]="selected"
+              (change)="onDepartmentSelect($event)"
             >
-              <mat-card
-                *ngFor="
-                  let control of newInventoryItemControls;
-                  let item;
-                  of: newInventoryProducts;
-                  let i = index
-                "
-                [formGroupName]="i"
-                class="inventory-products"
-              >
-                <div class="inventory-products-input">
-                  <h6>{{ item.product.name }}</h6>
-                  <p>
-                    {{
-                      item.product.unitSize +
-                        " " +
-                        (item.product.unitSize > 1
-                          ? item.product.unitMeasure.plural
-                          : item.product.unitMeasure.singular)
-                    }}
-                    {{
-                      " x " +
-                        item.product.unitsPerPack * item.product.packsPerCase
-                    }}
-                    per case
-                  </p>
-                  <p>
-                    How many {{ item.product.unitMeasure.plural }} in stock?
-                  </p>
-                  <mat-form-field appearance="outline" hidden>
-                    <input
-                      matInput
-                      type="text"
-                      #product
-                      formControlName="product"
-                    />
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>Enter Quantity</mat-label>
-                    <input
-                      matInput
-                      type="number"
-                      #quantity
-                      formControlName="quantity"
-                    />
-                  </mat-form-field>
-                  <p *ngIf="quantity.value">
-                    Value:
-                    {{
-                      (item.product.casePrice /
-                        (item.product.unitSize *
-                          item.product.unitsPerPack *
-                          item.product.packsPerCase)) *
-                        quantity.value | currency
-                    }}
-                  </p>
-                </div>
-              </mat-card>
-            </div>
-            <div
-              *ngIf="user.userProfile.role > 1"
-              class="inventory-card-submit-status"
-            >
-              <mat-label>Save as:</mat-label>
-              <mat-radio-group
-                required
-                #isFinal
-                formControlName="isFinal"
-                [value]="selected"
-              >
-                <mat-radio-button [value]="true">Final</mat-radio-button>
-                <mat-radio-button [value]="false">Draft</mat-radio-button>
-              </mat-radio-group>
-            </div>
-          </form>
-        </mat-card-content>
-        <mat-card-actions align="center">
-          <mat-error *ngIf="locationStateError">
-            {{ locationStateError }}
-          </mat-error>
-          <mat-error *ngIf="newInventoryForm.dirty && newInventoryForm.invalid">
-            Please complete all fields to save.
-          </mat-error>
-          <div class="spinner">
-            <mat-spinner
-              diameter="30"
-              strokeWidth="4"
-              *ngIf="locLoading"
-            ></mat-spinner>
+              <mat-radio-button [value]="'foh'" [checked]="true">FOH</mat-radio-button>
+              <mat-radio-button [value]="'boh'">BOH</mat-radio-button>
+            </mat-radio-group>
           </div>
-          <button
-            *ngIf="
-              !locLoading && (userRole !== 'staff' || userDept === 'admin')
-            "
-            mat-raised-button
-            #invSubmit
-            type="submit"
-            (click)="onInventorySubmit(newInventoryForm, true)"
-            [disabled]="newInventoryForm.invalid"
-          >
-            {{
-              newInventoryForm.value.isFinal
-                ? "Finalize and Submit"
-                : "Save Working Draft"
-            }}
-          </button>
-          <button
-            *ngIf="!locLoading && userRole === 'staff' && userDept !== 'admin'"
-            mat-raised-button
-            type="button"
-            color="accent"
-            (click)="onInventorySubmit(newInventoryForm, true)"
-            [disabled]="newInventoryForm.invalid"
-          >
-            Save
-          </button>
 
-          <br />
-          <br />
-          <button
-            mat-raised-button
-            type="button"
-            color="primary"
-            (click)="onResetNewInventoryForm()"
-            [disabled]="!newInventoryForm.touched"
+          <h6
+            *ngIf="
+              userDept === 'admin' &&
+              locationState.activeLocation &&
+              formDept &&
+              newInventoryProducts?.length === 0
+            "
           >
-            Reset
-          </button>
-        </mat-card-actions>
+            Add
+            {{ this.userDept !== "admin" ? (userDept | uppercase) : null }}
+            products to the
+            {{ locationState.activeLocation?.locationName }}
+            location to start a new
+            {{
+              formDept | uppercase
+            }}
+            inventory.
+          </h6>
+
+          <app-inventory-form
+            *ngIf="formDept && newInventoryProducts?.length > 0"
+            [inventoryProducts]="newInventoryProducts"
+            [formDept]="formDept"
+            (inventoryFormSubmitted)="onInventorySubmit($event)"
+          ></app-inventory-form>
+        </mat-card-content>
       </mat-card>
     </div>
   </mat-expansion-panel>
@@ -257,14 +118,10 @@
 
 <!-- NO WORKING DRAFTS MESSAGE -->
 <div
-  *ngIf="!workingInventory || !locationState.activeLocation"
+  *ngIf="!draftInventory || !locationState.activeLocation"
   class="no-drafts"
 >
-  <p
-    *ngIf="
-      locationState.activeLocation?.inventoryData.length > 0
-    "
-  >
+  <p *ngIf="locationState.activeLocation?.inventoryData.length > 0">
     No working
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory
     drafts found.
@@ -272,7 +129,7 @@
 </div>
 
 <!-- WORKING INVENTORIES START -->
-<div *ngIf="workingInventory" class="new-inventory-container">
+<div *ngIf="draftInventory" class="new-inventory-container">
   <mat-expansion-panel class="inventory-expansion">
     <mat-expansion-panel-header>
       <mat-panel-title
@@ -285,119 +142,7 @@
     <div class="inventory-new-main">
       <mat-card class="inventory-card">
         <mat-card-content>
-          <form [formGroup]="draftInventoryForm">
-            <div class="inventory-card-control">
-              <mat-form-field appearance="fill">
-                <mat-label
-                  >Select a {{ inventoryPeriod + 1 }} day date range</mat-label
-                >
-                <mat-date-range-input [rangePicker]="picker">
-                  <input
-                    matInput
-                    matStartDate
-                    required
-                    placeholder="Start date"
-                    formControlName="dateStart"
-                  />
-                  <input
-                    matInput
-                    matEndDate
-                    required
-                    placeholder="End date"
-                    formControlName="dateEnd"
-                  />
-                </mat-date-range-input>
-                <mat-hint>MM/DD/YYYY - MM/DD/YYYY</mat-hint>
-                <mat-datepicker-toggle matSuffix [for]="picker">
-                </mat-datepicker-toggle>
-                <mat-date-range-picker #picker>
-                  <mat-icon>date_range</mat-icon>
-                </mat-date-range-picker>
-              </mat-form-field>
-            </div>
-
-            <div formArrayName="inventory">
-              <mat-card
-                *ngFor="
-                  let control of draftInventoryItemControls;
-                  let i = index;
-                  let item;
-                  of: workingInventoryItems
-                "
-                [formGroupName]="i"
-                class="inventory-products"
-              >
-                <div class="inventory-products-input">
-                  <h6>{{ item.product.name }}</h6>
-                  <p>
-                    {{
-                      item.product.unitSize +
-                        " " +
-                        (item.product.unitSize > 1
-                          ? item.product.unitMeasure.plural
-                          : item.product.unitMeasure.singular)
-                    }}
-                    {{
-                      " x " +
-                        item.product.unitsPerPack * item.product.packsPerCase
-                    }}
-                    per case
-                  </p>
-                  <p>
-                    How many {{ item.product.unitMeasure.plural }} in stock?
-                  </p>
-                  <mat-form-field appearance="outline" hidden>
-                    <input
-                      matInput
-                      type="text"
-                      #product
-                      formControlName="product"
-                    />
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>Enter Quantity</mat-label>
-                    <input
-                      matInput
-                      type="number"
-                      #quantity
-                      formControlName="quantity"
-                    />
-                  </mat-form-field>
-                  <p *ngIf="quantity.value">
-                    Value:
-                    {{
-                      (item.product.casePrice /
-                        (item.product.unitSize *
-                          item.product.unitsPerPack *
-                          item.product.packsPerCase)) *
-                        quantity.value | currency
-                    }}
-                  </p>
-                </div>
-              </mat-card>
-            </div>
-            <div class="inventory-card-submit-value">
-              Total Inventory Value: <br />
-              {{ workingInventory.value | currency }}
-            </div>
-            <div
-              *ngIf="user.userProfile.role > 1"
-              class="inventory-card-submit-status"
-            >
-              <div class="inventory-card-submit-status-box">
-                <mat-label>Save as:</mat-label>
-                <mat-radio-group
-                  required
-                  #isFinal
-                  formControlName="isFinal"
-                  [value]="selected"
-                >
-                  <mat-radio-button [value]="true">Final</mat-radio-button>
-                  <mat-radio-button [value]="false">Draft</mat-radio-button>
-                </mat-radio-group>
-              </div>
-            </div>
-          </form>
+          <app-inventory-form></app-inventory-form>
         </mat-card-content>
         <mat-card-actions align="center">
           <mat-error *ngIf="locationStateError">

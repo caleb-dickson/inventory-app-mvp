@@ -192,7 +192,7 @@ export class BusinessEffects {
                   'storedBusiness',
                   JSON.stringify(storedBusiness)
                 );
-                console.log('||| fetching locations |||');
+                console.warn('||| fetching locations |||');
                 this.store.dispatch(
                   BusinessActions.GETBusinessLocationsStart({
                     businessId: resData.businessId,
