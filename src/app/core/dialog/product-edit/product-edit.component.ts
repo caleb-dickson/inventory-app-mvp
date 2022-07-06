@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { ProductsService } from '../../business/location/inventory/products/products.service';
+import { ProductsService } from '../../core-control/products.service';
 import { Product } from '../../models/product.model';
 
 @Component({

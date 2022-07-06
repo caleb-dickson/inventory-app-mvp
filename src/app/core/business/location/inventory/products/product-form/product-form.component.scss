@@ -72,7 +72,7 @@
 }
 
 // MOBILE STYLES
-@media only screen and (max-width: var.$bp-mobile) {
+@media only screen and (max-width: var.$bp-mobile-lg) {
   .product-add-new-form {
     display: flex;
     flex-direction: column;

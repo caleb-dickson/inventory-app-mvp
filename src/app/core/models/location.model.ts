@@ -7,6 +7,26 @@ export interface Staff { staffMember: string | User };
 export interface ProductList { product: Product };
 export interface InventoryData { inventory: string | Inventory };
 
+
+/**
+ * View at: {@link Location}
+ *
+ * `Constructor`
+ * ```
+ * (_id: string | null,
+ * locationName: string,
+ * parentBusiness: string,
+ * managers: Manager[] | [],
+ * staff: Staff[] | [],
+ * productList: ProductList[] | [],
+ * inventoryData: InventoryData[] | [])
+ *
+ * interface Manager { manager: string | User };
+ * interface Staff { staffMember: string | User };
+ * interface ProductList { product: Product };
+ * interface InventoryData { inventory: string | Inventory };
+ * ```
+ */
 export class Location {
   public _id: string | null;
   public locationName: string;

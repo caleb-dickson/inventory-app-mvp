@@ -81,6 +81,7 @@
       #isFinal
       formControlName="isFinal"
       [value]="selected"
+      (change)="onSaveTypeSelect($event)"
     >
       <mat-radio-button [value]="true">Final</mat-radio-button>
       <mat-radio-button [value]="false">Draft</mat-radio-button>
@@ -106,11 +107,16 @@
       mat-raised-button
       #invSubmit
       type="submit"
-      (click)="onInventorySubmit(inventoryForm, true)"
+      (click)="
+        onInventorySubmit({
+          inventoryForm: inventoryForm,
+          saveNew: inventoryForm.get('isFinal').value
+        })
+      "
       [disabled]="inventoryForm.invalid"
     >
       {{
-        inventoryForm.value.isFinal
+        inventoryForm.get("isFinal").value
           ? "Finalize and Submit"
           : "Save Working Draft"
       }}
@@ -120,7 +126,9 @@
       mat-raised-button
       type="button"
       color="accent"
-      (click)="onInventorySubmit(inventoryForm, true)"
+      (click)="
+        onInventorySubmit({ inventoryForm: inventoryForm, saveNew: true })
+      "
       [disabled]="inventoryForm.invalid"
     >
       Save

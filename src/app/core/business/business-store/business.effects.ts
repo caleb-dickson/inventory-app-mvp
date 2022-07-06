@@ -51,6 +51,7 @@ export class BusinessEffects {
     .pipe(map((authState) => authState.user))
     .subscribe((userAuth) => (this.user = userAuth));
 
+  //  MOVED TO business.service.ts
   // addBusinessStart$ = createEffect(() =>
   //   this.actions$.pipe(
   //     ofType(BusinessActions.POSTBusinessStart),

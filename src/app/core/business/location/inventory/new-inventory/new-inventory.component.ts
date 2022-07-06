@@ -17,6 +17,7 @@ import { Inventory } from '../../../../models/inventory.model';
 import { LocationService } from '../../../../core-control/location.service';
 import { InventoryService } from '../../../../core-control/inventory.service';
 import { MatRadioChange } from '@angular/material/radio';
+import { InventoryFormData } from '../inventory-form/inventory-form.component';
 
 @Component({
   selector: 'app-new-inventory',
@@ -37,6 +38,17 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
   user: User;
   userRole: string;
   userDept: string = null;
+
+  /**
+   * Set to `foh` by default.
+   * Changed by user input during inventory creation for edge case scenarios.
+   *
+   * This variable will only change the inventory type if the user is
+   * assigned `admin` department (includes 'owner' `User`s).
+   *
+   * Generally, it's expected that these users would most often
+   * create `foh` inventories and only occasionally use the `boh` type.
+   */
   formDept = 'foh';
 
   locationState: LocationState;
@@ -62,7 +74,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
   formError: string;
 
   ngOnInit() {
-    console.clear();
+    // console.clear();
 
     this._userAuthSub = this._store
       .select('user')
@@ -147,16 +159,15 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     this.initInvProducts = false;
   }
 
-  onInventorySubmit($event: { newInventoryForm: NgForm; saveNew: boolean }) {
-    console.log($event.newInventoryForm);
-    console.log($event.saveNew);
+  onInventorySubmit(formData: InventoryFormData) {
+    console.log(formData);
     this._inventoryService.saveInventory(
-      $event.newInventoryForm,
+      formData.inventoryForm,
       this.activeLocation,
-      this.userDept,
-      $event.saveNew
+      this.formDept,
+      true
     );
-    this._router.navigate(['/app/dashboard']);
+    // this._router.navigate(['/app/dashboard']);
   }
 
   // UPDATE EXISTING, !isFinal INVENTORIES

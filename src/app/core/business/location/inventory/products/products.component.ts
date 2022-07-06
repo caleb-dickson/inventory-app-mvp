@@ -14,7 +14,7 @@ import { Product } from '../../../../models/product.model';
 
 import { LocationService } from '../../../../core-control/location.service';
 import { User } from 'src/app/users/user-control/user.model';
-import { ProductsService } from './products.service';
+import { ProductsService } from '../../../../core-control/products.service';
 
 @Component({
   selector: 'app-products',

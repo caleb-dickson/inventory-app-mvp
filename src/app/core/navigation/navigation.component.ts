@@ -19,6 +19,7 @@ import { Location } from '../models/location.model';
 import { LocationService } from '../core-control/location.service';
 import { Inventory } from '../models/inventory.model';
 import { Product } from '../models/product.model';
+import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-navigation',
@@ -62,7 +63,7 @@ export class NavigationComponent implements OnInit {
   businessState: BusinessState;
   businessName: string;
   businessId: string;
-  // OWNER USER SPECIFIC
+  // OWNER USER SPECIFIC BUSINESS STATE
   singleBizLocationName: string;
   multiBizLocations: Location[];
 
@@ -73,6 +74,8 @@ export class NavigationComponent implements OnInit {
   selectedProducts: Product[] = [];
   activeProducts: Product[] = [];
 
+  multiLocationSelectForm: FormGroup;
+
   inventoryData: any[];
   inventoryDataPopulated: Inventory[];
   workingInventory: any;
@@ -80,7 +83,7 @@ export class NavigationComponent implements OnInit {
   newInventoryProducts: any[] = [];
   initInvProducts = true;
   initLocInventories = true;
-  // NON-OWNER USER SPECIFIC
+  // NON-OWNER USER SPECIFIC LOCATION STATE
   singleUserLocation: Location;
   singleUserLocationName: string;
   multiUserLocations: Location[];
@@ -161,6 +164,29 @@ export class NavigationComponent implements OnInit {
             this._onGetPopulatedInventories();
           }
         }
+
+        this.multiLocationSelectForm = new FormGroup({
+          activeLocation: new FormControl(
+            this.activeLocation,
+            Validators.required
+          ),
+        });
+        if (!this.activeLocation) {
+          this.multiLocationSelectForm.markAsTouched();
+          this.multiLocationSelectForm.markAsDirty();
+          this.multiLocationSelectForm
+            .get('activeLocation')
+            .setErrors({ noActiveLocation: true });
+          console.log(
+            this.multiLocationSelectForm.get('activeLocation').errors
+          );
+        } else {
+          this.multiLocationSelectForm
+            .get('activeLocation')
+            .setValue(this.activeLocation);
+          this.multiLocationSelectForm.updateValueAndValidity();
+        }
+        console.log(this.multiLocationSelectForm);
       });
 
     this._businessStoreSub = this._store
@@ -224,7 +250,6 @@ export class NavigationComponent implements OnInit {
   }
 
   setNavSpacer(state?: boolean) {
-
     switch (this.userRole) {
       case 'owner':
         return 'spacer-owner';

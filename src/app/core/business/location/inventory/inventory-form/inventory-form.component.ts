@@ -1,11 +1,13 @@
-import { Component, EventEmitter, Injectable, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import {
-  FormArray,
-  FormControl,
-  FormGroup,
-  NgForm,
-  Validators,
-} from '@angular/forms';
+  Component,
+  EventEmitter,
+  Injectable,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import {
   DateRange,
   MatDateRangeSelectionStrategy,
@@ -29,6 +31,7 @@ import { Inventory } from '../../../../models/inventory.model';
 import { LocationService } from '../../../../core-control/location.service';
 import { InventoryService } from '../../../../core-control/inventory.service';
 import { BusinessInventoryPeriod } from '../../../../models/business.model';
+import { MatRadioChange } from '@angular/material/radio';
 
 @Injectable()
 export class RangeSelectionStrategy<D>
@@ -54,6 +57,11 @@ export class RangeSelectionStrategy<D>
   }
 }
 
+export interface InventoryFormData {
+  inventoryForm: FormGroup;
+  saveNew: boolean;
+}
+
 @Component({
   selector: 'app-inventory-form',
   templateUrl: './inventory-form.component.html',
@@ -65,7 +73,7 @@ export class RangeSelectionStrategy<D>
     },
   ],
 })
-export class InventoryFormComponent implements OnInit {
+export class InventoryFormComponent implements OnInit, OnDestroy {
   constructor(
     private _store: Store<fromAppStore.AppState>,
     private _router: Router,
@@ -73,8 +81,7 @@ export class InventoryFormComponent implements OnInit {
     private _inventoryService: InventoryService
   ) {}
 
-  @Output() inventoryFormSubmitted =
-    new EventEmitter<FormGroup>();
+  @Output() inventoryFormSubmitted = new EventEmitter<InventoryFormData>();
 
   private _userAuthSub: Subscription;
   private _locationStoreSub: Subscription;
@@ -82,8 +89,12 @@ export class InventoryFormComponent implements OnInit {
   user: User;
   userRole: string;
   userDept: string;
-  @Input() formDept: string;
 
+  /**
+   * Needed for `User`s with a department of `admin` to determine
+   * which department to create a new inventory for.
+   */
+  @Input() formDept: string;
 
   locationState: LocationState;
   locationStateError: string;
@@ -108,8 +119,8 @@ export class InventoryFormComponent implements OnInit {
   formIsFinal = false;
   formError: string;
 
-  ngOnInit() {
-    console.clear();
+  ngOnInit(): void {
+    // console.clear();
 
     this._userAuthSub = this._store
       .select('user')
@@ -162,20 +173,47 @@ export class InventoryFormComponent implements OnInit {
         );
         console.groupEnd();
       });
-      if (this.formDept && this.inventoryProducts?.length > 0) {
-        this._initInventoryForm();
-      }
+    if (this.formDept && this.inventoryProducts?.length > 0) {
+      this._initInventoryForm();
+    }
   }
 
-  onResetInventoryForm() {
+  onResetInventoryForm(): void {
     this.inventoryForm.reset();
+    this._initInventoryForm();
   }
 
-  onInventorySubmit(inventoryForm: NgForm, saveNew: boolean) {
-
+  /**
+   * Sets `inventoryForm` control `isFinal` to `true` or
+   * `false` based on user input.
+   * @param $event
+   */
+  onSaveTypeSelect($event: MatRadioChange) {
+    this.inventoryForm.get('isFinal').setValue($event.value);
+    console.log(this.inventoryForm.value);
   }
 
-  private _initInventoryForm() {
+  /**
+   * ### Outputs an `EventEmitter<InventoryFormData>` to the parent component of `<app-inventory-form>`
+   * ###
+   *
+   * @param formData Is an Object of `InventoryFormData`
+   *  ```
+   * interface InventoryFormData {
+   * inventoryForm: FormGroup;
+   * saveNew: boolean;
+   * }
+   * ```
+   */
+  onInventorySubmit(formData: InventoryFormData): void {
+    console.log(formData);
+    this.inventoryFormSubmitted.emit(formData);
+  }
+
+  /**
+   * In a future update, initializes the form depending on the form mode.
+   */
+  private _initInventoryForm(): void {
     let start = new Date();
     let beginDate = start.getDate() - this.inventoryPeriod;
     beginDate = start.setDate(beginDate);
@@ -200,17 +238,14 @@ export class InventoryFormComponent implements OnInit {
     });
   }
 
-    // GETS AND HOLDS THE LIST OF inventoryForm CONTROLS
-    get inventoryItemControls() {
-      if (this.inventoryForm) {
-        return (<FormArray>this.inventoryForm.get('inventory')).controls;
-      }
+  get inventoryItemControls() {
+    if (this.inventoryForm) {
+      return (<FormArray>this.inventoryForm.get('inventory')).controls;
     }
+  }
 
-    ngOnDestroy(): void {
-      this._userAuthSub.unsubscribe();
-      this._locationStoreSub.unsubscribe();
-    }
-
-
+  ngOnDestroy(): void {
+    this._userAuthSub.unsubscribe();
+    this._locationStoreSub.unsubscribe();
+  }
 }

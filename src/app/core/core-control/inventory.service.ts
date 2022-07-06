@@ -13,12 +13,13 @@ import { LocationState } from '../business/location/location-store/location.redu
 import { BusinessState } from '../business/business-store/business.reducer';
 import { Product } from '../models/product.model';
 import { Inventory } from '../models/inventory.model';
-import { NgForm } from '@angular/forms';
+import { FormGroup, NgForm } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root',
 })
 export class InventoryService implements OnInit {
+
   constructor(private _store: Store<fromAppStore.AppState>) {}
 
   private _businessStoreSub: Subscription;
@@ -43,8 +44,15 @@ export class InventoryService implements OnInit {
       });
   }
 
+  /**
+   *
+   * @param inventoryForm
+   * @param activeLocation
+   * @param userDept
+   * @param saveNew
+   */
   saveInventory(
-    inventoryForm: NgForm,
+    inventoryForm: FormGroup,
     activeLocation: Location,
     userDept: string,
     saveNew: boolean
@@ -102,6 +110,11 @@ export class InventoryService implements OnInit {
   }
 
   // WHEN SUBMITTING OR UPDATING INVENTORY, CALCULATES TOTAL INV VALUE
+  /**
+   *
+   * @param inventoryItems
+   * @returns The total value of all inventory items.
+   */
   getInventoriesValues(
     inventoryItems: [{ product: Product; quantity: number }]
   ) {

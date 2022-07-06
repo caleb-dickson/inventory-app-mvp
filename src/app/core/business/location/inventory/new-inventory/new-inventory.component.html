@@ -67,10 +67,7 @@
     >
       <mat-card class="inventory-card">
         <mat-card-content>
-          <div
-            *ngIf="userDept === 'admin'"
-            class="inventory-card-submit-status"
-          >
+          <div *ngIf="userDept === 'admin'" class="inventory-card-submit-dept">
             <mat-label>Department: </mat-label>
             <mat-radio-group
               required
@@ -78,8 +75,11 @@
               formControlName="isFinal"
               [value]="selected"
               (change)="onDepartmentSelect($event)"
+              class="inventory-card-submit-dept-box"
             >
-              <mat-radio-button [value]="'foh'" [checked]="true">FOH</mat-radio-button>
+              <mat-radio-button [value]="'foh'" [checked]="true"
+                >FOH</mat-radio-button
+              >
               <mat-radio-button [value]="'boh'">BOH</mat-radio-button>
             </mat-radio-group>
           </div>
@@ -91,15 +91,14 @@
               formDept &&
               newInventoryProducts?.length === 0
             "
+            class="dept-error"
           >
             Add
-            {{ this.userDept !== "admin" ? (userDept | uppercase) : null }}
+            {{ formDept | uppercase }}
             products to the
             {{ locationState.activeLocation?.locationName }}
             location to start a new
-            {{
-              formDept | uppercase
-            }}
+            {{ formDept | uppercase }}
             inventory.
           </h6>
 
@@ -117,10 +116,7 @@
 <!-- NEW INVENTORY MAIN END END END -->
 
 <!-- NO WORKING DRAFTS MESSAGE -->
-<div
-  *ngIf="!draftInventory || !locationState.activeLocation"
-  class="no-drafts"
->
+<div *ngIf="!draftInventory || !locationState.activeLocation" class="no-drafts">
   <p *ngIf="locationState.activeLocation?.inventoryData.length > 0">
     No working
     {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory

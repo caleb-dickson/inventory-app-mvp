@@ -1,4 +1,3 @@
-import { OnInit } from '@angular/core';
 import { Product } from './product.model';
 
 export interface InventoryItem {
@@ -6,6 +5,26 @@ export interface InventoryItem {
   quantity: number;
 }
 
+/**
+ * View at: {@link Inventory}
+ *
+ * `Constructor`
+ * ```
+ * (_id: string | null,
+ * parentLocation: string | Location | null,
+ * dateStart: string,
+ * dateEnd: string,
+ * department: string,
+ * isFinal: boolean,
+ * inventory: InventoryItem[],
+ * value: number)
+ *
+ * interface InventoryItem {
+ * product: Product;
+ * quantity: number;
+ * }
+ * ```
+ */
 export class Inventory {
   public _id: string | null;
   public parentLocation: string | Location | null;

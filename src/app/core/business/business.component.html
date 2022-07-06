@@ -128,7 +128,7 @@
         ></mat-spinner>
 
         <h6 class="business-info-subtitle">
-          {{ locations ? "Manage Locations" : null }}
+          {{ locations ? "Locations" : null }}
         </h6>
         <div *ngFor="let location of locations" class="business-manage-info-locations">
           <a
@@ -166,7 +166,7 @@
           {{ locationSubmitMode ? "Cancel" : "" }}</mat-label
         >
         <mat-label *ngIf="!locationSubmitMode" (click)="onCreateLocation(true)">
-          {{ locationSubmitMode ? "Cancel" : "New location" }}</mat-label
+          {{ locationSubmitMode ? "Cancel" : "Create New location" }}</mat-label
         >
       </button>
       <form

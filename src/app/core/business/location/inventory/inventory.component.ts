@@ -85,7 +85,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
   displayedColumns = inventoryColumns;
 
   ngOnInit(): void {
-    console.clear();
+    // console.clear();
 
     this._userAuthSub = this._store
       .select('user')
@@ -150,7 +150,6 @@ export class InventoryComponent implements OnInit, OnDestroy {
     this._initDateFilterForm();
   }
 
-  // WORKING
   defineFilter() {
     console.log(this.dateFilterForm.value);
 
@@ -214,7 +213,6 @@ export class InventoryComponent implements OnInit, OnDestroy {
   onSortInventoryData() {
     let arr = [];
     let sortedInv = [...this.locationState.activeLocationInventories];
-    console.log(this.userRole);
     if (this.userDept === 'admin') {
       for (const inv of sortedInv) {
         if (inv.isFinal) {

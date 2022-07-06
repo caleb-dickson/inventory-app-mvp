@@ -1,5 +1,36 @@
-export interface Unit { singular: string, plural: string }
+/**
+ * ```
+ * {
+ * singular: string;
+ * plural: string
+ * }
+ * ```
+ */
+export interface Unit {
+  singular: string;
+  plural: string;
+}
 
+/**
+ * View at: {@link Product}
+ *
+ * `Constructor`
+ * ```
+ * (_id: string | null,
+ * parentOrg: string,
+ * isActive: boolean,
+ * department: string,
+ * category: string,
+ * name: string,
+ * unitSize: number,
+ * unitMeasure: Unit { singular: string, plural: string }
+ * unitsPerPack: number,
+ * packsPerCase: number,
+ * casePrice: number,
+ * par: number)
+ *
+ * ```
+ */
 export class Product {
   public _id: string | null;
   public parentOrg: string;

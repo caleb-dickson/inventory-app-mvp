@@ -12,6 +12,8 @@
       <img [src]="user.userProfile.userPhoto" alt="Your profile photo" />
     </mat-toolbar-row>
     <mat-toolbar-row>
+      <!-- **USER NAME BLOCK** -->
+
       <!-- **OWNER** -->
       <span *ngIf="userRole === 'owner'" class="sidenav-owner-name">
         {{
@@ -36,6 +38,7 @@
       [checked]="themeMode === 'theme-dark' ? true : false"
       >Dark Mode</mat-slide-toggle
     >
+    <!-- SIDENAV LINKS -->
     <mat-nav-list>
       <a
         *ngIf="userRole !== 'staff' || userDept === 'admin'"
@@ -86,35 +89,40 @@
         "
         class="owner-location-select"
       >
-        <mat-form-field
-          class="location-select"
-          appearance="outline"
-          matTooltip="You have multiple locations to choose from. Select one to work on."
-        >
-          <mat-label>
-            {{
-              activeLocation
-                ? activeLocation.locationName + " selected"
-                : "Select Location"
-            }}
-          </mat-label>
-          <mat-select
-            [(ngModel)]="activeLocation"
-            name="activeLocation"
-            [selected]="activeLocation ? activeLocation : selected"
-            (selectionChange)="onActivateLocation(activeLocation)"
+        <form multiLocationSelectForm="ngForm">
+          <mat-error *ngIf="multiLocationSelectForm.invalid"
+            >Select a Location</mat-error
           >
-            <mat-option
-              class="location-select-dropdown"
-              #selectedValue
-              *ngFor="let location of multiBizLocations"
-              [value]="location"
+          <mat-form-field
+            class="location-select"
+            appearance="outline"
+            matTooltip="You have multiple locations to choose from. Select one to work on."
+          >
+            <mat-label>
+              {{
+                activeLocation
+                  ? activeLocation.locationName + " selected"
+                  : "Select Location"
+              }}
+            </mat-label>
+            <mat-select
+              name="activeLocation"
+              matInput
+              [(ngModel)]="activeLocation"
+              [selected]="activeLocation ? activeLocation : selected"
+              (selectionChange)="onActivateLocation(activeLocation)"
             >
-              {{ location.locationName }}
-            </mat-option>
-          </mat-select>
-          <mat-hint>Multiple locations detected.</mat-hint>
-        </mat-form-field>
+              <mat-option
+                class="location-select-dropdown"
+                #selectedValue
+                *ngFor="let location of multiBizLocations"
+                [value]="location"
+              >
+                {{ location.locationName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
       </div>
 
       <!-- LOCATION SELECT - MULTI-UNIT MANAGERS/STAFF - NON-OWNER -->
@@ -170,7 +178,7 @@
         {{ locationState.locationError }}
       </mat-error>
 
-            <!-- **OWNER** -->
+      <!-- **OWNER** -->
       <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **OWNER** BUSINESS ONLY HAS ONE LOCATION -->
       <a
         *ngIf="

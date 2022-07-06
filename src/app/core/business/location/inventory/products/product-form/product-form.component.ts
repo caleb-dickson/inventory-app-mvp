@@ -16,7 +16,7 @@ import { LocationState } from '../../../location-store/location.reducer';
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../../../../app-store/app.reducer';
 import { Location } from 'src/app/core/models/location.model';
-import { ProductsService } from '../products.service';
+import { ProductsService } from '../../../../../core-control/products.service';
 
 @Component({
   selector: 'app-product-form',
