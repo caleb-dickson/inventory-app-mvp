@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 
 @Component({
   selector: 'app-dashboard',

@@ -10,7 +10,7 @@ import { map, Subscription } from 'rxjs';
 
 import { Location } from '../../../../models/location.model';
 import { Product } from '../../../../models/product.model';
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 import { Router } from '@angular/router';
 import { Inventory } from '../../../../models/inventory.model';
 
@@ -34,6 +34,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
 
   private _userAuthSub: Subscription;
   private _locationStoreSub: Subscription;
+  private _updateInventorySub: Subscription;
 
   user: User;
   userRole: string;
@@ -41,10 +42,10 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
 
   /**
    * Set to `foh` by default.
-   * Changed by user input during inventory creation for edge case scenarios.
+   * Changed by user input during inventory creation on exception.
    *
    * This variable will only change the inventory type if the user is
-   * assigned `admin` department (includes 'owner' `User`s).
+   * assigned `admin` department or if the `User` is an Owner (`role` = 3).
    *
    * Generally, it's expected that these users would most often
    * create `foh` inventories and only occasionally use the `boh` type.
@@ -64,7 +65,6 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
   locationProducts: any[];
   newInventoryProducts: any[] = [];
   initInvProducts = true;
-  initLocInventories = true;
 
   selectedProducts: Product[] = [];
   activeProducts: Product[] = [];
@@ -117,12 +117,34 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
           this.inventoryData = locState.activeLocation.inventoryData;
           this.inventoryDataPopulated = locState.activeLocationInventories;
 
+          // IF PRODUCTS ARE NEEDED AND USER ISN'T AN ADMIN
+          if (
+            this.activeLocation &&
+            this.initInvProducts &&
+            this.user.userProfile.department !== 'admin'
+          ) {
+            // SET PRODUCTS TO ONLY USER'S DEPT PRODUCTS
+            this.setProductList();
+
+            // IF USER IS AN ADMIN
+          } else if (
+            this.activeLocation &&
+            this.initInvProducts &&
+            this.user.userProfile.department === 'admin'
+          ) {
+            this.onDepartmentSelect(this.formDept);
+          }
+
           // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
           if (this.draftInventory) {
-            this.draftInventoryItems = this.draftInventory.inventory;
+            this._inventoryService.setInventoryForUpdate(this.draftInventory.inventory)
+            this._updateInventorySub = this._inventoryService.$updateInventory.subscribe(inv => {
+              this.draftInventoryItems = inv;
+            })
           }
         }
 
+        // this.setProductList();
         console.group(
           '%cLocation State',
           `font-size: 1rem;
@@ -131,19 +153,13 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
         );
         console.groupEnd();
       });
-
-    // IF PRODUCTS ARE NEEDED AND USER ISN'T AN ADMIN
-    if (this.activeLocation && this.initInvProducts && this.formDept) {
-      // SET PRODUCTS TO ONLY USER'S DEPT PRODUCTS
-      this.setProductList();
-    }
   }
 
-  onDepartmentSelect($event: MatRadioChange) {
+  onDepartmentSelect(dept: string) {
     this.newInventoryProducts = [];
-    console.log($event);
-    this.formDept = $event.value;
-      this.setProductList();
+    console.log(dept);
+    this.formDept = dept;
+    this.setProductList();
   }
 
   // DETERMINE WHAT PRODUCTS SHOULD BE INITIALIZED IN THE NEW INVENTORY FORM
@@ -157,6 +173,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
       }
     }
     this.initInvProducts = false;
+    console.log(this.newInventoryProducts)
   }
 
   onInventorySubmit(formData: InventoryFormData) {

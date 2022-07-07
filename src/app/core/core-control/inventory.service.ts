@@ -1,6 +1,6 @@
 import { Injectable, OnInit } from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
@@ -28,6 +28,8 @@ export class InventoryService implements OnInit {
   private _businessState: BusinessState;
   private _locationState: LocationState;
 
+  $updateInventory = new BehaviorSubject<Inventory>(null);
+
   ngOnInit(): void {
     this._locationStoreSub = this._store
       .select('location')
@@ -42,6 +44,10 @@ export class InventoryService implements OnInit {
         console.log(bizState);
         this._businessState = bizState;
       });
+  }
+
+  setInventoryForUpdate(inventory: Inventory) {
+    this.$updateInventory.next(inventory);
   }
 
   /**
@@ -112,7 +118,7 @@ export class InventoryService implements OnInit {
   // WHEN SUBMITTING OR UPDATING INVENTORY, CALCULATES TOTAL INV VALUE
   /**
    *
-   * @param inventoryItems
+   * @param inventoryItems Takes an items array from the inventory form or document
    * @returns The total value of all inventory items.
    */
   getInventoriesValues(

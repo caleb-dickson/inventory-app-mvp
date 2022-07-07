@@ -72,30 +72,26 @@
       </button>
     </form>
 
-    <!-- PAST INVENTORY TABLE LIST START -->
+    <!-- FINALIZED INVENTORY TABLE LIST START -->
     <mat-table
-    *ngFor="let inv of inventoryDataPopulatedSorted"
-    mat-table
-    matRipple
-    [dataSource]="inv.inventory"
-    class="mat-elevation-z8"
+      *ngFor="let inv of inventoryDataPopulatedSorted"
+      mat-table
+      matRipple
+      [dataSource]="inv.inventory"
+      class="mat-elevation-z8 inventory-table"
     >
       <!-- Table Title Header Row -->
       <ng-container matColumnDef="dateStart">
         <mat-cell mat-cell *matHeaderCellDef class="inventory-table-title">
+          <p class="inventory-table-title-dept">
+            {{ inv.department | uppercase }}
+          </p>
+
           <mat-icon>insert_chart_outlined</mat-icon>
           {{ inv.dateStart | date: "shortDate" }} -
           {{ inv.dateEnd | date: "shortDate" }}
         </mat-cell>
       </ng-container>
-
-      <!-- Table Department Header Row -->
-      <!-- <ng-container matColumnDef="dept"> -->
-      <!-- <mat-cell mat-cell *matHeaderCellDef class="inventory-table-title"> -->
-      <!-- <mat-icon>insert_chart_outlined</mat-icon> -->
-      <!-- {{ inv.department | uppercase }} -->
-      <!-- </mat-cell> -->
-      <!-- </ng-container> -->
 
       <!-- Prod Category Column -->
       <ng-container matColumnDef="category">
@@ -108,7 +104,7 @@
       </ng-container>
 
       <!-- Product Name Column -->
-      <ng-container matColumnDef="product name">
+      <ng-container matColumnDef="productName">
         <mat-header-cell mat-header-cell *matHeaderCellDef
           >Product</mat-header-cell
         >
@@ -143,7 +139,7 @@
       </ng-container>
 
       <!-- Case Size Column -->
-      <ng-container matColumnDef="case size">
+      <ng-container matColumnDef="caseSize">
         <mat-header-cell mat-header-cell *matHeaderCellDef
           >Case Size</mat-header-cell
         >
@@ -158,7 +154,7 @@
       </ng-container>
 
       <!-- Par Column -->
-      <ng-container matColumnDef="packs par">
+      <ng-container matColumnDef="packsPar">
         <mat-header-cell mat-header-cell *matHeaderCellDef
           >Packs Par</mat-header-cell
         >
@@ -168,7 +164,7 @@
       </ng-container>
 
       <!-- Quantity Column -->
-      <ng-container matColumnDef="in stock">
+      <ng-container matColumnDef="inStock">
         <mat-header-cell mat-header-cell *matHeaderCellDef
           >Qty. in Stock</mat-header-cell
         >
@@ -176,7 +172,7 @@
       </ng-container>
 
       <!-- Inv Value Column -->
-      <ng-container matColumnDef="inventory value">
+      <ng-container matColumnDef="inventoryValue">
         <mat-header-cell mat-header-cell *matHeaderCellDef
           >Inv. Value</mat-header-cell
         >
@@ -201,14 +197,38 @@
         </mat-cell>
       </ng-container>
 
+      <ng-container matColumnDef="inv-actions">
+        <mat-cell
+          mat-footer-cell
+          *matFooterCellDef
+          class="inventory-table-actions"
+        >
+          <button
+            *ngIf="
+              user.userProfile.department === 'admin' || userRole === 'manager'
+            "
+            mat-raised-button
+            disabled
+          >
+            Delete
+          </button>
+          <button
+            *ngIf="
+              user.userProfile.department === 'admin' || userRole === 'manager'
+            "
+            mat-raised-button
+            disabled
+          >
+            Edit
+          </button>
+        </mat-cell>
+      </ng-container>
+
       <mat-header-row
         mat-header-row
         *matHeaderRowDef="['dateStart']"
       ></mat-header-row>
-      <!-- <mat-header-row
-        mat-header-row
-        *matHeaderRowDef="['dept']"
-      ></mat-header-row> -->
+
       <mat-header-row
         mat-header-row
         *matHeaderRowDef="displayedColumns"
@@ -218,7 +238,8 @@
         *matRowDef="let row; columns: displayedColumns"
       ></mat-row>
       <mat-row mat-footer-row *matFooterRowDef="['inv-total']"> </mat-row>
+      <mat-row mat-footer-row *matFooterRowDef="['inv-actions']"> </mat-row>
     </mat-table>
   </div>
-  <!-- PAST INVENTORY TABLE LIST END END END -->
+  <!-- FINALIZED INVENTORY TABLE LIST END END END -->
 </div>

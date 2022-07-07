@@ -70,11 +70,8 @@
           <div *ngIf="userDept === 'admin'" class="inventory-card-submit-dept">
             <mat-label>Department: </mat-label>
             <mat-radio-group
-              required
-              #isFinal
-              formControlName="isFinal"
               [value]="selected"
-              (change)="onDepartmentSelect($event)"
+              (change)="onDepartmentSelect($event.value)"
               class="inventory-card-submit-dept-box"
             >
               <mat-radio-button [value]="'foh'" [checked]="true"
@@ -86,10 +83,10 @@
 
           <h6
             *ngIf="
-              userDept === 'admin' &&
               locationState.activeLocation &&
-              formDept &&
-              newInventoryProducts?.length === 0
+              newInventoryProducts?.length === 0 &&
+              userDept === 'admin' &&
+              formDept
             "
             class="dept-error"
           >
@@ -103,9 +100,10 @@
           </h6>
 
           <app-inventory-form
-            *ngIf="formDept && newInventoryProducts?.length > 0"
+            *ngIf="newInventoryProducts?.length > 0"
             [inventoryProducts]="newInventoryProducts"
             [formDept]="formDept"
+            [invFormMode]="'new'"
             (inventoryFormSubmitted)="onInventorySubmit($event)"
           ></app-inventory-form>
         </mat-card-content>
@@ -131,61 +129,22 @@
       <mat-panel-title
         ><mat-icon class="new-inventory-icon">insert_chart_outlined</mat-icon>
         Inventory Draft
-        {{ workingInventory.dateEnd | date: "shortDate" }}</mat-panel-title
+        {{ draftInventory.dateEnd | date: "shortDate" }}</mat-panel-title
       >
     </mat-expansion-panel-header>
 
     <div class="inventory-new-main">
       <mat-card class="inventory-card">
         <mat-card-content>
-          <app-inventory-form></app-inventory-form>
+          <app-inventory-form
+          *ngIf="draftInventory"
+          [draftInventory]="draftInventory"
+          [inventoryProducts]="draftInventory.inventory"
+          [formDept]="formDept"
+          [invFormMode]="'update'"
+          (inventoryFormSubmitted)="onInventorySubmit($event)"
+          ></app-inventory-form>
         </mat-card-content>
-        <mat-card-actions align="center">
-          <mat-error *ngIf="locationStateError">
-            {{ locationStateError }}
-          </mat-error>
-          <mat-error
-            *ngIf="draftInventoryForm.dirty && draftInventoryForm.invalid"
-          >
-            Please complete all fields to save.
-          </mat-error>
-          <button
-            *ngIf="userRole !== 'staff' || userDept === 'admin'"
-            mat-raised-button
-            #invSubmit
-            type="submit"
-            (click)="onInventorySubmit(draftInventoryForm, false)"
-            [disabled]="draftInventoryForm.invalid"
-          >
-            {{
-              draftInventoryForm.value.isFinal
-                ? "Finalize and Submit"
-                : "Save Working Draft"
-            }}
-          </button>
-          <button
-            *ngIf="userRole === 'staff' && userDept !== 'admin'"
-            mat-raised-button
-            type="button"
-            color="accent"
-            (click)="onInventorySubmit(draftInventoryForm, false)"
-            [disabled]="draftInventoryForm.invalid"
-          >
-            Save
-          </button>
-
-          <br />
-          <br />
-          <button
-            mat-raised-button
-            type="button"
-            color="primary"
-            (click)="onResetDraftInventoryForm()"
-            [disabled]="!draftInventoryForm.touched"
-          >
-            Reset
-          </button>
-        </mat-card-actions>
       </mat-card>
     </div>
   </mat-expansion-panel>

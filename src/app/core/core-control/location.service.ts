@@ -220,6 +220,7 @@ export class LocationService {
       this.locationState.activeLocation.inventoryData &&
       this.locationState.activeLocation.inventoryData.length > 0
     ) {
+      console.warn('||| Found ' + this.locationState.activeLocation.inventoryData.length + ' inventories at the ' + this.locationState.activeLocation.locationName + ' location |||');
       this._store.dispatch(
         LocationActions.GETLocationInventoriesStart({
           locationId: this.locationState.activeLocation._id,
@@ -231,7 +232,7 @@ export class LocationService {
       this.locationState.activeLocation.inventoryData &&
       this.locationState.activeLocation.inventoryData.length === 0
     ) {
-      console.warn('||| NULL INV |||');
+      console.warn('||| No inventories found at the ' + this.locationState.activeLocation.locationName + ' location |||');
       this._store.dispatch(LocationActions.GETLocationInventoriesNull());
     }
   }

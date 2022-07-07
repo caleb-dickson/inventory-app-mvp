@@ -13,7 +13,7 @@ import { Location } from '../../../models/location.model';
 import { Product } from '../../../models/product.model';
 
 import { LocationService } from '../../../core-control/location.service';
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 import { Router } from '@angular/router';
 import { Inventory } from '../../../models/inventory.model';
 import { InventoryService } from '../../../core-control/inventory.service';
@@ -26,13 +26,13 @@ interface DateRange {
 
 const inventoryColumns = [
   'category',
-  'product name',
+  'productName',
   'department',
   'unit',
-  'case size',
-  'packs par',
-  'in stock',
-  'inventory value',
+  'caseSize',
+  'packsPar',
+  'inStock',
+  'inventoryValue',
 ];
 
 @Component({

@@ -24,7 +24,7 @@ import { map, Subscription } from 'rxjs';
 
 import { Location } from '../../../../models/location.model';
 import { Product } from '../../../../models/product.model';
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 import { Router } from '@angular/router';
 import { Inventory } from '../../../../models/inventory.model';
 
@@ -73,7 +73,7 @@ export interface InventoryFormData {
     },
   ],
 })
-export class InventoryFormComponent implements OnInit, OnDestroy {
+export class InventoryFormComponent implements OnInit {
   constructor(
     private _store: Store<fromAppStore.AppState>,
     private _router: Router,
@@ -95,14 +95,15 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
    * which department to create a new inventory for.
    */
   @Input() formDept: string;
+  @Input() invFormMode: string;
 
   locationState: LocationState;
   locationStateError: string;
   activeLocation: Location;
   inventoryData: any[];
   inventoryDataPopulated: Inventory[];
-  workingInventory: any;
-  workingInventoryItems: any;
+  @Input() draftInventory: Inventory;
+  draftInventoryItems: any;
 
   locLoading: boolean;
 
@@ -121,6 +122,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // console.clear();
+    console.log(this.formDept);
 
     this._userAuthSub = this._store
       .select('user')
@@ -151,7 +153,6 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
         this.locationStateError = locState.locationError;
         this.activeProducts = locState.activeProducts;
         this.activeLocation = locState.activeLocation;
-        this.workingInventory = locState.activeInventory;
 
         // IF USER HAS AT LEAST ONE ACTIVATED LOCATION
         if (locState.activeLocation?.productList.length > 0) {
@@ -160,8 +161,8 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
           this.inventoryDataPopulated = locState.activeLocationInventories;
 
           // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
-          if (this.workingInventory) {
-            this.workingInventoryItems = this.workingInventory.inventory;
+          if (this.draftInventory) {
+            this.draftInventoryItems = this.draftInventory.inventory;
           }
         }
 
@@ -173,13 +174,11 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
         );
         console.groupEnd();
       });
-    if (this.formDept && this.inventoryProducts?.length > 0) {
-      this._initInventoryForm();
-    }
+    this._initInventoryForm();
   }
 
   onResetInventoryForm(): void {
-    this.inventoryForm.reset();
+    // this.inventoryForm.reset();
     this._initInventoryForm();
   }
 
@@ -214,38 +213,69 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
    * In a future update, initializes the form depending on the form mode.
    */
   private _initInventoryForm(): void {
-    let start = new Date();
-    let beginDate = start.getDate() - this.inventoryPeriod;
-    beginDate = start.setDate(beginDate);
+    console.log(this.invFormMode);
+    if (this.invFormMode === 'new') {
+      let start = new Date();
+      let beginDate = start.getDate() - this.inventoryPeriod;
+      beginDate = start.setDate(beginDate);
 
-    let items = new FormArray([]);
+      let items = new FormArray([]);
 
-    for (const product of this.inventoryProducts) {
-      items.push(
-        new FormGroup({
-          product: new FormControl(product.product, Validators.required),
-          quantity: new FormControl(0),
-        })
-      );
+      for (const product of this.inventoryProducts) {
+        items.push(
+          new FormGroup({
+            product: new FormControl(product.product, Validators.required),
+            quantity: new FormControl(null),
+          })
+        );
+      }
+
+      this.inventoryForm = new FormGroup({
+        dateStart: new FormControl(start, Validators.required),
+        dateEnd: new FormControl(new Date(), Validators.required),
+        department: new FormControl(this.userDept, Validators.required),
+        isFinal: new FormControl(this.formIsFinal, Validators.required),
+        inventory: items,
+      });
+    } else {
+      console.log(this.invFormMode);
+
+      let items = new FormArray([]);
+
+      for (const product of this.inventoryProducts) {
+        items.push(
+          new FormGroup({
+            product: new FormControl(product.product, Validators.required),
+            quantity: new FormControl(product.quantity),
+          })
+        );
+      }
+
+      this.inventoryForm = new FormGroup({
+        dateStart: new FormControl(
+          this.draftInventory.dateStart,
+          Validators.required
+        ),
+        dateEnd: new FormControl(
+          this.draftInventory.dateEnd,
+          Validators.required
+        ),
+        department: new FormControl(
+          this.draftInventory.department,
+          Validators.required
+        ),
+        isFinal: new FormControl(
+          this.draftInventory.isFinal,
+          Validators.required
+        ),
+        inventory: items,
+      });
     }
-
-    this.inventoryForm = new FormGroup({
-      dateStart: new FormControl(start, Validators.required),
-      dateEnd: new FormControl(new Date(), Validators.required),
-      department: new FormControl(this.userDept, Validators.required),
-      isFinal: new FormControl(this.formIsFinal, Validators.required),
-      inventory: items,
-    });
   }
 
   get inventoryItemControls() {
     if (this.inventoryForm) {
       return (<FormArray>this.inventoryForm.get('inventory')).controls;
     }
-  }
-
-  ngOnDestroy(): void {
-    this._userAuthSub.unsubscribe();
-    this._locationStoreSub.unsubscribe();
   }
 }

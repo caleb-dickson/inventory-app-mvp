@@ -1,5 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { map, Subscription } from 'rxjs';
 import {
   defaultCategories,
@@ -10,7 +16,7 @@ import {
   defaultUnits,
   UnitsCategories,
 } from 'src/app/core/models/units-list.model';
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 import { LocationState } from '../../../location-store/location.reducer';
 
 import { Store } from '@ngrx/store';
@@ -23,7 +29,7 @@ import { ProductsService } from '../../../../../core-control/products.service';
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss'],
 })
-export class ProductFormComponent implements OnInit {
+export class ProductFormComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<fromAppStore.AppState>,
     private _productsService: ProductsService
@@ -225,5 +231,12 @@ export class ProductFormComponent implements OnInit {
         par: new FormControl(this.updateProduct?.par, Validators.required),
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    this._userAuthSub.unsubscribe();
+    this._locationStoreSub.unsubscribe();
+    this._updateProductSub.unsubscribe();
+    this._productFormModeSub.unsubscribe();
   }
 }

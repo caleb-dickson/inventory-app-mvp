@@ -13,7 +13,7 @@ import { Location } from '../../../../models/location.model';
 import { Product } from '../../../../models/product.model';
 
 import { LocationService } from '../../../../core-control/location.service';
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 import { ProductsService } from '../../../../core-control/products.service';
 
 @Component({

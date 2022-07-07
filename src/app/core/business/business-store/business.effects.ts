@@ -21,7 +21,7 @@ import { environment } from 'src/environments/environment';
 
 import { Business } from '../../models/business.model';
 import { Location } from '../../models/location.model';
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 
 const BACKEND_URL = environment.apiUrl + '/business';
 

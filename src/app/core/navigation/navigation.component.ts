@@ -11,7 +11,7 @@ import { LocationState } from '../business/location/location-store/location.redu
 import { Observable, Subscription } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 
 import { ThemeService } from 'src/app/app-control/theme.service';
 import { Business } from '../models/business.model';

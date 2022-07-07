@@ -10,7 +10,7 @@ import * as fromAppStore from '../../app-store/app.reducer';
 import * as BusinessActions from '../business/business-store/business.actions';
 import { authSuccess } from '../../users/user-store/user.actions';
 
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 import { Location } from '../models/location.model';
 import { UserState } from 'src/app/users/user-store/user.reducer';
 import { BusinessState } from './business-store/business.reducer';

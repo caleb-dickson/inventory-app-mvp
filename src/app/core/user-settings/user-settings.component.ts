@@ -8,7 +8,7 @@ import { map, Subscription } from 'rxjs';
 import * as fromAppStore from '../../app-store/app.reducer';
 import * as UserActions from '../../users/user-store/user.actions';
 
-import { User } from 'src/app/users/user-control/user.model';
+import { User } from 'src/app/users/user.model';
 
 import { environment } from 'src/environments/environment';
 import { ThemeService } from 'src/app/app-control/theme.service';

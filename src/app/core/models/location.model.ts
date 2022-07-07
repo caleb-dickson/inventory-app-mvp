@@ -1,4 +1,4 @@
-import { User } from "src/app/users/user-control/user.model";
+import { User } from "src/app/users/user.model";
 import { Inventory } from "./inventory.model";
 import { Product } from "./product.model";
 
