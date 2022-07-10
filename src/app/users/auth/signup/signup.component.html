@@ -9,20 +9,18 @@
       width="72"
       height="57"
     />
-    <form (submit)="onSignup(signupForm)" #signupForm="ngForm">
+    <form [formGroup]="signupForm">
       <mat-dialog-title>Sign Up!</mat-dialog-title>
       <mat-form-field appearance="outline">
         <mat-label>First Name</mat-label>
         <input
-          ngModel
           matInput
           required
-          name="firstName"
+          formControlName="firstName"
           type="text"
           placeholder="First Name"
-          #firstName="ngModel"
         />
-        <mat-error *ngIf="firstName.invalid"
+        <mat-error *ngIf="signupForm.get('firstName').invalid"
           >Please enter your first name.</mat-error
         >
       </mat-form-field>
@@ -30,24 +28,20 @@
         <mat-label>Last Name</mat-label>
         <input
           matInput
-          ngModel
           required
-          name="lastName"
+          formControlName="lastName"
           type="text"
           placeholder="Last Name"
-          #lastName="ngModel"
         />
-        <mat-error *ngIf="lastName.invalid"
+        <mat-error *ngIf="signupForm.get('lastName').invalid"
           >Please enter your last name.</mat-error
         >
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Account Type</mat-label>
         <mat-select
-          ngModel
-          #role
           required
-          name="role"
+          formControlName="role"
           type="number"
           placeholder="Select your account type"
         >
@@ -56,34 +50,37 @@
           <mat-option [value]="1"> Supervisor / Junior Staff </mat-option>
         </mat-select>
       </mat-form-field>
-      <mat-form-field appearance="outline" *ngIf="signupForm.value.role && signupForm.value.role !== 3">
+      <mat-form-field
+        appearance="outline"
+        *ngIf="
+          signupForm.get('role').value && signupForm.get('role').value !== 3
+        "
+      >
         <mat-label>Department</mat-label>
         <mat-select
-          ngModel
-          #department
-          name="department"
+          formControlName="department"
           type="text"
           placeholder="Select your department."
         >
           <mat-option value="boh"> Back of House (BOH) </mat-option>
           <mat-option value="foh"> Front of House (FOH) </mat-option>
-          <mat-option value="admin"> Administrative / Access to All </mat-option>
+          <mat-option value="admin">
+            Administrative / Access to All
+          </mat-option>
         </mat-select>
       </mat-form-field>
       <mat-form-field class="input-phone" appearance="outline">
         <mat-label>Phone Number</mat-label>
         <input
           matInput
-          ngModel
           required
           type="tel"
-          name="phoneNumber"
+          formControlName="phoneNumber"
           placeholder="Phone Number"
-          #phoneNumber="ngModel"
           pattern="[0-9]{10}"
           tel
         />
-        <mat-error *ngIf="phoneNumber.invalid"
+        <mat-error *ngIf="signupForm.get('phoneNumber').invalid"
           >Please enter only your phone number; no dashes or parenthesis (ex.
           4048535555).</mat-error
         >
@@ -92,49 +89,56 @@
         <mat-label>Email</mat-label>
         <input
           matInput
-          ngModel
           email
           required
-          name="email"
+          formControlName="email"
           type="email"
           placeholder="E-Mail"
-          #email="ngModel"
         />
-        <mat-error *ngIf="email.invalid">Please enter a valid email.</mat-error>
+        <mat-error *ngIf="signupForm.get('email').invalid"
+          >Please enter a valid email.</mat-error
+        >
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Password</mat-label>
         <input
-          ngModel
           matInput
           required
-          type="password"
-          name="password"
+          [type]="showPass ? 'text' : 'password'"
+          formControlName="password"
           minlength="6"
           placeholder="Password"
-          #password="ngModel"
         />
-        <mat-error *ngIf="password.invalid"
+        <mat-icon matSuffix (click)="onShowPass('password')"
+          >visibility</mat-icon
+        >
+        <mat-error *ngIf="signupForm.get('password').invalid"
           >Please enter a valid password (6 characters minimum).</mat-error
         >
       </mat-form-field>
-      <!-- <mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Confirm Password</mat-label>
         <input
-          type="password"
-          name="confirmPassword"
-          minlength="6"
-          ngModel
           matInput
-          placeholder="Confirm Password"
-          #confirmPassword="ngModel"
           required
+          [type]="showConfirmPass ? 'text' : 'password'"
+          formControlName="confirmPassword"
+          placeholder="Confirm Password"
         />
-        <mat-error *ngIf=""
+        <!-- (keyup)="
+            onConfirmPassword(signupForm.get('confirmPassword').value)
+          " -->
+        <mat-icon matSuffix (click)="onShowPass('confirmPassword')"
+          >visibility</mat-icon
+        >
+        <mat-error *ngIf="signupForm.get('confirmPassword').errors?.mustMatch" class="password-error"
           >Passwords do not match.</mat-error
         >
-      </mat-form-field> -->
+      </mat-form-field>
       <mat-dialog-actions align="center">
-        <button mat-raised-button type="submit">Sign Up</button>
+        <button mat-raised-button type="button" (click)="onSignup()" [disabled]="signupForm.invalid">
+          Sign Up
+        </button>
       </mat-dialog-actions>
       <mat-error *ngIf="error" class="mt-4">{{ this.error }}</mat-error>
     </form>

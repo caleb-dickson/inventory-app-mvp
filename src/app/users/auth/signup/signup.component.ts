@@ -1,72 +1,134 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Subscription } from 'rxjs';
-
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
 import * as UserActions from '../../user-store/user.actions';
 
 import { UserService } from '../../user-control/user.service';
+import { CustomValidators } from '../auth-form.validators';
 
 @Component({
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
 })
 export class SignupComponent implements OnInit, OnDestroy {
+  private _userStoreSub: Subscription;
+
   isLoading: boolean;
   error: string;
-  private _userStoreSub: Subscription;
+
+  signupForm: FormGroup;
+  passLength: number;
+  showPass = false;
+  showConfirmPass = false;
+  passMatch = true;
 
   constructor(
     public userService: UserService,
     private store: Store<fromAppStore.AppState>
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this._userStoreSub = this.store.select('user').subscribe((authState) => {
       this.isLoading = authState.loading;
       this.error = authState.authError;
     });
+
+    this._initSignupForm();
   }
 
-  onSignup(signupForm: NgForm) {
-    if (!signupForm.valid) {
-      return;
+  onSignup(): void {
+    console.log(this.signupForm.value);
+    this.signupForm.updateValueAndValidity();
+    console.log(this.signupForm.value);
+    if (!this.signupForm.valid) {
+      this.store.dispatch(
+        UserActions.userError({ message: 'Signup form invalid.' })
+      );
+    } else if (!this.passMatch) {
+      this.store.dispatch(
+        UserActions.userError({ message: 'Passwords do not match.' })
+      );
     }
-    console.log(signupForm);
 
     let department = 'admin';
 
-    if (signupForm.value.department) {
-      department = signupForm.value.department;
+    if (this.signupForm.get('department').value) {
+      department = this.signupForm.get('department').value;
     }
 
-    let themePref = !signupForm.value.themePref
+    let themePref = !this.signupForm.value.themePref
       ? undefined
-      : signupForm.value.themePref;
+      : this.signupForm.get('themePref').value;
 
-    this.store.dispatch(
-      UserActions.signupStart({
-        newUser: {
-          _id: null,
-          userId: null,
-          email: signupForm.value.email,
-          password: signupForm.value.password,
-          userProfile: {
-            role: signupForm.value.role,
-            department: department,
-            firstName: signupForm.value.firstName,
-            lastName: signupForm.value.lastName,
-            phoneNumber: signupForm.value.phoneNumber,
-            themePref: themePref,
-            userPhoto: null
-          },
-        },
-      })
-    );
+    // this.store.dispatch(
+    //   UserActions.signupStart({
+    //     newUser: {
+    //       _id: null,
+    //       userId: null,
+    //       email: this.signupForm.value.email,
+    //       password: this.signupForm.value.password,
+    //       userProfile: {
+    //         role: this.signupForm.value.role,
+    //         department: department,
+    //         firstName: this.signupForm.value.firstName,
+    //         lastName: this.signupForm.value.lastName,
+    //         phoneNumber: this.signupForm.value.phoneNumber,
+    //         themePref: themePref,
+    //         userPhoto: null,
+    //       },
+    //     },
+    //   })
+    // );
     // form.reset();
+  }
+
+  onShowPass(input: string) {
+    if (input === 'password') {
+      this.showPass = !this.showPass;
+    } else {
+      this.showConfirmPass = !this.showConfirmPass;
+    }
+  }
+
+  // onConfirmPassword(confirmPassword: string): void {
+  //   this.signupForm.updateValueAndValidity();
+
+  //   let password = this.signupForm.get('password')?.value;
+
+  //   this.passLength = password?.length;
+
+  //   if (
+  //     confirmPassword != password &&
+  //     confirmPassword.length >= this.passLength
+  //   ) {
+  //     this.passMatch = false;
+  //     this.signupForm.setErrors();
+  //   } else {
+  //     this.passMatch = true;
+  //     this.signupForm.get('confirmPassword').markAsPristine({ onlySelf: true });
+  //   }
+  //   this.signupForm.updateValueAndValidity();
+  //   console.log(this.signupForm.get('confirmPassword').errors);
+  // }
+
+  private _initSignupForm(): void {
+    this.signupForm = new FormGroup(
+      {
+        firstName: new FormControl(null, Validators.required),
+        lastName: new FormControl(null, Validators.required),
+        role: new FormControl(null, Validators.required),
+        department: new FormControl(null, Validators.required),
+        phoneNumber: new FormControl(null, Validators.required),
+        email: new FormControl(null, [Validators.email, Validators.required]),
+        password: new FormControl(null, Validators.required),
+        confirmPassword: new FormControl(null, Validators.required),
+      },
+      CustomValidators.mustMatch('password', 'confirmPassword')
+    );
   }
 
   ngOnDestroy(): void {

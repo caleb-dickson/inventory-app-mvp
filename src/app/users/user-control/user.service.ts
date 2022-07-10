@@ -69,6 +69,7 @@ export class UserService {
       this.dialog.open(SignupComponent, {
         width: '55vw',
         height: 'min-content',
+        maxHeight: '100vh',
         minWidth: 350,
         minHeight: 700,
       });
