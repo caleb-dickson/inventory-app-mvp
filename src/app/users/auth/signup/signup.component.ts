@@ -8,7 +8,7 @@ import * as fromAppStore from '../../../app-store/app.reducer';
 import * as UserActions from '../../user-store/user.actions';
 
 import { UserService } from '../../user-control/user.service';
-import { CustomValidators } from '../auth-form.validators';
+import { CustomValidators } from '../../../form.validators';
 
 @Component({
   templateUrl: './signup.component.html',
