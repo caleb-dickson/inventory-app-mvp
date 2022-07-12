@@ -105,6 +105,12 @@ export class NewInventoryComponent
     }
   }
 
+  ngOnDestroy(): void {
+    super.userStoreSub.unsubscribe();
+    super.locationStoreSub.unsubscribe();
+    super.themeSub.unsubscribe();
+  }
+
   onDepartmentSelect(dept: string) {
     this.newInventoryProducts = [];
     this.formDept = dept;
@@ -155,8 +161,4 @@ export class NewInventoryComponent
     this._router.navigate(['/app/dashboard']);
   }
 
-  ngOnDestroy(): void {
-    this.userStoreSub.unsubscribe();
-    this.locationStoreSub.unsubscribe();
-  }
 }

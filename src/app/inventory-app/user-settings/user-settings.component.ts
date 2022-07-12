@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -22,7 +22,7 @@ const BACKEND_URL = environment.apiUrl + '/user';
   templateUrl: './user-settings.component.html',
   styleUrls: ['./user-settings.component.scss'],
 })
-export class UserSettingsComponent extends BaseComponent implements OnInit {
+export class UserSettingsComponent extends BaseComponent implements OnInit, OnDestroy {
 
   constructor(
     private _http: HttpClient,
@@ -33,7 +33,6 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
   ) {
     super(store, themeService)
   }
-
 
   userProfileForm: FormGroup;
   userPhoto: string;
@@ -48,6 +47,12 @@ export class UserSettingsComponent extends BaseComponent implements OnInit {
   ngOnInit() {
     this.userPhoto = this.user.userProfile.userPhoto;
     this._initUserProfileForm();
+  }
+
+  ngOnDestroy(): void {
+    super.userStoreSub.unsubscribe();
+    super.locationStoreSub.unsubscribe();
+    super.themeSub.unsubscribe();
   }
 
   onUserProfileSubmit(userProfileForm: FormGroup) {

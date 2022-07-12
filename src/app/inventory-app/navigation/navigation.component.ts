@@ -69,12 +69,14 @@ export class NavigationComponent extends BaseComponent implements OnInit {
   multiUserLocations: Location[];
 
   ngOnInit() {
-    console.clear();
+    // console.clear();
+
 
     this.locationStoreSub = this.store
-      .select('location')
-      .subscribe((locState) => {
-        this.workingInventory = locState.activeInventory;
+    .select('location')
+    .subscribe((locState) => {
+      console.log(this.userLocations);
+      this.workingInventory = locState.activeInventory;
 
         this.multiUserLocations =
           locState.userLocations.length > 1 ? locState.userLocations : null;
@@ -190,6 +192,17 @@ export class NavigationComponent extends BaseComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.userStoreSub.unsubscribe();
+    this.businessStoreSub.unsubscribe();
+    this.locationStoreSub.unsubscribe();
+    this.themeSub.unsubscribe();
+
+    super.userStoreSub.unsubscribe();
+    super.locationStoreSub.unsubscribe();
+    super.themeSub.unsubscribe();
+  }
+
   setNavSpacer(): string {
     switch (this.userRole) {
       case 'owner':
@@ -274,10 +287,4 @@ export class NavigationComponent extends BaseComponent implements OnInit {
     );
   }
 
-  ngOnDestroy(): void {
-    this.userStoreSub.unsubscribe();
-    this.businessStoreSub.unsubscribe();
-    this.locationStoreSub.unsubscribe();
-    this.themeSub.unsubscribe();
-  }
 }

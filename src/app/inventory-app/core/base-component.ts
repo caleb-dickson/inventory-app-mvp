@@ -10,9 +10,11 @@ import { Inventory } from '../models/inventory.model';
 
 export class BaseComponent {
   // STATE
+  // subs
   private _userStoreSub: Subscription;
   private _businessStoreSub: Subscription;
   private _locationStoreSub: Subscription;
+  // loading state
   private _appLoading: boolean;
   private _userLoading: boolean;
   private _businessLoading: boolean;
@@ -64,7 +66,6 @@ export class BaseComponent {
         this.user = userState.user;
         this.userDept = userState.user.userProfile.department;
         this.setUserRoleString(userState.user.userProfile.role);
-        this.userLocations = userState.userLocations;
       }
     });
 
@@ -74,6 +75,7 @@ export class BaseComponent {
         this.appLoading = locationState.loading;
         this.locationLoading = locationState.loading;
         this.locationError = locationState.locationError;
+        this.userLocations = locationState.userLocations;
         this.activeLocation = locationState.activeLocation;
         this.inventoryData = locationState.activeLocation?.inventoryData;
         this.activeInventory = locationState.activeInventory;

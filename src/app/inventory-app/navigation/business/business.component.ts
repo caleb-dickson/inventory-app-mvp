@@ -106,6 +106,14 @@ export class BusinessComponent
       });
   }
 
+  ngOnDestroy(): void {
+    this.businessStoreSub.unsubscribe();
+
+    super.userStoreSub.unsubscribe();
+    super.locationStoreSub.unsubscribe();
+    super.themeSub.unsubscribe();
+  }
+
   onEditBusiness(mode: string): void {
     this.businessSubmitMode = mode;
     this._initBusinessForm();
@@ -348,8 +356,4 @@ export class BusinessComponent
     }
   }
 
-  ngOnDestroy(): void {
-    this.userStoreSub.unsubscribe();
-    this.businessStoreSub.unsubscribe();
-  }
 }

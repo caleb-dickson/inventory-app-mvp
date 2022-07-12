@@ -18,7 +18,6 @@ import { DateAdapter } from '@angular/material/core';
 import { Store } from '@ngrx/store';
 import { LocationState } from '../../location-store/location.reducer';
 import * as fromAppStore from '../../../../../../app-store/app.reducer';
-import * as LocationActions from '../../location-store/location.actions';
 
 import { map, Subscription } from 'rxjs';
 
@@ -73,7 +72,11 @@ export interface InventoryFormData {
     },
   ],
 })
-export class InventoryFormComponent implements OnInit {
+export class InventoryFormComponent implements OnInit, OnDestroy {
+
+  private _userAuthSub: Subscription;
+  private _locationStoreSub: Subscription;
+
   constructor(
     private _store: Store<fromAppStore.AppState>,
     private _router: Router,
@@ -82,9 +85,6 @@ export class InventoryFormComponent implements OnInit {
   ) {}
 
   @Output() inventoryFormSubmitted = new EventEmitter<InventoryFormData>();
-
-  private _userAuthSub: Subscription;
-  private _locationStoreSub: Subscription;
 
   user: User;
   userRole: string;
@@ -121,8 +121,6 @@ export class InventoryFormComponent implements OnInit {
   formError: string;
 
   ngOnInit(): void {
-    // console.clear();
-    console.log(this.formDept);
 
     this._userAuthSub = this._store
       .select('user')
@@ -175,6 +173,11 @@ export class InventoryFormComponent implements OnInit {
         console.groupEnd();
       });
     this._initInventoryForm();
+  }
+
+  ngOnDestroy(): void {
+    this._userAuthSub.unsubscribe();
+    this._locationStoreSub.unsubscribe();
   }
 
   onResetInventoryForm(): void {

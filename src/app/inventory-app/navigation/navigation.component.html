@@ -163,12 +163,12 @@
 
       <!-- **USER* -->
       <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **USER** ONLY HAS ACCESS TO ONE LOCATION -->
-      <!-- ===||| Push this down some |||=== -->
       <a
         *ngIf="userRole !== 'owner' && userLocations.length === 1"
         mat-list-item
-        (click)="onActivateLocation(locationState.userLocations[0])"
-      >
+        class="single-location-user"
+        >
+        <!-- (click)="onActivateLocation(userLocations[0])" -->
         <mat-icon class="sidenav-icon">{{ manageIcon }}</mat-icon
         >{{ singleUserLocationName }}
         <mat-icon class="sidenav-icon-check">done</mat-icon>
@@ -186,7 +186,7 @@
         "
         mat-list-item
         routerLinkActive="active"
-      >
+        >
         <mat-icon class="sidenav-icon">store</mat-icon
         >{{ singleBizLocationName }}
       </a>

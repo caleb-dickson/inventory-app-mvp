@@ -130,6 +130,12 @@ export class InventoryComponent
     this._initDateFilterForm();
   }
 
+  ngOnDestroy(): void {
+    super.userStoreSub.unsubscribe();
+    super.locationStoreSub.unsubscribe();
+    super.themeSub.unsubscribe();
+  }
+
   defineFilter() {
     console.log(this.dateFilterForm.value);
 
@@ -234,8 +240,4 @@ export class InventoryComponent
     this._router.navigate(['/app/dashboard']);
   }
 
-  ngOnDestroy(): void {
-    this.userStoreSub.unsubscribe();
-    this.locationStoreSub.unsubscribe();
-  }
 }
