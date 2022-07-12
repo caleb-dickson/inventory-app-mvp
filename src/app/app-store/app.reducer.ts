@@ -1,8 +1,8 @@
 import { ActionReducerMap } from "@ngrx/store";
 
 import * as fromUser from '../users/user-store/user.reducer';
-import * as fromBusiness from '../core/business/business-store/business.reducer';
-import * as fromLocation from '../core/business/location/location-store/location.reducer';
+import * as fromBusiness from '../inventory-app/navigation/business/business-store/business.reducer';
+import * as fromLocation from '../inventory-app/navigation/business/location/location-store/location.reducer';
 import * as fromNotifications from "../notifications/notifications-store/notifications.reducer";
 
 export interface AppState {

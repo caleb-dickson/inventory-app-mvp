@@ -10,7 +10,7 @@ import * as UserActions from '../users/user-store/user.actions';
 import * as NotificationsActions from '../notifications/notifications-store/notifications.actions';
 
 import { UserService } from '../users/user-control/user.service';
-import { ThemeService } from '../app-control/theme.service';
+import { ThemeService } from '../theme/theme.service';
 import { NgForm } from '@angular/forms';
 
 @Component({

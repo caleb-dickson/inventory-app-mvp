@@ -8,7 +8,7 @@ import * as fromAppStore from '../../../app-store/app.reducer';
 import * as UserActions from '../../../users/user-store/user.actions';
 
 import { UserService } from '../../../users/user-control/user.service';
-import { ThemeService } from 'src/app/app-control/theme.service';
+import { ThemeService } from 'src/app/theme/theme.service';
 
 @Component({
   selector: 'app-header',

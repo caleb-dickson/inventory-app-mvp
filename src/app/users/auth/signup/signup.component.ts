@@ -64,26 +64,26 @@ export class SignupComponent implements OnInit, OnDestroy {
       ? undefined
       : this.signupForm.get('themePref').value;
 
-    // this.store.dispatch(
-    //   UserActions.signupStart({
-    //     newUser: {
-    //       _id: null,
-    //       userId: null,
-    //       email: this.signupForm.value.email,
-    //       password: this.signupForm.value.password,
-    //       userProfile: {
-    //         role: this.signupForm.value.role,
-    //         department: department,
-    //         firstName: this.signupForm.value.firstName,
-    //         lastName: this.signupForm.value.lastName,
-    //         phoneNumber: this.signupForm.value.phoneNumber,
-    //         themePref: themePref,
-    //         userPhoto: null,
-    //       },
-    //     },
-    //   })
-    // );
-    // form.reset();
+    this.store.dispatch(
+      UserActions.signupStart({
+        newUser: {
+          _id: null,
+          userId: null,
+          email: this.signupForm.value.email,
+          password: this.signupForm.value.password,
+          userProfile: {
+            role: this.signupForm.value.role,
+            department: department,
+            firstName: this.signupForm.value.firstName,
+            lastName: this.signupForm.value.lastName,
+            phoneNumber: this.signupForm.value.phoneNumber,
+            themePref: themePref,
+            userPhoto: null,
+          },
+        },
+      })
+    );
+    this._initSignupForm();
   }
 
   onShowPass(input: string) {
@@ -93,27 +93,6 @@ export class SignupComponent implements OnInit, OnDestroy {
       this.showConfirmPass = !this.showConfirmPass;
     }
   }
-
-  // onConfirmPassword(confirmPassword: string): void {
-  //   this.signupForm.updateValueAndValidity();
-
-  //   let password = this.signupForm.get('password')?.value;
-
-  //   this.passLength = password?.length;
-
-  //   if (
-  //     confirmPassword != password &&
-  //     confirmPassword.length >= this.passLength
-  //   ) {
-  //     this.passMatch = false;
-  //     this.signupForm.setErrors();
-  //   } else {
-  //     this.passMatch = true;
-  //     this.signupForm.get('confirmPassword').markAsPristine({ onlySelf: true });
-  //   }
-  //   this.signupForm.updateValueAndValidity();
-  //   console.log(this.signupForm.get('confirmPassword').errors);
-  // }
 
   private _initSignupForm(): void {
     this.signupForm = new FormGroup(

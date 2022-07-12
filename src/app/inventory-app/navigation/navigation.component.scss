@@ -1,0 +1,199 @@
+@use "../../../sass/abstracts/variables" as var;
+
+.sidenav-container {
+  height: 100vh;
+
+  mat-sidenav {
+    padding-left: 1rem;
+    width: 13rem;
+
+    mat-toolbar-row {
+      background: inherit;
+
+      img {
+        height: 7rem;
+        width: 7rem;
+        transform: translateY(2rem);
+        z-index: -1;
+        clip-path: circle(50%);
+      }
+
+      .sidenav-owner-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 1rem;
+      }
+
+      .sidenav-non-owner-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 1rem;
+        margin-block-start: 1rem;
+      }
+    }
+
+    .sidenav-user-role {
+      margin-inline-start: 1rem;
+      font-weight: 200;
+    }
+
+    mat-slide-toggle {
+      margin-left: 1rem;
+    }
+
+    mat-nav-list {
+      display: flex;
+      flex-direction: column;
+      margin-inline-end: 1rem;
+      align-items: center;
+      gap: 0.3rem;
+
+      .active {
+        background-color: var.$color-green-light;
+        border-radius: 0.3rem;
+      }
+
+      .spacer {
+
+        &-owner {
+          margin-top: 12vh;
+        }
+        &-mgr {
+          margin-top: 18vh;
+        }
+        &-staff {
+          margin-top: 42vh;
+        }
+      }
+
+      .sidenav-icon {
+        margin-inline-end: 0.3rem;
+
+        &-check {
+          margin-inline-start: 1rem;
+          color: var.$color-green-light;
+        }
+      }
+
+      .no-locations {
+        font-size: 0.8rem;
+      }
+
+      .location-select {
+        max-width: 10rem;
+
+      }
+
+      .logout {
+        margin-inline-end: 1rem;
+      }
+
+      .user-display {
+        width: 100%;
+        font-size: 0.8rem;
+        margin-block-start: 0.5rem;
+        overflow-wrap: break-word;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: var.$bp-mobile-lg) {
+  .sidenav-container {
+    height: 100vh;
+
+    mat-sidenav {
+      padding-left: 1rem;
+      width: 13rem;
+
+      mat-toolbar-row {
+        background: inherit;
+
+        img {
+          height: 7rem;
+          width: 7rem;
+          transform: translateY(2rem);
+          z-index: -1;
+          clip-path: circle(50%);
+        }
+
+        .sidenav-owner-name {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 1rem;
+        }
+
+        .sidenav-non-owner-name {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          font-size: 1rem;
+          margin-block-start: 1rem;
+        }
+      }
+
+      .sidenav-user-role {
+        margin-inline-start: 1rem;
+        font-weight: 200;
+      }
+
+      mat-slide-toggle {
+        margin-left: 1rem;
+      }
+
+      mat-nav-list {
+        display: flex;
+        flex-direction: column;
+        margin-inline-end: 1rem;
+        align-items: center;
+        gap: 0.3rem;
+
+        .active {
+          background-color: var.$color-green-light;
+          border-radius: 0.3rem;
+        }
+
+        .spacer {
+
+          &-owner {
+            margin-top: 3.5vh;
+          }
+          &-mgr {
+            margin-top: 12vh;
+          }
+          &-staff {
+            margin-top: 39vh;
+          }
+        }
+
+        .sidenav-icon {
+          margin-inline-end: 0.3rem;
+
+          &-check {
+            margin-inline-start: 1rem;
+            color: var.$color-green-light;
+          }
+        }
+
+        .no-locations {
+          font-size: 0.8rem;
+        }
+
+        .location-select {
+          max-width: 10rem;
+
+        }
+
+        .logout {
+          margin-inline-end: 1rem;
+        }
+
+        .user-display {
+          width: 100%;
+          font-size: 0.8rem;
+          margin-block-start: 0.5rem;
+          overflow-wrap: break-word;
+        }
+      }
+    }
+  }
+}

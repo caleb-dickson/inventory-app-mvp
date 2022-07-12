@@ -1,0 +1,251 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    color="primary"
+    [fixedInViewport]="false"
+    [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+    [mode]="(isHandset$ | async) ? 'over' : 'side'"
+    [opened]="(isHandset$ | async) === false"
+  >
+    <mat-toolbar-row>
+      <img [src]="user.userProfile.userPhoto" alt="Your profile photo" />
+    </mat-toolbar-row>
+    <mat-toolbar-row>
+      <!-- **USER NAME BLOCK** -->
+
+      <!-- **OWNER** -->
+      <span *ngIf="userRole === 'owner'" class="sidenav-owner-name">
+        {{
+          business
+            ? business.businessName
+            : user.userProfile.firstName + " " + user.userProfile.lastName
+        }}
+      </span>
+      <!-- **NON-OWNER** -->
+      <span *ngIf="userRole !== 'owner'" class="sidenav-non-owner-name">
+        {{ user.userProfile.firstName + " " + user.userProfile.lastName }}
+      </span>
+      <br />
+    </mat-toolbar-row>
+    <!-- **USER ROLE & DEPARTMENT** -->
+    <p class="sidenav-user-role">
+      {{ (userRole | titlecase) + " - " + (userDept | uppercase) }}
+    </p>
+    <!-- **THEME CONTROL** -->
+    <mat-slide-toggle
+      (change)="onThemeModeSwitched($event)"
+      [checked]="themeMode === 'theme-dark' ? true : false"
+      >Dark Mode</mat-slide-toggle
+    >
+    <!-- SIDENAV LINKS -->
+    <mat-nav-list>
+      <a
+        *ngIf="userRole !== 'staff' || userDept === 'admin'"
+        mat-list-item
+        routerLink="/app/dashboard"
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">dashboard</mat-icon>Dashboard
+      </a>
+      <a
+        *ngIf="userRole !== 'staff' || userDept === 'admin'"
+        mat-list-item
+        routerLink="/app/dashboard"
+      >
+        <mat-icon class="sidenav-icon">trending_up</mat-icon>Insights
+      </a>
+      <a
+        *ngIf="userRole !== 'staff' || userDept === 'admin'"
+        mat-list-item
+        routerLink="/app/products"
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">sell</mat-icon>Products
+      </a>
+      <a
+        mat-list-item
+        routerLink="/app/new-inventory"
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">addchart</mat-icon>New/Current Inventory
+      </a>
+      <a
+        *ngIf="userRole !== 'staff' || userDept === 'admin'"
+        mat-list-item
+        routerLink="/app/past-inventory"
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">history</mat-icon>Past Inventory
+      </a>
+
+      <!-- SPACER -->
+      <span [ngClass]="setNavSpacer()"></span>
+
+      <!-- MULTI-LOCATION SELECT - FOR OWNER -->
+      <div
+        *ngIf="
+          userRole === 'owner' && business?.locations.length > 1
+        "
+        class="owner-location-select"
+      >
+        <form multiLocationSelectForm="ngForm">
+          <mat-error *ngIf="multiLocationSelectForm.invalid"
+            >Select a Location</mat-error
+          >
+          <mat-form-field
+            class="location-select"
+            appearance="outline"
+            matTooltip="You have multiple locations to choose from. Select one to work on."
+          >
+            <mat-label>
+              {{
+                activeLocation
+                  ? activeLocation.locationName + " selected"
+                  : "Select Location"
+              }}
+            </mat-label>
+            <mat-select
+              name="activeLocation"
+              matInput
+              [(ngModel)]="activeLocation"
+              [selected]="activeLocation ? activeLocation : selected"
+              (selectionChange)="onActivateLocation(activeLocation)"
+            >
+              <mat-option
+                class="location-select-dropdown"
+                #selectedValue
+                *ngFor="let location of multiBizLocations"
+                [value]="location"
+              >
+                {{ location.locationName }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+      </div>
+
+      <!-- LOCATION SELECT - MULTI-UNIT MANAGERS/STAFF - NON-OWNER -->
+      <div
+        *ngIf="userRole !== 'owner' && userLocations.length > 1"
+        class="div staff-location-select"
+      >
+        <mat-form-field
+          class="location-select"
+          appearance="outline"
+          matTooltip="You have multiple locations to choose from. Select one to work on."
+        >
+          <mat-label>
+            {{
+              activeLocation
+                ? activeLocation.locationName + " selected"
+                : "Select Location"
+            }}
+          </mat-label>
+          <mat-select
+            [(ngModel)]="activeLocation"
+            name="activeLocation"
+            [selected]="activeLocation ? activeLocation : selected"
+            (selectionChange)="onActivateLocation(activeLocation)"
+          >
+            <mat-option
+              class="location-select-dropdown"
+              #selectedValue
+              *ngFor="let location of multiUserLocations"
+              [value]="location"
+            >
+              {{ location.locationName }}
+            </mat-option>
+          </mat-select>
+          <mat-hint>Multiple locations detected.</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <!-- **USER* -->
+      <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **USER** ONLY HAS ACCESS TO ONE LOCATION -->
+      <!-- ===||| Push this down some |||=== -->
+      <a
+        *ngIf="userRole !== 'owner' && userLocations.length === 1"
+        mat-list-item
+        (click)="onActivateLocation(locationState.userLocations[0])"
+      >
+        <mat-icon class="sidenav-icon">{{ manageIcon }}</mat-icon
+        >{{ singleUserLocationName }}
+        <mat-icon class="sidenav-icon-check">done</mat-icon>
+      </a>
+
+      <mat-error *ngIf="locationError" class="no-locations">
+        {{ locationState.locationError }}
+      </mat-error>
+
+      <!-- **OWNER** -->
+      <!-- SHOW SINGLE 'MANAGE LOCATION' LINK IF **OWNER** BUSINESS ONLY HAS ONE LOCATION -->
+      <a
+        *ngIf="
+          userRole === 'owner' && businessState.businessLocations.length === 1
+        "
+        mat-list-item
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">store</mat-icon
+        >{{ singleBizLocationName }}
+      </a>
+
+      <!-- SHOW 'MANAGE BUSINESS' LINK IF USER IS OWNER -->
+      <a
+        *ngIf="userRole === 'owner'"
+        class="manage-business"
+        mat-list-item
+        routerLink="/app/business"
+        routerLinkActive="active"
+      >
+        <mat-icon class="sidenav-icon">business</mat-icon>Manage Business
+      </a>
+
+      <a mat-list-item routerLink="/app/settings" routerLinkActive="active">
+        <mat-icon class="sidenav-icon settings">settings</mat-icon>User Settings
+      </a>
+      <a mat-list-item routerLink="/app/support" routerLinkActive="active">
+        <mat-icon class="sidenav-icon">support_agent</mat-icon>Tech Support
+      </a>
+      <a
+        *ngIf="isAuthenticated"
+        mat-stroked-button
+        type="button"
+        class="btn logout"
+        (click)="onLogout()"
+        >Log Out</a
+      >
+      <p *ngIf="isAuthenticated" class="user-display">
+        {{
+          user
+            ? "Logged in as " +
+              user.userProfile.firstName +
+              " " +
+              user.userProfile.lastName
+            : "Logged in as " + user.email
+        }}
+        <br />
+        {{ user ? "(" + user.email + ")" : null }}
+      </p>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" role="heading">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle(); toggleSideNav()"
+        *ngIf="isHandset$"
+      >
+        <mat-icon *ngIf="!sideNavOpen" aria-label="Side nav toggle icon"
+          >menu
+        </mat-icon>
+        <mat-icon *ngIf="sideNavOpen">menu_open</mat-icon>
+      </button>
+      <img src="../../../assets/inv-logo.webp" alt="Inventory App logo" />
+    </mat-toolbar>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

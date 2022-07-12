@@ -10,8 +10,8 @@ import { EffectsModule } from '@ngrx/effects';
 import * as fromAppStore from './app-store/app.reducer'
 import { UserEffects } from './users/user-store/user.effects';
 import { NotificationsEffects } from './notifications/notifications-store/notifications.effects';
-import { BusinessEffects } from './core/business/business-store/business.effects';
-import { LocationEffects } from './core/business/location/location-store/location.effects';
+import { BusinessEffects } from './inventory-app/navigation/business/business-store/business.effects';
+import { LocationEffects } from './inventory-app/navigation/business/location/location-store/location.effects';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -19,7 +19,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AuthInterceptor } from './users/user-control/auth-interceptor';
 
 import { UserModule } from './users/user.module';
-import { AppCoreModule } from './core/core.module';
+import { AppCoreModule } from './inventory-app/core.module';
 import { MaterialModule } from './material.module';
 
 import { ErrorComponent } from './error/error.component';

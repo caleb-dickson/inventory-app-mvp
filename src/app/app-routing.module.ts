@@ -5,7 +5,7 @@ import { ErrorComponent } from "./error/error.component";
 
 import { AuthGuard } from './users/user-control/auth.guard';
 import { LandingComponent } from './landing/landing.component';
-import { CoreComponent } from './core/core.component';
+import { CoreComponent } from './inventory-app/core.component';
 import { CommonModule } from '@angular/common';
 
 const routes: Routes = [
@@ -14,7 +14,7 @@ const routes: Routes = [
     path: 'app',
     canActivate: [AuthGuard],
     component: CoreComponent,
-    loadChildren: () => import('./core/core.module').then((m) => m.AppCoreModule)
+    loadChildren: () => import('./inventory-app/core.module').then((m) => m.AppCoreModule)
   },
   { path: '**', component: ErrorComponent }
 ];

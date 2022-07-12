@@ -6,8 +6,8 @@ import { Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as fromAppStore from '../../app-store/app.reducer';
 import * as UserActions from './user.actions';
-import { clearBusinessState } from '../../core/business/business-store/business.actions';
-import { clearLocationState } from 'src/app/core/business/location/location-store/location.actions';
+import { clearBusinessState } from '../../inventory-app/navigation/business/business-store/business.actions';
+import { clearLocationState } from 'src/app/inventory-app/navigation/business/location/location-store/location.actions';
 
 import { of } from 'rxjs';
 import {
@@ -24,7 +24,7 @@ import { environment } from 'src/environments/environment';
 import { UserService } from '../user-control/user.service';
 
 import { User } from '../user.model';
-import { Location } from '../../core/models/location.model';
+import { Location } from '../../inventory-app/models/location.model';
 
 import { MatDialog } from '@angular/material/dialog';
 

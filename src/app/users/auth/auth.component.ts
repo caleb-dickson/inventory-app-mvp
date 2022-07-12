@@ -5,7 +5,7 @@ import { map, Subscription } from 'rxjs';
 import * as fromAppStore from '../../app-store/app.reducer';
 
 import { UserService } from '../user-control/user.service';
-import { ThemeService } from '../../app-control/theme.service';
+import { ThemeService } from '../../theme/theme.service';
 
 @Component({
   selector: 'app-auth',

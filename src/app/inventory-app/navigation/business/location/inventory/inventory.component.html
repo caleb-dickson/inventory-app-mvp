@@ -1,0 +1,245 @@
+<div class="inventory">
+  <div class="active-location-null" *ngIf="!activeLocation">
+    <h4>Select a location to view inventory</h4>
+  </div>
+  <!-- NO WORKING DRAFTS MESSAGE -->
+  <div
+    *ngIf="
+      !inventoryDataPopulatedSorted ||
+      inventoryDataPopulatedSorted?.length === 0
+    "
+    class="inventory-null-message"
+  >
+    <!-- "NO LOCATION ACTIVE" MESSAGE -->
+    <h4 *ngIf="activeLocation?.inventoryData.length === 0">
+      Past
+      {{ userDept === "admin" ? null : (userDept | uppercase) }} inventories
+      will show up here when finalized
+    </h4>
+  </div>
+
+  <div
+    *ngIf="activeLocationInventories?.length > 0"
+    class="inventory-main"
+  >
+    <div class="spinner spinner-top">
+      <mat-spinner
+        diameter="100"
+        strokeWidth="4"
+        *ngIf="loading"
+      ></mat-spinner>
+    </div>
+    <!-- INVENTORY DATE FILTER -->
+    <form
+      *ngIf="
+        (!loading && inventoryDataPopulatedSorted.length > 0) ||
+        inventoryData.length > 0
+      "
+      class="filter"
+    >
+      <mat-label>Filter by Inventory Ending Dates</mat-label>
+      <mat-form-field appearance="fill" class="filter-input">
+        <mat-label>Enter a date range</mat-label>
+        <mat-date-range-input
+          [rangePicker]="picker"
+          [formGroup]="dateFilterForm"
+        >
+          <input
+            matStartDate
+            #dateStart
+            formControlName="dateStart"
+            placeholder="Earliest"
+          />
+          <input
+            matEndDate
+            #dateEnd
+            formControlName="dateEnd"
+            placeholder="Latest"
+            (dateInput)="defineFilter()"
+          />
+        </mat-date-range-input>
+        <mat-hint>MM/DD/YYYY - MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+      </mat-form-field>
+      <button
+        *ngIf="dateFilterForm.dirty"
+        mat-raised-button
+        class="filter-reset"
+        (click)="resetFilter()"
+      >
+        Reset
+      </button>
+    </form>
+
+    <!-- FINALIZED INVENTORY TABLE LIST START -->
+    <mat-table
+      *ngFor="let inv of inventoryDataPopulatedSorted"
+      mat-table
+      matRipple
+      [dataSource]="inv.inventory"
+      class="mat-elevation-z8 inventory-table"
+    >
+      <!-- Table Title Header Row -->
+      <ng-container matColumnDef="dateStart">
+        <mat-cell mat-cell *matHeaderCellDef class="inventory-table-title">
+          <p class="inventory-table-title-dept">
+            {{ inv.department | uppercase }}
+          </p>
+
+          <mat-icon>insert_chart_outlined</mat-icon>
+          {{ inv.dateStart | date: "shortDate" }} -
+          {{ inv.dateEnd | date: "shortDate" }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Prod Category Column -->
+      <ng-container matColumnDef="category">
+        <mat-header-cell mat-header-cell *matHeaderCellDef
+          >Category</mat-header-cell
+        >
+        <mat-cell mat-cell *matCellDef="let inv">{{
+          inv.product.category
+        }}</mat-cell>
+      </ng-container>
+
+      <!-- Product Name Column -->
+      <ng-container matColumnDef="productName">
+        <mat-header-cell mat-header-cell *matHeaderCellDef
+          >Product</mat-header-cell
+        >
+        <mat-cell mat-cell *matCellDef="let inv">{{
+          inv.product.name
+        }}</mat-cell>
+      </ng-container>
+
+      <!-- Department Column -->
+      <ng-container matColumnDef="department">
+        <mat-header-cell mat-header-cell *matHeaderCellDef
+          >Dept.</mat-header-cell
+        >
+        <mat-cell mat-cell *matCellDef="let inv">{{
+          inv.product.department | uppercase
+        }}</mat-cell>
+      </ng-container>
+
+      <!-- Unit Column -->
+      <ng-container matColumnDef="unit">
+        <mat-header-cell mat-header-cell *matHeaderCellDef
+          >Unit</mat-header-cell
+        >
+        <mat-cell mat-cell *matCellDef="let inv">
+          {{ inv.product.unitSize + " " }}
+          {{
+            inv.product.unitSize > 1
+              ? inv.product.unitMeasure.plural
+              : inv.product.unitMeasure.singular
+          }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Case Size Column -->
+      <ng-container matColumnDef="caseSize">
+        <mat-header-cell mat-header-cell *matHeaderCellDef
+          >Case Size</mat-header-cell
+        >
+        <mat-cell mat-cell *matCellDef="let inv">
+          {{ inv.product.unitsPerPack * inv.product.packsPerCase }}
+          {{
+            inv.product.unitsPerPack > 1
+              ? inv.product.unitMeasure.plural
+              : inv.product.unitMeasure.singular
+          }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Par Column -->
+      <ng-container matColumnDef="packsPar">
+        <mat-header-cell mat-header-cell *matHeaderCellDef
+          >Packs Par</mat-header-cell
+        >
+        <mat-cell mat-cell *matCellDef="let inv">{{
+          inv.product.par
+        }}</mat-cell>
+      </ng-container>
+
+      <!-- Quantity Column -->
+      <ng-container matColumnDef="inStock">
+        <mat-header-cell mat-header-cell *matHeaderCellDef
+          >Qty. in Stock</mat-header-cell
+        >
+        <mat-cell mat-cell *matCellDef="let inv">{{ inv.quantity }}</mat-cell>
+      </ng-container>
+
+      <!-- Inv Value Column -->
+      <ng-container matColumnDef="inventoryValue">
+        <mat-header-cell mat-header-cell *matHeaderCellDef
+          >Inv. Value</mat-header-cell
+        >
+        <mat-cell mat-cell *matCellDef="let inv">
+          {{
+            (inv.product.casePrice /
+              (inv.product.unitSize *
+                inv.product.unitsPerPack *
+                inv.product.packsPerCase)) *
+              inv.quantity | currency
+          }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="inv-total">
+        <mat-cell
+          mat-footer-cell
+          *matFooterCellDef
+          class="inventory-table-total"
+        >
+          Total Value: {{ inv.value | currency }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="inv-actions">
+        <mat-cell
+          mat-footer-cell
+          *matFooterCellDef
+          class="inventory-table-actions"
+        >
+          <button
+            *ngIf="
+              user.userProfile.department === 'admin' || userRole === 'manager'
+            "
+            mat-raised-button
+            disabled
+          >
+            Delete
+          </button>
+          <button
+            *ngIf="
+              user.userProfile.department === 'admin' || userRole === 'manager'
+            "
+            mat-raised-button
+            disabled
+          >
+            Edit
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <mat-header-row
+        mat-header-row
+        *matHeaderRowDef="['dateStart']"
+      ></mat-header-row>
+
+      <mat-header-row
+        mat-header-row
+        *matHeaderRowDef="displayedColumns"
+      ></mat-header-row>
+      <mat-row
+        mat-row
+        *matRowDef="let row; columns: displayedColumns"
+      ></mat-row>
+      <mat-row mat-footer-row *matFooterRowDef="['inv-total']"> </mat-row>
+      <mat-row mat-footer-row *matFooterRowDef="['inv-actions']"> </mat-row>
+    </mat-table>
+  </div>
+  <!-- FINALIZED INVENTORY TABLE LIST END END END -->
+</div>

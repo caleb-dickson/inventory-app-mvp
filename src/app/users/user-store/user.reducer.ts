@@ -2,7 +2,7 @@ import { Action, createReducer, on } from '@ngrx/store';
 
 import * as UserActions from './user.actions';
 
-import { Location } from 'src/app/core/models/location.model';
+import { Location } from 'src/app/inventory-app/models/location.model';
 import { User } from '../user.model';
 
 export interface UserState {

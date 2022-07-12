@@ -8,14 +8,19 @@ import * as NotificationsActions from '../../notifications/notifications-store/n
 import { MatDialog } from '@angular/material/dialog';
 import { LoginComponent } from '../auth/login/login.component';
 import { SignupComponent } from '../auth/signup/signup.component';
-import { NgForm } from '@angular/forms';
+import { FormGroup, NgForm } from '@angular/forms';
 import { PreviewComponent } from '../auth/preview/preview.component';
 import { map, Subscription } from 'rxjs';
+import { User } from '../user.model';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
-export interface AuthResponseData {
-  email: string;
-  password: string;
-}
+const BACKEND_URL = environment.apiUrl + '/user';
+
+// export interface AuthResponseData {
+//   email: string;
+//   password: string;
+// }
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -24,8 +29,10 @@ export class UserService {
   private tokenExpirationTimer: any;
 
   isAuthenticated: boolean;
+  user: User;
 
   constructor(
+    private http: HttpClient,
     private dialog: MatDialog,
     private store: Store<fromAppStore.AppState>
   ) {
@@ -34,6 +41,7 @@ export class UserService {
       .pipe(map((userState) => userState))
       .subscribe((userState) => {
         this.isAuthenticated = !!userState.user;
+        this.user = userState.user;
       });
   }
 
@@ -120,5 +128,44 @@ export class UserService {
         duration: Infinity,
       })
     );
+  }
+
+  updateUserProfile(
+    userProfileForm: FormGroup,
+    userPhotoUpload: Blob | null,
+    userRole: string,
+    userDept: string
+  ) {
+    const formData = new FormData();
+    formData.append('userId', this.user._id ? this.user._id : this.user.userId);
+    formData.append('firstName', userProfileForm.value.firstName);
+    formData.append('lastName', userProfileForm.value.lastName);
+    formData.append('phoneNumber', userProfileForm.value.phoneNumber);
+    formData.append('themePref', userProfileForm.value.themePref);
+    if (userPhotoUpload) {
+      console.log('file');
+      formData.append(
+        'userPhoto',
+        userProfileForm.value.userPhoto,
+        userProfileForm.value.firstName +
+          '_' +
+          userProfileForm.value.lastName +
+          '_' +
+          userDept +
+          '_' +
+          userRole
+      );
+    }
+
+    this.store.dispatch(UserActions.PUTUpdateUserStart());
+
+    this.http
+      .put<{ updatedUser: User }>(BACKEND_URL + '/update-user', formData)
+      .subscribe((resData) => {
+        console.log(resData);
+        this.store.dispatch(
+          UserActions.PUTUpdateUserSuccess({ user: resData.updatedUser })
+        );
+      });
   }
 }
