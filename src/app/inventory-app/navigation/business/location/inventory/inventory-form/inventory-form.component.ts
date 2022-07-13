@@ -56,11 +56,6 @@ export class RangeSelectionStrategy<D>
   }
 }
 
-export interface InventoryFormData {
-  inventoryForm: FormGroup;
-  saveNew: boolean;
-}
-
 @Component({
   selector: 'app-inventory-form',
   templateUrl: './inventory-form.component.html',
@@ -73,7 +68,6 @@ export interface InventoryFormData {
   ],
 })
 export class InventoryFormComponent implements OnInit, OnDestroy {
-
   private _userAuthSub: Subscription;
   private _locationStoreSub: Subscription;
 
@@ -84,7 +78,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
     private _inventoryService: InventoryService
   ) {}
 
-  @Output() inventoryFormSubmitted = new EventEmitter<InventoryFormData>();
+  @Output() inventoryFormSubmitted = new EventEmitter<FormGroup>();
 
   user: User;
   userRole: string;
@@ -121,7 +115,6 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
   formError: string;
 
   ngOnInit(): void {
-
     this._userAuthSub = this._store
       .select('user')
       .pipe(map((authState) => authState.user))
@@ -207,9 +200,11 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
    * }
    * ```
    */
-  onInventorySubmit(formData: InventoryFormData): void {
-    console.log(formData);
-    this.inventoryFormSubmitted.emit(formData);
+  onInventorySubmit(): void {
+    console.log(this.inventoryForm);
+    this.inventoryFormSubmitted.emit(this.inventoryForm);
+    this.inventoryForm.reset();
+    this._initInventoryForm();
   }
 
   /**
@@ -245,7 +240,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
 
       let items = new FormArray([]);
 
-      for (const product of this.inventoryProducts) {
+      for (const product of this.draftInventory.inventory) {
         items.push(
           new FormGroup({
             product: new FormControl(product.product, Validators.required),
@@ -255,6 +250,8 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
       }
 
       this.inventoryForm = new FormGroup({
+        _id: new FormControl(this.draftInventory._id),
+        parentLocation: new FormControl(this.draftInventory.parentLocation),
         dateStart: new FormControl(
           this.draftInventory.dateStart,
           Validators.required

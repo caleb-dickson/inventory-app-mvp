@@ -1,22 +1,20 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { catchError, map } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
 import * as BusinessActions from './business-store/business.actions';
-import { authSuccess } from '../../../users/user-store/user.actions';
 
 import { User } from 'src/app/users/user.model';
 import { Location } from '../../models/location.model';
-import { HttpClient } from '@angular/common/http';
 import { Business } from '../../models/business.model';
-import { BaseComponent } from '../../core/base-component';
 import { ThemeService } from 'src/app/theme/theme.service';
 import { BusinessService } from '../../inventory-app-control/business.service';
+import { Inventory } from '../../models/inventory.model';
 
 const BACKEND_URL = environment.apiUrl + '/business';
 
@@ -26,21 +24,39 @@ const BACKEND_URL = environment.apiUrl + '/business';
   styleUrls: ['./business.component.scss'],
 })
 export class BusinessComponent
-  extends BaseComponent
   implements OnInit, OnDestroy
 {
-  constructor(
-    private _businessService: BusinessService,
-    themeService: ThemeService,
-    store: Store<fromAppStore.AppState>
-  ) {
-    super(store, themeService);
-  }
-
+  // STATE
+  // subs
+  private _userStoreSub: Subscription;
+  private _businessStoreSub: Subscription;
+  private _locationStoreSub: Subscription;
+  // Loading State
+  appLoading: boolean;
+  userLoading: boolean;
+  businessLoading: boolean;
+  locationLoading: boolean;
   // Business State
   business: Business;
   locations: Location[];
   businessError: string;
+
+  // THEME
+  private _themeSub: Subscription;
+  themeMode: string;
+  themePref: string;
+
+  // LOCATION
+  activeLocation: Location;
+  activeLocationInventories: Inventory[];
+  locationError: string;
+  activeInventory: Inventory;
+
+  // USER
+  user: User;
+  userRole: string;
+  userDept: string;
+  userLocations: Location[];
 
   // FORMS
   businessForm: FormGroup;
@@ -63,11 +79,53 @@ export class BusinessComponent
   locationAddUserSelector: Location;
   addUserToLocationMode: string;
 
+  constructor(
+    private _businessService: BusinessService,
+    private _themeService: ThemeService,
+    private _store: Store<fromAppStore.AppState>
+  ) {}
+
   ngOnInit(): void {
     // console.clear();
 
-    // BUSINESS STORE
-    this.businessStoreSub = this.store
+    this._userStoreSub = this._store.select('user').subscribe((userState) => {
+      this.appLoading = userState.loading;
+      this.userLoading = userState.loading;
+      this.user = userState.user;
+        this.userDept = userState.user?.userProfile.department;
+        this.setUserRoleString(userState.user?.userProfile.role);
+    });
+
+    this._locationStoreSub = this._store
+      .select('location')
+      .subscribe((locationState) => {
+        this.appLoading = locationState.loading;
+        this.locationLoading = locationState.loading;
+        this.locationError = locationState.locationError;
+        this.userLocations = locationState.userLocations;
+        this.activeLocation = locationState.activeLocation;
+        this.activeInventory = locationState.activeInventory;
+        this.activeLocationInventories =
+          locationState.activeLocationInventories;
+
+        console.group(
+          '%cLocation State',
+          `font-size: 1rem;
+            color: lightgreen;`,
+          locationState
+        );
+        console.groupEnd();
+      });
+
+    this._themeService.getThemeMode();
+    this._themeSub = this._themeService.themeStatus.subscribe(
+      (themeModeData) => {
+        this.themeMode = themeModeData;
+        this.themePref = themeModeData;
+      }
+    );
+
+    this._businessStoreSub = this._store
       .select('business')
       .subscribe((businessState) => {
         this.business = businessState.business;
@@ -107,11 +165,21 @@ export class BusinessComponent
   }
 
   ngOnDestroy(): void {
-    this.businessStoreSub.unsubscribe();
+    this._businessStoreSub.unsubscribe();
+  }
 
-    super.userStoreSub.unsubscribe();
-    super.locationStoreSub.unsubscribe();
-    super.themeSub.unsubscribe();
+  setUserRoleString(intRole: number): void {
+    switch (intRole) {
+      case 3:
+        this.userRole = 'owner';
+        break;
+      case 2:
+        this.userRole = 'manager';
+        break;
+      case 1:
+        this.userRole = 'staff';
+        break;
+    }
   }
 
   onEditBusiness(mode: string): void {
@@ -121,7 +189,7 @@ export class BusinessComponent
 
   onEditLocation(mode: boolean | null, location?: Location): void {
     this.locationEditMode = mode;
-    this.store.dispatch(BusinessActions.SelectLocation({ location: location }));
+    this._store.dispatch(BusinessActions.SelectLocation({ location: location }));
     console.log(this.locationEditSelector);
     this._initUpdateLocationForm();
   }
@@ -136,7 +204,7 @@ export class BusinessComponent
     this.mimeTypeValid = true;
     this.fileSizeOk = true;
     this.imagePreview = null;
-    this.store.dispatch(BusinessActions.clearError());
+    this._store.dispatch(BusinessActions.clearError());
 
     switch (formToCancel) {
       case 'business':
@@ -230,7 +298,7 @@ export class BusinessComponent
       return;
     }
     console.log(this.newLocationForm.value);
-    this.store.dispatch(
+    this._store.dispatch(
       BusinessActions.POSTLocationStart({
         location: {
           _id: null,
@@ -250,7 +318,7 @@ export class BusinessComponent
   // LOCATION FORM SUBMIT (JUST TO CHANGE LOCATION NAME FOR NOW)
   onUpdateLocationSubmit(): void {
     console.log(this.updateLocationForm.value);
-    this.store.dispatch(
+    this._store.dispatch(
       BusinessActions.PUTLocationStart({
         location: {
           _id: this.locationEditSelector._id,
@@ -284,7 +352,7 @@ export class BusinessComponent
     const authRole = this.addUserToLocationMode;
     console.log(authRole);
 
-    this.store.dispatch(
+    this._store.dispatch(
       BusinessActions.PUTUserToLocationStart({
         emails: emailStringArr,
         role: authRole,
@@ -325,7 +393,7 @@ export class BusinessComponent
   onAddUserToLocation(mode: string, location?: Location): void {
     this.addUserToLocationMode = mode;
 
-    this.store.dispatch(BusinessActions.SelectLocation({ location: location }));
+    this._store.dispatch(BusinessActions.SelectLocation({ location: location }));
 
     this._initAddUserToLocationForm();
   }

@@ -4,16 +4,15 @@ import { HttpClient } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngrx/store';
-import { map, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import * as fromAppStore from '../../app-store/app.reducer';
-import * as UserActions from '../../users/user-store/user.actions';
 
 import { User } from 'src/app/users/user.model';
 
 import { environment } from 'src/environments/environment';
 import { ThemeService } from 'src/app/theme/theme.service';
 import { UserService } from 'src/app/users/user-control/user.service';
-import { BaseComponent } from '../core/base-component';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 const BACKEND_URL = environment.apiUrl + '/user';
 
@@ -22,18 +21,29 @@ const BACKEND_URL = environment.apiUrl + '/user';
   templateUrl: './user-settings.component.html',
   styleUrls: ['./user-settings.component.scss'],
 })
-export class UserSettingsComponent extends BaseComponent implements OnInit, OnDestroy {
+export class UserSettingsComponent implements OnInit {
+  // STATE
+  // subs
+  private _userStoreSub: Subscription;
+  private _businessStoreSub: Subscription;
+  private _locationStoreSub: Subscription;
+  // loading state
+  appLoading: boolean;
+  userLoading: boolean;
+  businessLoading: boolean;
+  locationLoading: boolean;
+  // THEME
+  private _themeSub: Subscription;
+  themeMode: string;
+  themePref: string;
 
-  constructor(
-    private _http: HttpClient,
-    private _router: Router,
-    private _userService: UserService,
-    store: Store<fromAppStore.AppState>,
-    themeService: ThemeService
-  ) {
-    super(store, themeService)
-  }
+  // USER
+  user: User;
+  userRole: string;
+  userDept: string;
+  userLocations: Location[];
 
+  // FORM
   userProfileForm: FormGroup;
   userPhoto: string;
   userPhotoUpload: Blob | null;
@@ -42,17 +52,47 @@ export class UserSettingsComponent extends BaseComponent implements OnInit, OnDe
   mimeTypeValid = true;
   fileSizeOk = true;
 
-
+  constructor(
+    private _http: HttpClient,
+    private _router: Router,
+    private _userService: UserService,
+    private _store: Store<fromAppStore.AppState>,
+    private _themeService: ThemeService
+  ) {}
 
   ngOnInit() {
-    this.userPhoto = this.user.userProfile.userPhoto;
+    this._userStoreSub = this._store.select('user').subscribe((userState) => {
+      this.appLoading = userState.loading;
+      this.userLoading = userState.loading;
+      this.user = userState.user;
+      this.userDept = userState.user?.userProfile.department;
+      this.userPhoto = this.user?.userProfile.userPhoto;
+      this.setUserRoleString(userState.user?.userProfile.role);
+    });
     this._initUserProfileForm();
+
+    this._themeService.getThemeMode();
+    this._themeSub = this._themeService.themeStatus.subscribe(
+      (themeModeData) => {
+        this.themeMode = themeModeData;
+        this.themePref = themeModeData;
+      }
+    );
+    console.log(this.themeMode)
   }
 
-  ngOnDestroy(): void {
-    super.userStoreSub.unsubscribe();
-    super.locationStoreSub.unsubscribe();
-    super.themeSub.unsubscribe();
+  setUserRoleString(intRole: number): void {
+    switch (intRole) {
+      case 3:
+        this.userRole = 'owner';
+        break;
+      case 2:
+        this.userRole = 'manager';
+        break;
+      case 1:
+        this.userRole = 'staff';
+        break;
+    }
   }
 
   onUserProfileSubmit(userProfileForm: FormGroup) {
@@ -85,12 +125,11 @@ export class UserSettingsComponent extends BaseComponent implements OnInit, OnDe
     this.userProfileForm.updateValueAndValidity();
   }
 
-  onThemeToggle(checked: boolean) {
-    this.themePref = checked ? 'theme-dark' : 'theme-light';
+  onThemeToggle($event: MatSlideToggleChange) {
+    this.themePref = $event.checked ? 'theme-dark' : 'theme-light';
     this.userProfileForm.get('themePref').setValue(this.themePref);
     this.userProfileForm.updateValueAndValidity();
-    let theme = checked ? 'theme-dark' : 'theme-light';
-    // this.themeService.switchThemeMode(theme);
+    this._themeService.switchThemeMode(this.themePref);
   }
 
   onAvatarPicked(event: Event) /* CHECK FILE TYPE AND SIZE */ {

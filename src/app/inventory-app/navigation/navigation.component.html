@@ -34,7 +34,7 @@
     </p>
     <!-- **THEME CONTROL** -->
     <mat-slide-toggle
-      (change)="onThemeModeSwitched($event)"
+      (change)="onThemeToggle($event)"
       [checked]="themeMode === 'theme-dark' ? true : false"
       >Dark Mode</mat-slide-toggle
     >
@@ -175,7 +175,7 @@
       </a>
 
       <mat-error *ngIf="locationError" class="no-locations">
-        {{ locationState.locationError }}
+        {{ locationError }}
       </mat-error>
 
       <!-- **OWNER** -->

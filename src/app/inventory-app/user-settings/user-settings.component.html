@@ -71,15 +71,14 @@
           >
         </mat-form-field>
         <div class="theme-toggle">
-          <mat-label>Theme Preference:</mat-label>
+            <mat-label>Theme Preference:</mat-label>
           <mat-slide-toggle
-            matInput
-            formControlName="themePref"
-            [checked]="themeMode === 'theme-dark' ? true : false"
-            (change)="onThemeToggle($event.checked)"
+          matInput
+          (change)="onThemeToggle($event)"
+          [checked]="themeMode === 'theme-dark' ? true : false"
           >
-            {{ themePref === "theme-dark" ? "Dark" : "Light" }}
-          </mat-slide-toggle>
+          {{ themePref === "theme-dark" ? "Dark" : "Light" }}
+        </mat-slide-toggle>
         </div>
         <div class="user-photo-upload">
           <button mat-stroked-button type="button" (click)="filePicker.click()">

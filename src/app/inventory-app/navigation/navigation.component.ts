@@ -7,7 +7,7 @@ import * as UserActions from '../../users/user-store/user.actions';
 import * as BusinessActions from './business/business-store/business.actions';
 import { BusinessState } from './business/business-store/business.reducer';
 
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
 import { ThemeService } from 'src/app/theme/theme.service';
@@ -16,22 +16,31 @@ import { Location } from '../models/location.model';
 import { LocationService } from '../inventory-app-control/location.service';
 import { Inventory } from '../models/inventory.model';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { BaseComponent } from '../core/base-component';
+import { User } from 'src/app/users/user.model';
+import { Product } from '../models/product.model';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 @Component({
   selector: 'app-navigation',
   templateUrl: './navigation.component.html',
   styleUrls: ['./navigation.component.scss'],
 })
-export class NavigationComponent extends BaseComponent implements OnInit {
-  constructor(
-    private _breakpointObserver: BreakpointObserver,
-    private _locationService: LocationService,
-    themeService: ThemeService,
-    store: Store<fromAppStore.AppState>
-  ) {
-    super(store, themeService);
-  }
+export class NavigationComponent implements OnInit {
+  // STATE
+  // subs
+  private _userStoreSub: Subscription;
+  private _businessStoreSub: Subscription;
+  private _locationStoreSub: Subscription;
+
+  appLoading: boolean;
+  userLoading: boolean;
+  businessLoading: boolean;
+  locationLoading: boolean;
+
+  // THEME
+  private _themeSub: Subscription;
+  themeMode: string;
+  themePref: string;
 
   // UI
   sideNavOpen: boolean;
@@ -45,18 +54,21 @@ export class NavigationComponent extends BaseComponent implements OnInit {
       shareReplay()
     );
 
-  // BUSINESS STATE
-  businessState: BusinessState;
-  business: Business;
-  businessName: string;
-  businessId: string;
-  // OWNER USER SPECIFIC BUSINESS STATE
-  singleBizLocationName: string;
-  multiBizLocations: Location[];
+  // USER
+  isAuthenticated: boolean;
+  user: User;
+  userRole: string;
+  userDept: string;
+  userLocations: Location[];
 
-  multiLocationSelectForm: FormGroup;
+  // LOCATION
+  activeLocation: Location;
+  activeLocationInventories: Inventory[];
+  locationError: string;
+  activeInventory: Inventory;
 
-  // INVENTORY PROPS
+  // INVENTORY
+  inventoryData: any[];
   inventoryDataPopulated: Inventory[];
   workingInventory: any;
   workingInventoryItems: any;
@@ -68,27 +80,69 @@ export class NavigationComponent extends BaseComponent implements OnInit {
   singleUserLocationName: string;
   multiUserLocations: Location[];
 
+  // PRODUCTS
+  activeProducts: Product[] = [];
+  locationProducts: any[];
+  selectedProducts: Product[] = [];
+
+  // BUSINESS STATE
+  businessState: BusinessState;
+  business: Business;
+  businessName: string;
+  businessId: string;
+  // OWNER USER SPECIFIC BUSINESS STATE
+  singleBizLocationName: string;
+  multiBizLocations: Location[];
+
+  multiLocationSelectForm: FormGroup;
+
+  constructor(
+    private _breakpointObserver: BreakpointObserver,
+    private _locationService: LocationService,
+    private _themeService: ThemeService,
+    private _store: Store<fromAppStore.AppState>
+  ) {}
+
   ngOnInit() {
     // console.clear();
 
+    this._userStoreSub = this._store.select('user').subscribe((userState) => {
+      this.appLoading = userState.loading;
+      this.userLoading = userState.loading;
+      this.user = userState.user;
+      this.isAuthenticated = !!userState.user;
+      this.userDept = userState.user?.userProfile.department;
+      this.setUserRoleString(userState.user?.userProfile.role);
+    });
 
-    this.locationStoreSub = this.store
-    .select('location')
-    .subscribe((locState) => {
-      console.log(this.userLocations);
-      this.workingInventory = locState.activeInventory;
+    this._locationStoreSub = this._store
+      .select('location')
+      .subscribe((locationState) => {
+        this.appLoading = locationState.loading;
+        this.locationLoading = locationState.loading;
+        this.locationError = locationState.locationError;
+        this.userLocations = locationState.userLocations;
+        this.activeLocation = locationState.activeLocation;
+        this.inventoryData = locationState.activeLocation?.inventoryData;
+        this.activeInventory = locationState.activeInventory;
+        this.activeLocationInventories =
+          locationState.activeLocationInventories;
+        this.activeProducts = locationState.activeProducts;
+        this.workingInventory = locationState.activeInventory;
 
         this.multiUserLocations =
-          locState.userLocations.length > 1 ? locState.userLocations : null;
+          locationState.userLocations.length > 1
+            ? locationState.userLocations
+            : null;
 
         this.singleUserLocation =
-          locState.userLocations.length === 1
-            ? locState.userLocations[0]
+          locationState.userLocations.length === 1
+            ? locationState.userLocations[0]
             : null;
 
         this.singleUserLocationName =
-          locState.userLocations.length === 1
-            ? locState.userLocations[0].locationName
+          locationState.userLocations.length === 1
+            ? locationState.userLocations[0].locationName
             : null;
 
         // SET AN ERROR ON THE LOCATION SELECTOR
@@ -105,27 +159,27 @@ export class NavigationComponent extends BaseComponent implements OnInit {
             .get('activeLocation')
             .setValue(this.activeLocation);
           this.multiLocationSelectForm.updateValueAndValidity();
+          console.log(this.multiLocationSelectForm.value);
         }
-        console.log(this.multiLocationSelectForm.value);
 
         // ONCE A LOCATION HAS BEEN SELECTED/ACTIVATED
-        if (locState.activeLocation?.productList.length > 0) {
-          this.locationProducts = locState.activeLocation.productList;
-          this.inventoryDataPopulated = locState.activeLocationInventories;
+        if (locationState.activeLocation?.productList.length > 0) {
+          this.locationProducts = locationState.activeLocation.productList;
+          this.inventoryDataPopulated = locationState.activeLocationInventories;
 
           // AND POPULATED (JOINED) INVENTORIES WERE NOT ALREADY
           // FETCHED SINCE LAST RELOAD
           if (
-            !locState.activeLocationInventories ||
-            (locState.activeLocationInventories?.length === 0 &&
-              locState.activeLocation?.inventoryData.length > 0)
+            !locationState.activeLocationInventories ||
+            (locationState.activeLocationInventories?.length === 0 &&
+              locationState.activeLocation?.inventoryData.length > 0)
           ) {
             this._onGetPopulatedInventories();
           }
         }
       });
 
-    this.businessStoreSub = this.store
+    this._businessStoreSub = this._store
       .select('business')
       .subscribe((businessState) => {
         this.businessState = businessState;
@@ -145,6 +199,14 @@ export class NavigationComponent extends BaseComponent implements OnInit {
               : null;
         }
       });
+
+    this._themeService.getThemeMode();
+    this._themeSub = this._themeService.themeStatus.subscribe(
+      (themeModeData) => {
+        this.themeMode = themeModeData;
+        this.themePref = themeModeData;
+      }
+    );
 
     this.setNavSpacer();
 
@@ -193,14 +255,15 @@ export class NavigationComponent extends BaseComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.userStoreSub.unsubscribe();
-    this.businessStoreSub.unsubscribe();
-    this.locationStoreSub.unsubscribe();
-    this.themeSub.unsubscribe();
+    this._userStoreSub.unsubscribe();
+    this._businessStoreSub.unsubscribe();
+    this._locationStoreSub.unsubscribe();
+    this._themeSub.unsubscribe();
+  }
 
-    super.userStoreSub.unsubscribe();
-    super.locationStoreSub.unsubscribe();
-    super.themeSub.unsubscribe();
+  onThemeToggle($event: MatSlideToggleChange): void {
+    let theme = $event.checked ? 'theme-dark' : 'theme-light';
+    this._themeService.switchThemeMode(theme);
   }
 
   setNavSpacer(): string {
@@ -236,8 +299,22 @@ export class NavigationComponent extends BaseComponent implements OnInit {
     this._locationService.activateLocation(activeLocation);
   }
 
+  setUserRoleString(intRole: number): void {
+    switch (intRole) {
+      case 3:
+        this.userRole = 'owner';
+        break;
+      case 2:
+        this.userRole = 'manager';
+        break;
+      case 1:
+        this.userRole = 'staff';
+        break;
+    }
+  }
+
   onLogout() {
-    this.store.dispatch(UserActions.logout());
+    this._store.dispatch(UserActions.logout());
   }
 
   getBusiness() {
@@ -252,7 +329,7 @@ export class NavigationComponent extends BaseComponent implements OnInit {
           color: lightgreen;`,
         storedBusiness.business
       );
-      this.store.dispatch(
+      this._store.dispatch(
         BusinessActions.GETBusinessSuccess({
           business: {
             _id: storedBusiness.business._id,
@@ -266,14 +343,14 @@ export class NavigationComponent extends BaseComponent implements OnInit {
       this.onGetLocations();
     } else if (!storedBusiness) {
       console.warn('||| Fetching business from DB |||');
-      this.store.dispatch(
+      this._store.dispatch(
         BusinessActions.GETBusinessStart({
           ownerId: this.user.userId,
         })
       );
     } else {
       console.error('||| checkBusiness error |||');
-      this.store.dispatch(
+      this._store.dispatch(
         BusinessActions.BusinessError({ errorMessage: 'No business found.' })
       );
     }
@@ -286,5 +363,4 @@ export class NavigationComponent extends BaseComponent implements OnInit {
       this.user.userProfile.role
     );
   }
-
 }

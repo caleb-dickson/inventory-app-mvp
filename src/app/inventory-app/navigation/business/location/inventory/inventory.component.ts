@@ -6,15 +6,17 @@ import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../../../app-store/app.reducer';
 import * as LocationActions from '../location-store/location.actions';
 
-import { map } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 
 import { LocationService } from '../../../../inventory-app-control/location.service';
 import { Router } from '@angular/router';
 import { Inventory } from '../../../../models/inventory.model';
 import { InventoryService } from '../../../../inventory-app-control/inventory.service';
 import { BusinessInventoryPeriod } from '../../../../models/business.model';
-import { BaseComponent } from 'src/app/inventory-app/core/base-component';
 import { ThemeService } from 'src/app/theme/theme.service';
+import { User } from 'src/app/users/user.model';
+import { Product } from 'src/app/inventory-app/models/product.model';
+import { Location } from 'src/app/inventory-app/models/location.model';
 
 interface DateRange {
   dateStart: Date | null;
@@ -37,43 +39,66 @@ const inventoryColumns = [
   templateUrl: './inventory.component.html',
   styleUrls: ['./inventory.component.scss'],
 })
-export class InventoryComponent
-  extends BaseComponent
-  implements OnInit, OnDestroy
-{
-  constructor(
-    private _router: Router,
-    private _locationService: LocationService,
-    private _inventoryService: InventoryService,
-    store: Store<fromAppStore.AppState>,
-    themeService: ThemeService
-  ) {
-    super(store, themeService);
-  }
+export class InventoryComponent implements OnInit, OnDestroy {
 
   // STATE
+  // subs
+  private _userStoreSub: Subscription;
+  private _businessStoreSub: Subscription;
+  private _locationStoreSub: Subscription;
+  // loading state
+  appLoading: boolean;
+  userLoading: boolean;
+  businessLoading: boolean;
+  locationLoading: boolean;
+
+  // USER
+  user: User;
+  userRole: string;
+  userDept: string;
+  userLocations: Location[];
+
+  // LOCATION
+  activeLocation: Location;
+  activeLocationInventories: Inventory[];
+  locationError: string;
+  activeInventory: Inventory;
+
+  // INVENTORY
+  inventoryData: any[];
   inventoryDataPopulatedSorted: Inventory[];
   workingInventory: any;
-
-  dateFilterForm: FormGroup;
-
   newInventoryProducts: any[] = [];
   initInvProducts = true;
   initLocInventories = true;
 
-  dataSource: MatTableDataSource<Inventory>;
+  inventoryPeriod = BusinessInventoryPeriod - 1;
+  displayedColumns = inventoryColumns;
 
+  // PRODUCTS
+  activeProducts: Product[] = [];
+  locationProducts: any[];
+  selectedProducts: Product[] = [];
+
+  // FORMS
+  dateFilterForm: FormGroup;
+  dataSource: MatTableDataSource<Inventory>;
   pastInventoryUpdateForm: FormGroup;
   formIsFinal = false;
   formError: string;
 
-  inventoryPeriod = BusinessInventoryPeriod - 1;
-  displayedColumns = inventoryColumns;
+  constructor(
+    private _router: Router,
+    private _locationService: LocationService,
+    private _inventoryService: InventoryService,
+    private _store: Store<fromAppStore.AppState>,
+    private _themeService: ThemeService
+  ) {}
 
   ngOnInit(): void {
-    console.clear();
+    // console.clear();
 
-    this.userStoreSub = this.store
+    this._userStoreSub = this._store
       .select('user')
       .pipe(map((authState) => authState.user))
       .subscribe((user) => {
@@ -94,26 +119,37 @@ export class InventoryComponent
         }
       });
 
-    this.locationStoreSub = this.store
+    this._locationStoreSub = this._store
       .select('location')
-      .subscribe((locState) => {
-        this.activeProducts = locState.activeProducts;
-        this.activeLocation = locState.activeLocation;
-        this.workingInventory = locState.activeInventory;
-        this.inventoryDataPopulatedSorted = locState.activeLocationInventories;
+      .subscribe((locationState) => {
+        this.activeProducts = locationState.activeProducts;
+        this.activeLocation = locationState.activeLocation;
+        this.workingInventory = locationState.activeInventory;
+        this.inventoryDataPopulatedSorted = locationState.activeLocationInventories;
+
+        this.appLoading = locationState.loading;
+        this.locationLoading = locationState.loading;
+        this.locationError = locationState.locationError;
+        this.userLocations = locationState.userLocations;
+        this.activeLocation = locationState.activeLocation;
+        this.inventoryData = locationState.activeLocation?.inventoryData;
+        this.activeInventory = locationState.activeInventory;
+        this.activeLocationInventories =
+          locationState.activeLocationInventories;
+        this.activeProducts = locationState.activeProducts;
 
         // IF USER HAS AT LEAST ONE ACTIVATED LOCATION
         if (
-          locState.activeLocation &&
-          locState.activeLocation.productList &&
-          locState.activeLocation.productList.length > 0
+          locationState.activeLocation &&
+          locationState.activeLocation.productList &&
+          locationState.activeLocation.productList.length > 0
         ) {
-          this.locationProducts = locState.activeLocation.productList;
+          this.locationProducts = locationState.activeLocation.productList;
         }
 
         if (
-          locState.activeLocationInventories &&
-          locState.activeLocationInventories.length > 0
+          locationState.activeLocationInventories &&
+          locationState.activeLocationInventories.length > 0
         ) {
           this.onSortInventoryData();
         }
@@ -122,7 +158,7 @@ export class InventoryComponent
           '%cLocation State',
           `font-size: 1rem;
             color: lightgreen;`,
-          locState
+          locationState
         );
         console.groupEnd();
       });
@@ -131,9 +167,8 @@ export class InventoryComponent
   }
 
   ngOnDestroy(): void {
-    super.userStoreSub.unsubscribe();
-    super.locationStoreSub.unsubscribe();
-    super.themeSub.unsubscribe();
+    this._userStoreSub.unsubscribe();
+    this._locationStoreSub.unsubscribe();
   }
 
   defineFilter() {
@@ -221,7 +256,7 @@ export class InventoryComponent
 
   onPastInventoryUpdateSubmit(draftInventoryForm: NgForm) {
     if (draftInventoryForm.invalid) {
-      this.store.dispatch(
+      this._store.dispatch(
         LocationActions.LocationError({ errorMessage: 'Form Invalid' })
       );
     } else {
@@ -229,7 +264,7 @@ export class InventoryComponent
     }
     console.log(this.pastInventoryUpdateForm.value);
 
-    this.store.dispatch(
+    this._store.dispatch(
       LocationActions.PUTUpdateInventoryForLocationStart({
         inventory: draftInventoryForm.value,
       })
@@ -239,5 +274,4 @@ export class InventoryComponent
 
     this._router.navigate(['/app/dashboard']);
   }
-
 }

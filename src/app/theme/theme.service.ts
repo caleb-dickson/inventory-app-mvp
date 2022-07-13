@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { Subject } from 'rxjs';
-import { UserState } from '../users/user-store/user.reducer';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
-  readonly themeStatus = new Subject<string>();
+  readonly themeStatus = new BehaviorSubject<string>('theme-dark');
 
   constructor() {}
 

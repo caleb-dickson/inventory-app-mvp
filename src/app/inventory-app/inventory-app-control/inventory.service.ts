@@ -60,20 +60,22 @@ export class InventoryService implements OnInit {
   saveInventory(
     inventoryForm: FormGroup,
     activeLocation: Location,
-    userDept: string,
+    formDept: string,
     saveNew: boolean
   ) {
     // CREATE A NEW INVENTORY OBJ BASED ON FORM INPUT AND CALC TOTAL VALUE
     const inventory: Inventory = {
-      _id: null,
+      _id: inventoryForm.value._id,
       parentLocation: activeLocation._id,
       dateStart: inventoryForm.value.dateStart,
       dateEnd: inventoryForm.value.dateEnd,
-      department: userDept,
+      department: formDept,
       isFinal: inventoryForm.value.isFinal,
       inventory: inventoryForm.value.inventory,
       value: this.getInventoriesValues(inventoryForm.value.inventory),
     };
+    console.log(inventory);
+    console.log('||| ^^^ Inv object created ^^^ |||')
 
     // HANDLE INVALID FORM
     if (inventoryForm.invalid) {
@@ -111,6 +113,7 @@ export class InventoryService implements OnInit {
         // REMOVING THIS TRIGGERS A FETCH ACTION TO GET THE LATEST
         // THE INVENTORY DATA
         localStorage.removeItem('inventoryData');
+        this.setInventoryForUpdate(null);
       }
     }
   }

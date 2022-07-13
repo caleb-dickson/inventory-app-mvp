@@ -108,10 +108,7 @@
       #invSubmit
       type="submit"
       (click)="
-        onInventorySubmit({
-          inventoryForm: inventoryForm,
-          saveNew: inventoryForm.get('isFinal').value
-        })
+        onInventorySubmit()
       "
       [disabled]="inventoryForm.invalid"
     >
@@ -127,7 +124,7 @@
       type="button"
       color="accent"
       (click)="
-        onInventorySubmit({ inventoryForm: inventoryForm, saveNew: true })
+        onInventorySubmit()
       "
       [disabled]="inventoryForm.invalid"
     >

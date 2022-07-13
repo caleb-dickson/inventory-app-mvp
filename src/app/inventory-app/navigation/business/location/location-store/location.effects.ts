@@ -219,9 +219,9 @@ export class LocationEffects {
           .pipe(
             map((resData) => {
               if (resData.updatedInventory) {
-                return LocationActions.PUTUpdateInventoryForLocationSuccess({
+                this.store.dispatch(LocationActions.PUTUpdateInventoryForLocationSuccess({
                   updatedInventory: resData.updatedInventory,
-                });
+                }));
               }
               return LocationActions.GETUserLocationsStart({
                 userId: authState.user.userId,
