@@ -156,7 +156,6 @@ export class UserEffects {
       ofType(UserActions.PUTUpdateUserSuccess),
       map((action) => {
         console.warn('||| updateUser$ effect called |||===');
-        console.log(action);
 
         const userProfileData = {
           _id: action.user.userId,
@@ -169,9 +168,7 @@ export class UserEffects {
           'userProfileData',
           JSON.stringify(userProfileData)
         );
-
-        // return UserActions.autoLogin();
-        return { type: 'dummy data' };
+        return UserActions.autoLogin();
       })
     )
   );

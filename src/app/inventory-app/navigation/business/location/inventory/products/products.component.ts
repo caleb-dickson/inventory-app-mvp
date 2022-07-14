@@ -1,19 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormGroup, NgForm } from '@angular/forms';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../../../../app-store/app.reducer';
 import * as LocationActions from '../../location-store/location.actions';
 import { LocationState } from '../../location-store/location.reducer';
 
-import { map, Observable, Subject, Subscription } from 'rxjs';
+import { map, Subscription } from 'rxjs';
 
 import { Location } from '../../../../../models/location.model';
-
 import { Product } from '../../../../../models/product.model';
+import { User } from 'src/app/users/user.model';
 
 import { LocationService } from '../../../../../inventory-app-control/location.service';
-import { User } from 'src/app/users/user.model';
 import { ProductsService } from '../../../../../inventory-app-control/products.service';
 
 @Component({
@@ -23,9 +22,10 @@ import { ProductsService } from '../../../../../inventory-app-control/products.s
 })
 export class ProductsComponent implements OnInit, OnDestroy {
   constructor(
-    private store: Store<fromAppStore.AppState>,
-    private locationService: LocationService,
-    private _productsService: ProductsService
+    private _store: Store<fromAppStore.AppState>,
+    private _locationService: LocationService,
+    private _productsService: ProductsService,
+    // private _matExpansion: MatExpansionPanel
   ) {}
 
   private _userAuthSub: Subscription;
@@ -42,6 +42,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   bizLoading: boolean;
   locLoading: boolean;
 
+  matExpanded: boolean;
   newProductForm: NgForm;
   productFormMode: string = 'new';
   updateProduct: Product;
@@ -70,11 +71,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
     );
 
     this._productEditDialogStatus =
-      this._productsService.$productEditDialogStatus.subscribe((status) => {
+      this._productsService.$productEditDialogStatus.subscribe((status) => {});
 
-      });
-
-    this._userAuthSub = this.store
+    this._userAuthSub = this._store
       .select('user')
       .pipe(map((authState) => authState.user))
       .subscribe((user) => {
@@ -95,7 +94,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         }
       });
 
-    this._locationStoreSub = this.store
+    this._locationStoreSub = this._store
       .select('location')
       .subscribe((locState) => {
         this.locationState = locState;
@@ -111,13 +110,14 @@ export class ProductsComponent implements OnInit, OnDestroy {
         console.groupEnd();
       });
 
-    this._businessStoreLoadingSub = this.store
+    this._businessStoreLoadingSub = this._store
       .select('business')
       .pipe(map((bizState) => bizState.loading))
       .subscribe((loading) => (this.bizLoading = loading));
   }
 
-  onNewProductSubmit(newProductForm: any) {
+
+  onNewProductSubmit(newProductForm: FormGroup) {
     console.log(newProductForm);
     console.log(newProductForm?.value);
 
@@ -125,35 +125,34 @@ export class ProductsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // this.store.dispatch(
-    //   LocationActions.POSTCreateProductForLocationStart({
-    //     product: {
-    //       _id: null,
-    //       parentOrg: this.activeLocation._id,
-    //       isActive: this.productStatusInput === 'Active' ? true : false,
-    //       department: this.user.userProfile.department,
-    //       category: newProductForm.value.category,
-    //       name: newProductForm.value.name,
-    //       unitSize: newProductForm.value.unitSize,
-    //       unitMeasure: newProductForm.value.unit,
-    //       unitsPerPack: newProductForm.value.unitsPerPack,
-    //       packsPerCase: newProductForm.value.packsPerCase,
-    //       casePrice: newProductForm.value.casePrice,
-    //       par: newProductForm.value.par,
-    //     },
-    //     locationId: this.activeLocation._id,
-    //   })
-    // );
-    // newProductForm.reset();
+    this._store.dispatch(
+      LocationActions.POSTCreateProductForLocationStart({
+        product: {
+          _id: null,
+          parentOrg: this.activeLocation._id,
+          isActive: newProductForm.value.isActive,
+          department: newProductForm.value.department,
+          category: newProductForm.value.category,
+          name: newProductForm.value.name,
+          unitSize: newProductForm.value.unitSize,
+          unitMeasure: newProductForm.value.unitMeasure,
+          unitsPerPack: newProductForm.value.unitsPerPack,
+          packsPerCase: newProductForm.value.packsPerCase,
+          casePrice: newProductForm.value.casePrice,
+          par: newProductForm.value.par,
+        },
+        locationId: this.activeLocation._id,
+      })
+    );
   }
 
-  onProductUpdateSubmit(productUpdateForm: NgForm) {
-    console.log(productUpdateForm);
-    console.log(productUpdateForm.value);
-  }
+  // onProductUpdateSubmit(productUpdateForm: NgForm) {
+  //   console.log(productUpdateForm);
+  //   console.log(productUpdateForm.value);
+  // }
 
   onProductSelect(checked: boolean, product: Product) {
-    this.locationService.selectProducts(
+    this._locationService.selectProducts(
       checked,
       [...this.activeProducts],
       product

@@ -24,7 +24,6 @@ export class ThemeService {
 
     if (guestUserData) {
       this.themeStatus.next(guestUserData.themePref);
-      console.clear();
       console.log('||| Theme data found in guestUserData |||');
     } else if (userProfileData) {
       this.themeStatus.next(userProfileData.userProfile.themePref)

@@ -1,6 +1,10 @@
 <!-- TITLE BLOCK -->
 <div class="spinner spinner-top">
-  <mat-spinner diameter="100" strokeWidth="6" *ngIf="locationLoading"></mat-spinner>
+  <mat-spinner
+    diameter="100"
+    strokeWidth="6"
+    *ngIf="locationLoading"
+  ></mat-spinner>
 </div>
 
 <div
@@ -17,10 +21,7 @@
 </div>
 
 <!-- "NO DEPARTMENT PRODUCTS IN LOCATION" MESSAGE -->
-<div
-  class="location"
-  *ngIf="activeLocation?.productList.length === 0"
->
+<div class="location" *ngIf="activeLocation?.productList.length === 0">
   <!-- OWNERS, MANAGEMENT AND ADMINS -->
   <h4 *ngIf="userRole !== 'staff' && activeLocation">
     Add
@@ -35,11 +36,7 @@
     No
     {{ userDept | uppercase }}
     products found for the
-    {{
-      activeLocation
-        ? activeLocation.locationName
-        : null
-    }}
+    {{ activeLocation ? activeLocation.locationName : null }}
     location.
   </h4>
   <p *ngIf="userRole === 'staff'">
@@ -53,7 +50,9 @@
   class="new-inventory-container"
   *ngIf="activeLocation?.productList.length > 0"
 >
-  <mat-expansion-panel class="inventory-expansion">
+  <mat-expansion-panel
+    class="inventory-expansion"
+  >
     <mat-expansion-panel-header>
       <mat-panel-title
         ><mat-icon class="new-inventory-icon">addchart</mat-icon> Create New
@@ -101,7 +100,6 @@
 
           <app-inventory-form
             *ngIf="newInventoryProducts?.length > 0"
-            [inventoryProducts]="newInventoryProducts"
             [formDept]="formDept"
             [invFormMode]="'new'"
             (inventoryFormSubmitted)="onInventorySubmit($event, true)"
@@ -124,7 +122,9 @@
 
 <!-- WORKING INVENTORIES START -->
 <div *ngIf="draftInventory" class="new-inventory-container">
-  <mat-expansion-panel class="inventory-expansion">
+  <mat-expansion-panel
+    class="inventory-expansion"
+  >
     <mat-expansion-panel-header>
       <mat-panel-title
         ><mat-icon class="new-inventory-icon">insert_chart_outlined</mat-icon>
@@ -137,12 +137,12 @@
       <mat-card class="inventory-card">
         <mat-card-content>
           <app-inventory-form
-          *ngIf="draftInventory"
-          [draftInventory]="draftInventory"
-          [inventoryProducts]="draftInventory.inventory"
-          [formDept]="formDept"
-          [invFormMode]="'update'"
-          (inventoryFormSubmitted)="onInventorySubmit($event, false)"
+            *ngIf="draftInventory"
+            [draftInventory]="draftInventory"
+            [inventoryProducts]="draftInventory.inventory"
+            [formDept]="formDept"
+            [invFormMode]="'update'"
+            (inventoryFormSubmitted)="onInventorySubmit($event, false)"
           ></app-inventory-form>
         </mat-card-content>
       </mat-card>

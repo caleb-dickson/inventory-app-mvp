@@ -29,31 +29,31 @@
   </div>
 
   <!-- PRODUCT INVENTORY CARDS START -->
-  <div formArrayName="inventory" class="inventory-products-cards-container">
+  <div formArrayName="inventory" class="inventory-products">
     <mat-card
       *ngFor="
         let control of inventoryItemControls;
-        let item;
+        let product;
         of: inventoryProducts;
         let i = index
       "
       [formGroupName]="i"
-      class="inventory-products"
+      class="inventory-products-card"
     >
-      <div class="inventory-products-input">
-        <h6>{{ item.product.name }}</h6>
+      <div class="inventory-products-card-input">
+        <h6>{{ product.name }}</h6>
         <p>
           {{
-            item.product.unitSize +
+            product.unitSize +
               " " +
-              (item.product.unitSize > 1
-                ? item.product.unitMeasure.plural
-                : item.product.unitMeasure.singular)
+              (product.unitSize > 1
+                ? product.unitMeasure.plural
+                : product.unitMeasure.singular)
           }}
-          {{ " x " + item.product.unitsPerPack * item.product.packsPerCase }}
+          {{ " x " + product.unitsPerPack * product.packsPerCase }}
           per case
         </p>
-        <p>How many {{ item.product.unitMeasure.plural }} in stock?</p>
+        <p>How many {{ product.unitMeasure.plural }} in stock?</p>
         <mat-form-field appearance="outline" hidden>
           <input matInput type="text" #product formControlName="product" />
         </mat-form-field>
@@ -64,17 +64,17 @@
         <p *ngIf="quantity.value">
           Value:
           {{
-            (item.product.casePrice /
-              (item.product.unitSize *
-                item.product.unitsPerPack *
-                item.product.packsPerCase)) *
+            (product.casePrice /
+              (product.unitSize *
+                product.unitsPerPack *
+                product.packsPerCase)) *
               quantity.value | currency
           }}
         </p>
       </div>
     </mat-card>
   </div>
-  <div *ngIf="user.userProfile.role > 1" class="inventory-card-submit-status">
+  <div *ngIf="user.userProfile.role > 1" class="inventory-submit-status">
     <mat-label>Save as:</mat-label>
     <mat-radio-group
       required

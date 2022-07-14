@@ -22,6 +22,7 @@ import { environment } from 'src/environments/environment';
 import { Location } from '../../../../models/location.model';
 import { Inventory } from '../../../../models/inventory.model';
 import { LocationService } from 'src/app/inventory-app/inventory-app-control/location.service';
+import { Product } from 'src/app/inventory-app/models/product.model';
 
 const BACKEND_URL = environment.apiUrl + '/location';
 
@@ -50,7 +51,7 @@ export class LocationEffects {
     this.actions$.pipe(
       ofType(LocationActions.GETUserLocationsStart),
       switchMap((action) => {
-        console.warn('|||[Location] fetchUserLocations$ effect called |||===');
+        console.warn('|||[Location] fetchUserLocations$ effect called |||');
         return this.http
           .get<{ fetchedLocations: Location[] }>(
             BACKEND_URL +
@@ -94,9 +95,9 @@ export class LocationEffects {
   addProductsToLocation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LocationActions.POSTCreateProductForLocationStart),
-      withLatestFrom(this.store.select('user')),
-      concatMap(([action, authState]) => {
-        console.warn('|||[Location] addProductToLocation$ effect called |||===');
+      withLatestFrom(this.store.select('user'), this.store.select('business')),
+      concatMap(([action, authState, businessState]) => {
+        console.warn('|||[Location] addProductToLocation$ effect called |||');
         return this.http
           .post<{ message: string; updatedActiveLocation: Location }>(
             BACKEND_URL + '/new-product',
@@ -123,10 +124,16 @@ export class LocationEffects {
                 );
               }
 
-              return LocationActions.GETUserLocationsStart({
-                userId: authState.user.userId,
-                userRole: authState.user.userProfile.role,
-              });
+              if (authState.user.userProfile.role === 3) {
+                return BusinessActions.GETBusinessLocationsStart({
+                  businessId: businessState.business._id,
+                });
+              } else {
+                return LocationActions.GETUserLocationsStart({
+                  userId: authState.user.userId,
+                  userRole: authState.user.userProfile.role,
+                });
+              }
             }),
             catchError((errorRes) => {
               console.log(errorRes);
@@ -142,7 +149,7 @@ export class LocationEffects {
       ofType(LocationActions.POSTCreateInventoryForLocationStart),
       withLatestFrom(this.store.select('user'), this.store.select('business')),
       concatMap(([action, authState, businessState]) => {
-        console.warn('|||[Location] addNewInventory$ effect called |||===');
+        console.warn('|||[Location] addNewInventory$ effect called |||');
         return this.http
           .post<{
             message: string;
@@ -181,15 +188,80 @@ export class LocationEffects {
                 })
               );
               if (authState.user.userProfile.department !== 'admin') {
-                console.log('|||[Location] Fetching Non-Owner USER\'s Locations |||');
+                console.log(
+                  "|||[Location] Fetching Non-Owner USER's Locations |||"
+                );
                 return LocationActions.GETUserLocationsStart({
                   userId: authState.user.userId,
                   userRole: authState.user.userProfile.role,
                 });
               } else {
-                console.log('|||[Location] Fetching OWNER\'s BUSINESS Locations |||');
+                console.log(
+                  "|||[Location] Fetching OWNER's BUSINESS Locations |||"
+                );
                 return BusinessActions.GETBusinessLocationsStart({
                   businessId: businessState.business._id,
+                });
+              }
+            }),
+            catchError((errorRes) => {
+              console.warn(errorRes);
+              return handleError(errorRes);
+            })
+          );
+      })
+    )
+  );
+
+  updateLocationProduct$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(LocationActions.PUTUpdateProductForLocationStart),
+      withLatestFrom(this.store.select('user'), this.store.select('business')),
+      exhaustMap(([action, authState, businessState]) => {
+        console.warn('|||[Location] updateLocationProduct$ effect called |||');
+
+        return this.http
+          .put<{ updatedProduct: Product; updatedLocation: Location }>(
+            BACKEND_URL + '/update-product',
+            {
+              product: action.product,
+            }
+          )
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              console.warn('|||updateLocationProduct$ resData |||');
+              if (resData.updatedProduct) {
+
+                // UPDATE THE LOCATION LOCALLY AND ACTIVATE IT
+                localStorage.setItem(
+                  'activatedLocation',
+                  JSON.stringify(resData.updatedLocation));
+                this.store.dispatch(
+                  LocationActions.ActivateLocation({
+                    location: resData.updatedLocation,
+                  })
+                );
+                // STOP LOADING AND CLEAR ERRORS
+                this.store.dispatch(
+                  LocationActions.PUTUpdateProductForLocationSuccess({
+                    updatedProduct: resData.updatedProduct,
+                  })
+                );
+                this.store.dispatch(
+                  LocationActions.GETLocationInventoriesStart({
+                    locationId: resData.updatedProduct.parentOrg,
+                  })
+                );
+              }
+              if (authState.user.userProfile.role === 3) {
+                return BusinessActions.GETBusinessLocationsStart({
+                  businessId: businessState.business._id,
+                });
+              } else {
+                return LocationActions.GETUserLocationsStart({
+                  userId: authState.user.userId,
+                  userRole: authState.user.userProfile.role,
                 });
               }
             }),
@@ -205,9 +277,11 @@ export class LocationEffects {
   updateLocationInventory$ = createEffect(() =>
     this.actions$.pipe(
       ofType(LocationActions.PUTUpdateInventoryForLocationStart),
-      withLatestFrom(this.store.select('user')),
-      exhaustMap(([action, authState]) => {
-        console.warn('|||[Location] updateLocationInventory$ effect called |||===');
+      withLatestFrom(this.store.select('user'), this.store.select('business')),
+      exhaustMap(([action, authState, businessState]) => {
+        console.warn(
+          '|||[Location] updateLocationInventory$ effect called |||'
+        );
 
         return this.http
           .put<{ updatedInventory: Inventory }>(
@@ -219,14 +293,27 @@ export class LocationEffects {
           .pipe(
             map((resData) => {
               if (resData.updatedInventory) {
-                this.store.dispatch(LocationActions.PUTUpdateInventoryForLocationSuccess({
-                  updatedInventory: resData.updatedInventory,
-                }));
+                this.store.dispatch(
+                  LocationActions.PUTUpdateInventoryForLocationSuccess({
+                    updatedInventory: resData.updatedInventory,
+                  })
+                );
+                this.store.dispatch(
+                  LocationActions.GETLocationInventoriesStart({
+                    locationId: resData.updatedInventory.parentLocation,
+                  })
+                );
               }
-              return LocationActions.GETUserLocationsStart({
-                userId: authState.user.userId,
-                userRole: authState.user.userProfile.role,
-              });
+              if (authState.user.userProfile.role === 3) {
+                return BusinessActions.GETBusinessLocationsStart({
+                  businessId: businessState.business._id,
+                });
+              } else {
+                return LocationActions.GETUserLocationsStart({
+                  userId: authState.user.userId,
+                  userRole: authState.user.userProfile.role,
+                });
+              }
             }),
             catchError((errorRes) => {
               console.warn(errorRes);
@@ -241,7 +328,9 @@ export class LocationEffects {
     this.actions$.pipe(
       ofType(LocationActions.GETLocationInventoriesStart),
       switchMap((action) => {
-        console.warn('|||[Location] fetchLocationInventories$ effect called |||');
+        console.warn(
+          '|||[Location] fetchLocationInventories$ effect called |||'
+        );
 
         return this.http
           .get<{ fetchedInventories: Inventory[]; message: string }>(

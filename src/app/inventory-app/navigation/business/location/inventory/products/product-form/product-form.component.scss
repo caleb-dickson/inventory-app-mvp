@@ -6,6 +6,16 @@
   justify-content: center;
   align-items: center;
 
+  &-department {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-block-end: 1rem;
+
+    mat-radio-button {
+      margin-inline: 0.5rem;
+    }
+  }
 
   mat-form-field {
     width: 20vw;

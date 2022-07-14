@@ -1,5 +1,19 @@
 <form [formGroup]="productForm">
   <div class="product-add-new-form">
+
+    <div *ngIf="userDept === 'admin'" class="product-add-new-form-department">
+      <mat-label>Department</mat-label>
+      <mat-radio-group
+        formControlName="department"
+        [value]="selected"
+        (change)="onDepartmentSelect($event)"
+      >
+        <mat-radio-button [value]="'foh'">FOH</mat-radio-button>
+        <mat-radio-button [value]="'boh'">BOH</mat-radio-button>
+      </mat-radio-group>
+      <mat-error *ngIf="productForm.touched && productForm.get('department').invalid">Select a department to add this product to.</mat-error>
+    </div>
+
     <mat-form-field [appearance]="productFormMode === 'new' ? 'outline' : 'standard'">
       <mat-label>Product Category</mat-label>
       <mat-select required formControlName="category" type="text">
@@ -159,7 +173,6 @@
       (change)="onProductStatusSelect($event.checked)"
       [checked]="productStatusText === 'Active' ? true : false"
     >
-      <!-- [ngClass]="productStatus ? null : 'null-value'" -->
       {{ productStatusText }}
       <mat-icon
         matTooltip="Sets the inventory status of this product.

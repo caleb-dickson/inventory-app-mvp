@@ -10,7 +10,7 @@ import { LoginComponent } from '../auth/login/login.component';
 import { SignupComponent } from '../auth/signup/signup.component';
 import { FormGroup, NgForm } from '@angular/forms';
 import { PreviewComponent } from '../auth/preview/preview.component';
-import { map, Subscription } from 'rxjs';
+import { catchError, map, Subscription } from 'rxjs';
 import { User } from '../user.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
@@ -157,12 +157,15 @@ export class UserService {
       );
     }
 
+    // SET userLoading TO true
     this.store.dispatch(UserActions.PUTUpdateUserStart());
 
+    // SEND THE PUT REQUEST TO UPDATE THE USER DOC ON BACKEND
     this.http
       .put<{ updatedUser: User }>(BACKEND_URL + '/update-user', formData)
       .subscribe((resData) => {
         console.log(resData);
+        // SET THE UPDATED USER DATA IN LOCALSTORAGE AND AUTOLOGIN
         this.store.dispatch(
           UserActions.PUTUpdateUserSuccess({ user: resData.updatedUser })
         );

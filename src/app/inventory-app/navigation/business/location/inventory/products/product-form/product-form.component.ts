@@ -23,6 +23,7 @@ import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../../../../../app-store/app.reducer';
 import { Location } from 'src/app/inventory-app/models/location.model';
 import { ProductsService } from '../../../../../../inventory-app-control/products.service';
+import { MatRadioChange } from '@angular/material/radio';
 
 @Component({
   selector: 'app-product-form',
@@ -31,7 +32,7 @@ import { ProductsService } from '../../../../../../inventory-app-control/product
 })
 export class ProductFormComponent implements OnInit, OnDestroy {
   constructor(
-    private store: Store<fromAppStore.AppState>,
+    private _store: Store<fromAppStore.AppState>,
     private _productsService: ProductsService
   ) {}
 
@@ -45,6 +46,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   user: User;
   userRole: string;
+  userDept: string;
 
   bizLoading: boolean;
   locLoading: boolean;
@@ -69,6 +71,27 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     this.productCategories = defaultCategories;
     this.defaultUnits = defaultUnits;
 
+    this._userAuthSub = this._store
+      .select('user')
+      .pipe(map((authState) => authState.user))
+      .subscribe((user) => {
+        this.user = user;
+        if (user) {
+          switch (user.userProfile.role) {
+            case 3:
+              this.userRole = 'owner';
+              break;
+            case 2:
+              this.userRole = 'manager';
+              break;
+            case 1:
+              this.userRole = 'staff';
+              break;
+          }
+          this.userDept = user.userProfile.department;
+        }
+      });
+
     this._updateProductSub = this._productsService.$updateProduct.subscribe(
       (product) => {
         this.updateProduct = product;
@@ -82,7 +105,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       }
     );
 
-    this._userAuthSub = this.store
+    this._userAuthSub = this._store
       .select('user')
       .pipe(map((authState) => authState.user))
       .subscribe((user) => {
@@ -102,7 +125,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         }
       });
 
-    this._locationStoreSub = this.store
+    this._locationStoreSub = this._store
       .select('location')
       .subscribe((locState) => {
         this.locationState = locState;
@@ -119,6 +142,11 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       });
   }
 
+  onDepartmentSelect($event: MatRadioChange) {
+    this.productForm.get('department').setValue($event.value);
+    console.log(this.productForm.value);
+  }
+
   onProductNameInput(name: string) {
     this.productName = name;
   }
@@ -127,8 +155,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     checked
       ? (this.productStatusText = 'Active')
       : (this.productStatusText = 'Inactive');
-    this.productForm.get('isActive').setValue(this.productStatus);
     this.productStatus = checked;
+    this.productForm.get('isActive').setValue(this.productStatus);
 
     // IN UPDATE MODE, SET FORM STATUS TO ENABLE SUBMIT BUTTON ON
     // PRODUCT STATUS CHANGE FROM ORIGINAL DOC
@@ -149,7 +177,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       this.productForm.markAsTouched();
       this.productForm.markAsDirty();
     }
+    this.productForm.updateValueAndValidity();
     console.log(this.productForm.dirty);
+    console.log(this.productForm.value.isActive);
   }
 
   onResetForm() {
@@ -171,12 +201,15 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   private _initProductForm() {
+    let productDepartment = this.userDept === 'admin' ? null : this.userDept;
+    let deptRequired = this.userDept === 'admin' ? Validators.required : null;
+
     if (this.productFormMode === 'new') {
       this.productForm = new FormGroup({
         _id: new FormControl(null),
         parentOrg: new FormControl(null),
         isActive: new FormControl(this.productStatus, Validators.required),
-        department: new FormControl(null),
+        department: new FormControl(productDepartment, deptRequired),
         category: new FormControl(null, Validators.required),
         name: new FormControl(null, Validators.required),
         unitSize: new FormControl(null, Validators.required),
@@ -189,6 +222,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     } else if (this.productFormMode === 'update') {
       console.log(this.productFormMode);
       console.log(this.updateProduct);
+      this.productStatusText = this.updateProduct?.isActive
+        ? 'Active'
+        : 'Inactive';
 
       this.productForm = new FormGroup({
         _id: new FormControl(this.updateProduct?._id, Validators.required),
@@ -228,6 +264,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         ),
         par: new FormControl(this.updateProduct?.par, Validators.required),
       });
+      console.log(this.updateProduct);
     }
   }
 

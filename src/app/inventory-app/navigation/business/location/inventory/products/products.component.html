@@ -29,9 +29,7 @@
         </mat-card-subtitle>
 
         <mat-card-content>
-          <app-product-form
-            (productFormSubmitted)="onNewProductSubmit($event)"
-          >
+          <app-product-form (productFormSubmitted)="onNewProductSubmit($event)">
           </app-product-form>
         </mat-card-content>
 
@@ -62,7 +60,7 @@
 
   <div>
     <button
-      *ngIf="activeProducts.length > 0 && activeLocation.productList.length > 6"
+      *ngIf="activeProducts.length > 0 && activeLocation.productList.length > 3"
       mat-raised-button
       color="primary"
       type="button"
@@ -85,7 +83,14 @@
       </mat-card-title>
       <mat-card-content>
         <p>{{ product.product.department | uppercase }}</p>
-        <p>Status: {{ product.product.isActive ? "Active" : "Inactive" }}</p>
+        <p>
+          Status:
+          <span
+            class="product-list-cards-status"
+            [ngClass]="!product.product.isActive ? 'inactive' : null"
+            >{{ product.product.isActive ? "Active" : "Inactive" }}</span
+          >
+        </p>
         <p>{{ product.product.category }}</p>
         <p>
           {{
@@ -119,7 +124,10 @@
           {{ product.product.par > 1 ? "packs" : "pack" }}
         </p>
       </mat-card-content>
-      <mat-card-actions *ngIf="user.userProfile.role > 1 || userDept === 'admin'" align="center">
+      <mat-card-actions
+        *ngIf="user.userProfile.role > 1 || userDept === 'admin'"
+        align="center"
+      >
         <button mat-raised-button (click)="onEditProduct(product.product)">
           Edit
         </button>

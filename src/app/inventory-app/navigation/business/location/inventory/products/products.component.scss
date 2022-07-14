@@ -62,12 +62,21 @@
         flex-direction: column;
         margin-inline-start: 2rem;
       }
+
+      // &-status {
+
+      // }
+      .inactive {
+        color: #f44336;
+      }
+
+      .active {
+        color: #f44336;
+      }
+
     }
   }
 
-  &-delete {
-    margin-inline-start: 2rem;
-  }
   &-clear {
     margin-inline-start: 1rem;
   }
@@ -129,9 +138,7 @@
       }
     }
 
-    &-delete {
-      margin-inline-start: 2rem;
-    }
+
     &-clear {
       margin-inline-start: 1rem;
     }

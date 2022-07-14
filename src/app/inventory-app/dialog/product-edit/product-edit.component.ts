@@ -1,7 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+
 import { Subscription } from 'rxjs';
+
+import { Store } from '@ngrx/store';
+import * as fromAppStore from '../../../app-store/app.reducer';
+import * as LocationActions from '../../navigation/business/location/location-store/location.actions';
+
 import { ProductsService } from '../../inventory-app-control/products.service';
 import { Product } from '../../models/product.model';
 
@@ -13,7 +19,8 @@ import { Product } from '../../models/product.model';
 export class ProductEditComponent implements OnInit {
   constructor(
     private _productsService: ProductsService,
-    private _dialog: MatDialog
+    private _dialog: MatDialog,
+    private _store: Store<fromAppStore.AppState>
   ) {}
 
   private _updateProductSub: Subscription;
@@ -41,6 +48,12 @@ export class ProductEditComponent implements OnInit {
   onProductUpdateSubmit(productForm: FormGroup) {
     console.log(productForm);
     console.log(productForm.value);
+    this._store.dispatch(
+      LocationActions.PUTUpdateProductForLocationStart({
+        product: productForm.value,
+      })
+    );
+    this._dialog.closeAll();
   }
 
   onCloseDialog() {

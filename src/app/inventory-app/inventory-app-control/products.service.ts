@@ -16,10 +16,6 @@ export class ProductsService {
   $productFormMode = new BehaviorSubject<string>('new');
   $productEditDialogStatus = new BehaviorSubject<string>(null);
 
-  /**
-   *
-   * @param _dialog
-   */
   constructor(private _dialog: MatDialog) {
     this._onDialogClose = this._dialog.afterAllClosed.subscribe((event) => {
       this.$productEditDialogStatus.next('closed');
@@ -28,18 +24,10 @@ export class ProductsService {
     });
   }
 
-  /**
-   *
-   * @param updateProduct: {@link Product}
-   */
   setUpdateProduct(updateProduct: Product): void {
     this.$updateProduct.next(updateProduct);
   }
 
-  /**
-   *
-   * @param mode
-   */
   setFormMode(mode: string): void {
     this.$productFormMode.next(mode);
   }

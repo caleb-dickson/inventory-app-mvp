@@ -21,16 +21,14 @@ import { ThemeService } from 'src/app/theme/theme.service';
   templateUrl: './new-inventory.component.html',
   styleUrls: ['./new-inventory.component.scss'],
 })
-export class NewInventoryComponent
-  implements OnInit, OnDestroy
-{
-
+export class NewInventoryComponent implements OnInit, OnDestroy {
   // STATE
   // subs
   private _userStoreSub: Subscription;
   private _businessStoreSub: Subscription;
   private _locationStoreSub: Subscription;
   private _updateInventorySub: Subscription;
+  private _activeDepartmentProductsSub: Subscription;
   // loading state
   appLoading: boolean;
   userLoading: boolean;
@@ -77,7 +75,7 @@ export class NewInventoryComponent
   ) {}
 
   ngOnInit() {
-    // console.clear();
+    console.clear();
 
     this._userStoreSub = this._store.select('user').subscribe((userState) => {
       this.appLoading = userState.loading;
@@ -94,66 +92,73 @@ export class NewInventoryComponent
     });
 
     this._locationStoreSub = this._store
-    .select('location')
-    .subscribe((locationState) => {
-      this.appLoading = locationState.loading;
-      this.locationLoading = locationState.loading;
-      this.locationError = locationState.locationError;
-      this.userLocations = locationState.userLocations;
-      this.activeLocation = locationState.activeLocation;
-      this.inventoryData = locationState.activeLocation?.inventoryData;
-      this.activeInventory = locationState.activeInventory;
-      this.activeLocationInventories =
-        locationState.activeLocationInventories;
-      this.activeProducts = locationState.activeProducts;
+      .select('location')
+      .subscribe((locationState) => {
+        this.appLoading = locationState.loading;
+        this.locationLoading = locationState.loading;
+        this.locationError = locationState.locationError;
+        this.userLocations = locationState.userLocations;
+        this.activeLocation = locationState.activeLocation;
+        this.inventoryData = locationState.activeLocation?.inventoryData;
+        this.activeInventory = locationState.activeInventory;
+        this.activeLocationInventories =
+          locationState.activeLocationInventories;
+        this.activeProducts = locationState.activeProducts;
 
-      this.draftInventory = this.activeInventory;
+        this.draftInventory = this.activeInventory;
 
-      // IF USER HAS AT LEAST ONE ACTIVATED LOCATION
-      if (this.activeLocation?.productList.length > 0) {
-        this.locationProducts = this.activeLocation.productList;
-        this.inventoryDataPopulated = this.activeLocationInventories;
+        this._inventoryService.filterLocationProducts(
+          this.activeLocation?.productList,
+          this.formDept
+        );
 
-        // IF PRODUCTS ARE NEEDED AND USER ISN'T AN ADMIN
-        if (
-          this.activeLocation &&
-          this.initInvProducts &&
-          this.user.userProfile.department !== 'admin'
-        ) {
-          // SET PRODUCTS TO ONLY USER'S DEPT PRODUCTS
-          this.setProductList();
-          console.log(this.newInventoryProducts)
-          // IF USER IS AN ADMIN
-        } else if (
-          this.activeLocation &&
-          this.initInvProducts &&
-          this.user.userProfile.department === 'admin'
-        ) {
-          this.onDepartmentSelect(this.formDept);
+        // IF USER HAS AT LEAST ONE ACTIVATED LOCATION
+        if (this.activeLocation?.productList.length > 0) {
+          this.locationProducts = this.activeLocation.productList;
+          this.inventoryDataPopulated = this.activeLocationInventories;
+
+          // IF PRODUCTS ARE NEEDED AND USER ISN'T AN ADMIN
+          if (
+            this.activeLocation &&
+            this.user.userProfile.department !== 'admin'
+          ) {
+            // SET PRODUCTS TO ONLY USER'S DEPT PRODUCTS
+            // this.onDepartmentSelect(this.user.userProfile.department);
+            console.log(this.newInventoryProducts);
+            // IF USER IS AN ADMIN
+          } else if (
+            this.activeLocation &&
+            this.user.userProfile.department === 'admin'
+          ) {
+            // SET PRODUCTS TO ONLY SELECTED DEPT PRODUCTS
+            // this.onDepartmentSelect(this.formDept ? this.formDept : 'foh');
+          }
+
+          // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
+          if (this.draftInventory) {
+            this._inventoryService.setInventoryForUpdate(
+              this.draftInventory.inventory
+            );
+            this._updateInventorySub =
+              this._inventoryService.$updateInventory.subscribe((inv) => {
+                this.draftInventoryItems = inv;
+              });
+          }
         }
 
-        // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
-        if (this.draftInventory) {
-          this._inventoryService.setInventoryForUpdate(
-            this.draftInventory.inventory
-          );
-          this._updateInventorySub =
-            this._inventoryService.$updateInventory.subscribe((inv) => {
-              this.draftInventoryItems = inv;
-            });
-        }
-      }
-
-      console.group(
-        '%cLocation State',
-        `font-size: 1rem;
+        console.group(
+          '%cLocation State',
+          `font-size: 1rem;
           color: lightgreen;`,
-        locationState
-      );
-      console.groupEnd();
-    });
+          locationState
+        );
+        console.groupEnd();
+      });
 
-
+    this._activeDepartmentProductsSub =
+      this._inventoryService.$activeDepartmentProducts.subscribe((products) => {
+        this.newInventoryProducts = products;
+      });
   }
 
   ngOnDestroy(): void {
@@ -175,22 +180,14 @@ export class NewInventoryComponent
     }
   }
 
+
   onDepartmentSelect(dept: string) {
     this.newInventoryProducts = [];
     this.formDept = dept;
-    this.setProductList();
-  }
-
-  // DETERMINE WHAT PRODUCTS SHOULD BE INITIALIZED IN THE NEW INVENTORY FORM
-  // AND PASS THOSE PRODUCTS TO THE CHILD FORM FOR INITIALIZATION
-  setProductList(): void {
-    for (const product of this.activeLocation.productList) {
-      let productDept = product.product.department;
-      if (productDept === this.formDept && product.product.isActive) {
-        this.newInventoryProducts.push(product);
-      }
-    }
-    this.initInvProducts = false;
+    this._inventoryService.filterLocationProducts(
+      this.activeLocation.productList,
+      this.formDept
+    );
   }
 
   onInventorySubmit(inventoryForm: FormGroup, saveNew: boolean): void {
@@ -201,7 +198,5 @@ export class NewInventoryComponent
       this.formDept,
       saveNew
     );
-    // this._router.navigate(['/app/dashboard']);
   }
-
 }

@@ -243,7 +243,7 @@ export class NavigationComponent implements OnInit {
         this.onActivateLocation(this.businessState.businessLocations[0]);
       }
     } else {
-      // IF MANAGER HAS MULTIPLE AUTHORIZED LOCATIONS CHECK
+      // IF USER HAS MULTIPLE AUTHORIZED LOCATIONS CHECK
       // IN LOCALSTORAGE WHICH IS ACTIVE
       if (this.userLocations.length > 1) {
         this._locationService.getActivatedLocation();

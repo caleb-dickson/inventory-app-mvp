@@ -1,8 +1,9 @@
 import { BaseEntity } from './base.model';
+import { Location } from './location.model';
 import { Product } from './product.model';
 
 export class Inventory extends BaseEntity {
-  public parentLocation: string | Location | null;
+  public parentLocation: string;
   public dateStart: string;
   public dateEnd: string;
   public department: string;
@@ -11,7 +12,7 @@ export class Inventory extends BaseEntity {
   public value: number;
 
   constructor(
-    parentLocation: string | Location | null,
+    parentLocation: string,
     dateStart: string,
     dateEnd: string,
     department: string,

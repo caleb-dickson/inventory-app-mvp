@@ -70,13 +70,7 @@ export class RangeSelectionStrategy<D>
 export class InventoryFormComponent implements OnInit, OnDestroy {
   private _userAuthSub: Subscription;
   private _locationStoreSub: Subscription;
-
-  constructor(
-    private _store: Store<fromAppStore.AppState>,
-    private _router: Router,
-    private _locationService: LocationService,
-    private _inventoryService: InventoryService
-  ) {}
+  private _activeDepartmentProductsSub: Subscription;
 
   @Output() inventoryFormSubmitted = new EventEmitter<FormGroup>();
 
@@ -102,7 +96,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
   locLoading: boolean;
 
   locationProducts: any[];
-  @Input() inventoryProducts: any[];
+  inventoryProducts: any[];
   initInvProducts = true;
   initLocInventories = true;
 
@@ -113,6 +107,13 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
   inventoryPeriod = BusinessInventoryPeriod - 1;
   formIsFinal = false;
   formError: string;
+
+  constructor(
+    private _store: Store<fromAppStore.AppState>,
+    private _router: Router,
+    private _locationService: LocationService,
+    private _inventoryService: InventoryService
+  ) {}
 
   ngOnInit(): void {
     this._userAuthSub = this._store
@@ -157,15 +158,26 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
           }
         }
 
+
         console.group(
           '%cLocation State',
           `font-size: 1rem;
-            color: lightgreen;`,
+          color: lightgreen;`,
           locState
+          );
+          console.groupEnd();
+        });
+
+        this._activeDepartmentProductsSub =
+        this._inventoryService.$activeDepartmentProducts.subscribe(
+          (products) => {
+            this.inventoryProducts = products;
+            console.log(products);
+            this._initInventoryForm(products);
+          }
         );
-        console.groupEnd();
-      });
-    this._initInventoryForm();
+        console.log(this.inventoryProducts)
+
   }
 
   ngOnDestroy(): void {
@@ -174,8 +186,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
   }
 
   onResetInventoryForm(): void {
-    // this.inventoryForm.reset();
-    this._initInventoryForm();
+    this._initInventoryForm(this.inventoryProducts);
   }
 
   /**
@@ -185,33 +196,18 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
    */
   onSaveTypeSelect($event: MatRadioChange) {
     this.inventoryForm.get('isFinal').setValue($event.value);
-    console.log(this.inventoryForm.value);
   }
 
-  /**
-   * ### Outputs an `EventEmitter<InventoryFormData>` to the parent component of `<app-inventory-form>`
-   * ###
-   *
-   * @param formData Is an Object of `InventoryFormData`
-   *  ```
-   * interface InventoryFormData {
-   * inventoryForm: FormGroup;
-   * saveNew: boolean;
-   * }
-   * ```
-   */
   onInventorySubmit(): void {
     console.log(this.inventoryForm);
     this.inventoryFormSubmitted.emit(this.inventoryForm);
     this.inventoryForm.reset();
-    this._initInventoryForm();
+    this._initInventoryForm(this.inventoryProducts);
   }
 
-  /**
-   * In a future update, initializes the form depending on the form mode.
-   */
-  private _initInventoryForm(): void {
+  private _initInventoryForm(products: Product[]): void {
     console.log(this.invFormMode);
+    console.log(products)
     if (this.invFormMode === 'new') {
       let start = new Date();
       let beginDate = start.getDate() - this.inventoryPeriod;
@@ -219,10 +215,10 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
 
       let items = new FormArray([]);
 
-      for (const product of this.inventoryProducts) {
+      for (const product of products) {
         items.push(
           new FormGroup({
-            product: new FormControl(product.product, Validators.required),
+            product: new FormControl(product, Validators.required),
             quantity: new FormControl(null),
           })
         );
@@ -235,6 +231,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
         isFinal: new FormControl(this.formIsFinal, Validators.required),
         inventory: items,
       });
+      console.log(this.inventoryForm.value);
     } else {
       console.log(this.invFormMode);
 
@@ -270,6 +267,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
         ),
         inventory: items,
       });
+      console.log(this.inventoryForm.value);
     }
   }
 

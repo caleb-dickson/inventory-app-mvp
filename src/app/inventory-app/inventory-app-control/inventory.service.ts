@@ -7,7 +7,7 @@ import * as fromAppStore from '../../app-store/app.reducer';
 import * as LocationActions from '../navigation/business/location/location-store/location.actions';
 import * as BusinessActions from '../navigation/business/business-store/business.actions';
 
-import { Location } from '../models/location.model';
+import { Location, ProductList } from '../models/location.model';
 import { LocationIds } from '../models/business.model';
 import { LocationState } from '../navigation/business/location/location-store/location.reducer';
 import { BusinessState } from '../navigation/business/business-store/business.reducer';
@@ -29,6 +29,7 @@ export class InventoryService implements OnInit {
   private _locationState: LocationState;
 
   $updateInventory = new BehaviorSubject<Inventory>(null);
+  $activeDepartmentProducts = new BehaviorSubject<Product[]>(null);
 
   ngOnInit(): void {
     this._locationStoreSub = this._store
@@ -48,6 +49,18 @@ export class InventoryService implements OnInit {
 
   setInventoryForUpdate(inventory: Inventory) {
     this.$updateInventory.next(inventory);
+  }
+
+  filterLocationProducts(locationProducts: ProductList[], selectedDepartment: string) {
+    let newInventoryProducts: Product[] = [];
+    for (const product of locationProducts) {
+      let productDept = product.product.department;
+      if (productDept === selectedDepartment && product.product.isActive) {
+        newInventoryProducts.push(product.product);
+      }
+      console.log(newInventoryProducts)
+      this.$activeDepartmentProducts.next(newInventoryProducts);
+    }
   }
 
   /**

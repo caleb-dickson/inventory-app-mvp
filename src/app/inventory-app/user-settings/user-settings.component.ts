@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -6,6 +6,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import * as fromAppStore from '../../app-store/app.reducer';
+import * as UserActions from "../../users/user-store/user.actions";
 
 import { User } from 'src/app/users/user.model';
 
@@ -53,8 +54,6 @@ export class UserSettingsComponent implements OnInit {
   fileSizeOk = true;
 
   constructor(
-    private _http: HttpClient,
-    private _router: Router,
     private _userService: UserService,
     private _store: Store<fromAppStore.AppState>,
     private _themeService: ThemeService
@@ -68,8 +67,8 @@ export class UserSettingsComponent implements OnInit {
       this.userDept = userState.user?.userProfile.department;
       this.userPhoto = this.user?.userProfile.userPhoto;
       this.setUserRoleString(userState.user?.userProfile.role);
+      this._initUserProfileForm();
     });
-    this._initUserProfileForm();
 
     this._themeService.getThemeMode();
     this._themeSub = this._themeService.themeStatus.subscribe(
@@ -78,7 +77,6 @@ export class UserSettingsComponent implements OnInit {
         this.themePref = themeModeData;
       }
     );
-    console.log(this.themeMode)
   }
 
   setUserRoleString(intRole: number): void {
@@ -95,20 +93,24 @@ export class UserSettingsComponent implements OnInit {
     }
   }
 
-  onUserProfileSubmit(userProfileForm: FormGroup) {
+  onUserProfileSubmit() {
     this.userProfileForm.updateValueAndValidity();
-    if (userProfileForm.invalid) {
+    if (this.userProfileForm.invalid) {
       return;
     }
 
-    this._userService.updateUserProfile(
-      userProfileForm,
-      this.userPhotoUpload,
-      this.userRole,
-      this.userDept
-    );
-    this.onResetForm();
-    this._initUserProfileForm();
+    if (this.mimeTypeValid && this.fileSizeOk) {
+      this._userService.updateUserProfile(
+        this.userProfileForm,
+        this.userPhotoUpload,
+        this.userRole,
+        this.userDept
+      );
+      this.userProfileForm.reset();
+      this.userProfileForm.updateValueAndValidity();
+    } else {
+      this._store.dispatch(UserActions.userError({ message: "Form invalid"}))
+    }
   }
 
   onResetForm() {
@@ -120,7 +122,6 @@ export class UserSettingsComponent implements OnInit {
   }
 
   onDepartmentSelect(dept: Event) {
-    console.log(dept);
     this.userProfileForm.get('department').setValue(dept);
     this.userProfileForm.updateValueAndValidity();
   }
@@ -175,30 +176,29 @@ export class UserSettingsComponent implements OnInit {
 
     this.userProfileForm.get('userPhoto').updateValueAndValidity();
     reader.readAsDataURL(this.userPhotoUpload);
-    console.log(this.userProfileForm.value);
   }
 
   private _initUserProfileForm() {
     this.userProfileForm = new FormGroup({
       email: new FormControl(
-        { value: this.user.email, disabled: true },
+        { value: this.user?.email, disabled: true },
         {
           validators: [Validators.required],
         }
       ),
       department: new FormControl(
-        { value: this.user.userProfile.department, disabled: true },
+        { value: this.user?.userProfile.department, disabled: true },
         {
           validators: [Validators.required],
         }
       ),
-      firstName: new FormControl(this.user.userProfile.firstName, {
+      firstName: new FormControl(this.user?.userProfile.firstName, {
         validators: [Validators.required],
       }),
-      lastName: new FormControl(this.user.userProfile.lastName, {
+      lastName: new FormControl(this.user?.userProfile.lastName, {
         validators: [Validators.required],
       }),
-      phoneNumber: new FormControl(this.user.userProfile.phoneNumber, {
+      phoneNumber: new FormControl(this.user?.userProfile.phoneNumber, {
         validators: [Validators.required],
       }),
       themePref: new FormControl(this.themePref, {
@@ -206,6 +206,5 @@ export class UserSettingsComponent implements OnInit {
       }),
       userPhoto: new FormControl(null),
     });
-    console.log(this.userProfileForm.value);
   }
 }

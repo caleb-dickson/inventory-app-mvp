@@ -65,7 +65,7 @@ export function locationReducer(
       ...state,
       loading: false,
       activeLocationInventories: [],
-      activeInventory: null
+      activeInventory: null,
     })),
 
     // UPDATE
@@ -89,7 +89,9 @@ export function locationReducer(
         ...state,
         loading: false,
         locationError: null,
-        activeInventory: action.updatedInventory,
+        activeInventory: action.updatedInventory.isFinal
+          ? null
+          : action.updatedInventory,
       })
     ),
 
