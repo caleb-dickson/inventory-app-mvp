@@ -1,5 +1,5 @@
-import { Component, OnInit /* Inject, Renderer2 */ } from '@angular/core';
-// import { DOCUMENT } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -11,7 +11,6 @@ import * as NotificationsActions from '../notifications/notifications-store/noti
 
 import { UserService } from '../users/user-control/user.service';
 import { ThemeService } from '../theme/theme.service';
-import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-landing',

@@ -6,8 +6,7 @@ import { ThemeService } from '../theme/theme.service';
 
 @Component({
   selector: 'app-core',
-  templateUrl: './core.component.html',
-  styleUrls: ['./core.component.scss'],
+  templateUrl: './core.component.html'
 })
 export class CoreComponent implements OnInit {
   themeMode: string;

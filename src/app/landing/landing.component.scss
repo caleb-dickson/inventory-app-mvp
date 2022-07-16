@@ -1,11 +1,5 @@
 @use "../../sass/abstracts/variables" as var;
 
-@media (min-width: 992px) {
-  .rounded-lg-3 {
-    border-radius: 0.3rem;
-  }
-}
-
 .landing {
   height: 500vh;
 
@@ -47,24 +41,13 @@
     &-text {
       color: var.$mode-txt-dark;
 
-      // &-body {
-      // }
       .signup {
         height: 2.5rem;
       }
       .login {
         height: 2.5rem;
       }
-
-
-
     }
-  }
-
-  .test {
-    display: flex;
-    justify-content: center;
-    margin-block: 2rem;
   }
 
   .user-spinner {
@@ -72,7 +55,7 @@
     justify-content: center;
   }
 
-  &-features-1 {
+  &-features {
 
     &-title {
       text-align: center;
@@ -97,47 +80,51 @@
         margin-top: -2rem;
       }
     }
+  }
 
-    mat-card {
-      max-width: 40rem;
+  &-usage {
+    margin-block-end: 8rem;
 
-      mat-card-header {
+    @media only screen and (max-width: var.$bp-tablet-sm) {
+      justify-content: center;
+    }
+
+    &-title {
+      text-align: center;
+      margin-block: 2rem;
+    }
+
+    &-main {
+      display: flex;
+      justify-content: space-around;
+      margin-block: 4rem;
+
+      @media only screen and (max-width: var.$bp-tablet-sm) {
         flex-direction: column;
-
-        .consult-form-logo {
-          background-image: url(../../assets/inv-logo-simple.png);
-          background-size: cover;
-          margin: auto;
-        }
-        // mat-card-title {}
-        // mat-card-subtitle {}
+        align-items: center;
       }
-      mat-card-content {
-        h6 {
-          font-size: 0.9rem;
+
+      &-feature {
+        display: flex;
+        width: 20rem;
+
+        @media only screen and (max-width: var.$bp-tablet-sm) {
+          width: 90vw;
         }
-        form {
-          @media only screen and (min-width: var.$bp-tablet-sm) {
-            // min-width: 30rem;
-            mat-form-field {
-              padding-inline: 1.5rem;
-            }
+
+        &-title {
+          font-weight: 700;
+        }
+
+        &-icon {
+
+          &-reverse {
+            transform: scaleX(-1);
           }
         }
       }
-      mat-card-actions {
-        padding-bottom: 2rem;
-        button {
-          padding-inline: 2rem;
-          padding-block: 0.5rem;
-        }
-      }
     }
 
-    // mat-card LIGHT MODE STYLES
-    mat-card.mode-light {
-      background-color: var.$color-grey-dark;
-    }
   }
 
   .image--1 {
@@ -149,17 +136,18 @@
 
   .image--2 {
     height: 30rem;
-    margin-block: 5rem;
+    margin-block: 12rem;
     background-image: url(../../assets/landing/grill.webp);
     background-size: cover;
     background-position: center;
   }
 
-  app-auth {
-    align-self: center;
-  }
 
 
+  // #auth {
+  //   align-self: center;
+  //   margin-block-start: 14rem !important;
+  // }
 
 }
 
@@ -168,6 +156,3 @@
   color: var.$mode-txt-dark;
 }
 
-// .mode-light {
-
-// }

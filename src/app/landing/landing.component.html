@@ -60,20 +60,20 @@
     ></mat-spinner>
   </div>
   <div
-    class="landing-features-1 container px-4 py-5 mt-5"
+    class="landing-features container px-4 py-5 mt-5"
     [ngClass]="getTheme()"
     id="icon-grid"
   >
-    <h2 class="landing-features-1-title pb-2" id="features">App Features</h2>
+    <h2 class="landing-features-title pb-2" id="features">App Features</h2>
 
-    <div class="landing-features-1-inner row row-cols-1 row-cols-lg-3 g-6 py-5">
+    <div class="landing-features-inner row row-cols-1 row-cols-lg-3 g-6 py-5">
       <div class="col d-flex align-items-start">
         <mat-icon class="flex-shrink-0 me-3">business</mat-icon>
         <div>
           <h4 class="fw-bold mb-0">You Decide</h4>
           <p>
             Set up your business and all of your locations inside the app! Every
-            business is unique and we let you decide how you manage your
+            business is unique so we let you decide how to manage your
             inventory. Do-it-yourself or delegate to your team.
           </p>
         </div>
@@ -112,7 +112,7 @@
           </p>
         </div>
       </div>
-      <div class="col d-flex align-items-start">
+      <div class="col d-flex align-items-start mt-lg-4">
         <mat-icon class="flex-shrink-0 me-3">insights</mat-icon>
         <div>
           <h4 class="fw-bold mb-0">Plan Ahead</h4>
@@ -127,101 +127,28 @@
   </div>
 
   <div class="landing-consult">
-    <div class="col-xxl-10 px-5 py-5 py-lg-5">
+    <div class="col-sm-12 col-lg-10 col-xl-8 col-xxl-6 px-5 py-5 py-lg-5">
       <div
         class="landing-consult-inner row flex-lg-row justify-content-center align-content-center g-5 py-lg-5"
         [ngClass]="getTheme()"
       >
-        <div class="landing-consult-inner-text col-12 col-sm-8 col-lg-5">
-          <h1>Need a custom solution?</h1>
+        <div class="landing-consult-inner-text text-center text-lg-start col-12 col-sm-8 col-lg-5">
+          <h1 id="consult">Need a custom solution?</h1>
           <p class="lead">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Consequatur odio in pariatur placeat! Quod exercitationem cumque
-            quasi excepturi, nulla neque molestiae, beatae earum aspernatur
-            aperiam consequuntur laborum alias nobis culpa!
+            Whitetail Web Studio creates original software of all kinds for
+            businesses of types and sizes. Tell us your ideas and let's discuss
+            the possibilities!
           </p>
         </div>
 
-        <div class="col-12 col-sm-8 col-lg-6 my-5">
-          <mat-card align="center" [ngClass]="getTheme()">
-            <mat-card-header>
-              <div mat-card-avatar class="consult-form-logo"></div>
-              <mat-card-title>Schedule a Consultation</mat-card-title>
-              <mat-card-subtitle
-                >Create your own custom software</mat-card-subtitle
-              >
-            </mat-card-header>
-            <mat-card-content>
-              <h6 class="mt-4">Request an Appointment</h6>
-              <form
-                (submit)="onConsultSubmit(consultationForm)"
-                #consultationForm="ngForm"
-              >
-                <mat-form-field>
-                  <input
-                    ngModel
-                    matInput
-                    required
-                    name="name"
-                    type="text"
-                    placeholder="Name"
-                    #name="ngModel"
-                  />
-                  <mat-error *ngIf="name.invalid"
-                    >Please enter your name.</mat-error
-                  >
-                </mat-form-field>
-                <mat-form-field>
-                  <input
-                    matInput
-                    ngModel
-                    tel
-                    required
-                    type="tel"
-                    placeholder="Phone Number"
-                    name="phoneNumber"
-                    #phoneNumber="ngModel"
-                    pattern="[0-9]{10}"
-                  />
-                  <mat-error *ngIf="phoneNumber.invalid"
-                    >Please enter your phone number (ex. 4048534924).</mat-error
-                  >
-                </mat-form-field>
-                <mat-form-field>
-                  <input
-                    ngModel
-                    matInput
-                    email
-                    required
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    #name="ngModel"
-                  />
-                  <mat-error *ngIf="name.invalid"
-                    >Please enter a valid email address.</mat-error
-                  >
-                </mat-form-field>
-                <mat-form-field>
-                  <input
-                    ngModel
-                    matInput
-                    required
-                    type="text"
-                    placeholder="Business (brand) Name "
-                    name="businessName"
-                    #businessName="ngModel"
-                  />
-                  <mat-error *ngIf="name.invalid"
-                    >Please enter the name of the business.</mat-error
-                  >
-                </mat-form-field>
-              </form>
-            </mat-card-content>
-            <mat-card-actions align="center">
-              <button mat-raised-button type="submit">Submit</button>
-            </mat-card-actions>
-          </mat-card>
+        <div class="d-flex justify-content-center col-12 col-sm-8 col-lg-6 my-5">
+          <a
+          href=""
+          onclick="Calendly.initPopupWidget({url: 'https://calendly.com/whitetail-web'});return false;"
+          >
+          <button mat-raised-button color="primary">Schedule a Consultation</button>
+          </a
+        >
         </div>
       </div>
     </div>
@@ -229,51 +156,51 @@
 
   <div class="image--1"></div>
 
-  <div
-    class="landing-features-2 container px-4 py-5 mt-5"
-    [ngClass]="getTheme()"
-    id="icon-grid"
-  >
-    <div class="row row-cols-1 row-cols-lg-3 g-3 py-5">
-      <div class="col d-flex align-items-start">
-        <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
-        <div>
-          <h4 class="fw-bold mb-0">Featured title</h4>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
-            doloremque facere est eaque optio. Ullam consequatur itaque nobis
-            corrupti officia sapiente harum, neque illo explicabo quia, soluta
-            modi laudantium doloribus!
-          </p>
+  <div class="landing-usage" [ngClass]="getTheme()" id="usage">
+
+    <div class="landing-usage-main">
+        <div class="landing-usage-main-feature">
+          <mat-icon class="landing-usage-main-feature-icon">alt_route</mat-icon>
+          <div>
+            <h4 class="landing-usage-main-feature-title">Small</h4>
+            <p>
+              For a small operation with few staff you may want to simply manage
+              inventory yourself. Just log in, create a business, add a location
+              and you're ready to get started in just a few minutes.
+            </p>
+          </div>
+        </div>
+        <div class="landing-usage-main-feature">
+          <mat-icon class="landing-usage-main-feature-icon">alt_route</mat-icon>
+          <div>
+            <h4 class="landing-usage-main-feature-title">Medium</h4>
+            <p>
+              Maybe your single location has grown to a larger size and you need
+              to delegate those tasks, but you still want to keep an eye on
+              things. <br />
+              Just have your Managers create an account, then add them to your
+              locations by email and they're ready to go!
+            </p>
+          </div>
+        </div>
+        <div class="landing-usage-main-feature">
+          <mat-icon class="landing-usage-main-feature-icon-reverse">alt_route</mat-icon>
+          <div>
+            <h4 class="landing-usage-main-feature-title">Large</h4>
+            <p>
+              For larger businesses with many layers of heirarchy, add both
+              Managers and junior staff to your locations in a any department. <br>
+              Junior staff can
+              enter inventory counts that managers can review and approve for
+              each inventory period. <br>
+
+            </p>
+          </div>
         </div>
       </div>
-      <div class="col d-flex align-items-start">
-        <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
-        <div>
-          <h4 class="fw-bold mb-0">Featured title</h4>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
-            doloremque facere est eaque optio. Ullam consequatur itaque nobis
-            corrupti officia sapiente harum!
-          </p>
-        </div>
-      </div>
-      <div class="col d-flex align-items-start">
-        <mat-icon class="flex-shrink-0 me-3">home</mat-icon>
-        <div>
-          <h4 class="fw-bold mb-0">Featured title</h4>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Porro
-            doloremque facere est eaque optio. Ullam consequatur itaque nobis
-            corrupti officia sapiente harum, neque illo explicabo quia, soluta
-            modi laudantium doloribus!
-          </p>
-        </div>
-      </div>
-    </div>
   </div>
 
-  <app-auth *ngIf="!isAuthenticated" id="auth"></app-auth>
+  <app-auth *ngIf="!isAuthenticated" class="auth" id="auth"></app-auth>
 
   <div class="image--2"></div>
 

@@ -4,214 +4,51 @@ footer {
   position: sticky;
   top: 100%;
   font-size: 12px;
+  display: flex;
+  margin-block-end: 2rem;
 
   ul {
-    padding-left: 0;
+    display: flex;
+    align-items: center;
 
     li {
       list-style: none;
-      display: block;
-      a {
-        text-decoration: none;
-        color: grey;
-        text-decoration: none;
-        &:hover {
-          text-decoration: none;
-          color: #f5f5f5 !important;
-        }
-      }
+      margin-inline: 1rem;
     }
   }
 
   .logo-part {
-    border-right: 1px solid grey;
+    border-right: none;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     .logo-footer {
       margin-bottom: 3rem;
-    }
-  }
-
-  h6 {
-    font-family: "Playfair Display", serif;
-    margin-bottom: 40px;
-    position: relative;
-    &:after {
-      position: absolute;
-      content: "";
-      background: grey;
-      width: 12%;
-      height: 1px;
-      left: 0;
-      bottom: -20px;
-    }
-  }
-
-  .btn-footer {
-    color: grey;
-
-    text-decoration: none;
-    border: 1px solid;
-    border-radius: 43px;
-    font-size: 13px;
-    padding: 7px 30px;
-    line-height: 47px;
-    &:hover {
-      text-decoration: none;
+      width: 25vw;
+      min-width: 15rem;
     }
   }
 
   .social {
-    .bi {
-      margin: 1rem 1rem;
-    }
-
-  }
-  .portfolio {
-    display: inline-flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: #f5f5f5;
-
-    svg {
-      transform: translateX(0.4rem);
-    }
-
-    p {
-      margin-block-start: -1rem;
-      font-size: 0.7rem;
-    }
-  }
-
-  .interview {
-    display: inline-flex;
-    flex-direction: column;
-    text-decoration: none;
+    display: flex;
     align-items: center;
-    text-align: center;
-    color: #f5f5f5;
-    margin-inline-start: 1rem;
 
-    mat-icon {
-      font-size: 1.75rem;
-      transform: translateX(0rem);
-      text-align: center;
-    }
-    p {
-      margin-block-start: 0.3rem;
-      font-size: 0.7rem;
-      text-align: center;
-    }
-  }
-
-  .form-footer {
-    input[type="text"] {
-      border: none;
-      border-radius: 16px 0 0 16px;
-      outline: none;
-      padding-left: 10px;
-      height: 1.36rem;
-    }
-    input[type="submit"] {
-      position: absolute;
-      border: none;
-      background: var.$color-grey-dark;
-      // margin-top: -1px;
-      margin-left: -5px;
-      color: #ffff;
-      outline: none;
-      border-radius: 0 16px 16px 0;
-      padding: 2px 12px;
-    }
-  }
-
-  ::placeholder {
-    font-size: 0.9rem;
-    padding-left: 0.5rem;
-    font-style: italic;
-  }
-}
-
-// MOBILE STYLES
-@media only screen and (max-width: var.$bp-mobile-lg) {
-  footer {
-    position: sticky;
-    top: 100%;
-    font-size: 12px;
-
-    ul {
-      padding-left: 0;
-
-      li {
-        list-style: none;
-        display: block;
-        a {
-          text-decoration: none;
-          color: grey;
-          text-decoration: none;
-          &:hover {
-            text-decoration: none;
-            color: #f5f5f5 !important;
-          }
-        }
-      }
+    .bi {
+      margin-inline: 5vw;
     }
 
-    .logo-part {
-      border-right: 1px solid grey;
-      height: 100%;
-      .logo-footer {
-        margin-bottom: 3rem;
-      }
-    }
-
-    h6 {
-      font-family: "Playfair Display", serif;
-      margin-bottom: 40px;
-      position: relative;
-      &:after {
-        position: absolute;
-        content: "";
-        background: grey;
-        width: 12%;
-        height: 1px;
-        left: 0;
-        bottom: -20px;
-      }
-    }
-
-    .btn-footer {
-      color: grey;
-
-      text-decoration: none;
-      border: 1px solid;
-      border-radius: 43px;
-      font-size: 13px;
-      padding: 7px 30px;
-      line-height: 47px;
-      &:hover {
-        text-decoration: none;
-      }
-    }
-
-    .social {
-      .bi {
-        margin: 1rem 1rem;
-      }
-
-    }
     .portfolio {
       display: inline-flex;
       flex-direction: column;
       text-decoration: none;
       color: #f5f5f5;
-
-      svg {
-        transform: translateX(0.4rem);
-      }
+      margin-block-end: -1.3rem;
 
       p {
-        margin-block-start: -1rem;
+        // margin-block-start: -1rem;
         font-size: 0.7rem;
+        text-align: center;
       }
     }
 
@@ -219,48 +56,78 @@ footer {
       display: inline-flex;
       flex-direction: column;
       text-decoration: none;
-      align-items: center;
       text-align: center;
       color: #f5f5f5;
       margin-inline-start: 1rem;
+      margin-block-end: -1rem;
 
       mat-icon {
         font-size: 1.75rem;
-        transform: translateX(0rem);
         text-align: center;
+        margin-inline: 5rem;
       }
       p {
-        margin-block-start: 0.3rem;
+        margin-block-start: 0rem;
         font-size: 0.7rem;
         text-align: center;
       }
     }
+  }
+}
 
-    .form-footer {
-      input[type="text"] {
-        border: none;
-        border-radius: 16px 0 0 16px;
-        outline: none;
-        padding-left: 10px;
-        height: 1.36rem;
-      }
-      input[type="submit"] {
-        position: absolute;
-        border: none;
-        background: var.$color-grey-dark;
-        // margin-top: -1px;
-        margin-left: -5px;
-        color: #ffff;
-        outline: none;
-        border-radius: 0 16px 16px 0;
-        padding: 2px 12px;
-      }
-    }
+// MOBILE STYLES
+@media only screen and (max-width: var.$bp-tablet-sm) {
+  footer {
+    display: block;
 
-    ::placeholder {
-      font-size: 0.9rem;
-      padding-left: 0.5rem;
-      font-style: italic;
+    .social {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+
+      .bi {
+        // margin-inline: none;
+        // display: flex;
+        // align-items: center;
+        // justify-content: space-around;
+      }
+
+      .portfolio {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        color: #f5f5f5;
+        margin-block-end: -1.3rem;
+
+        p {
+          // margin-block-start: -1rem;
+          font-size: 0.7rem;
+          text-align: center;
+        }
+      }
+
+      .interview {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        text-align: center;
+        color: #f5f5f5;
+        margin-inline-start: 1rem;
+        margin-block-end: -1rem;
+
+        mat-icon {
+          font-size: 1.75rem;
+          text-align: center;
+          margin-inline: 0rem;
+        }
+        p {
+          margin-block-start: 0rem;
+          font-size: 0.7rem;
+          text-align: center;
+        }
+      }
     }
   }
 }

@@ -12,8 +12,6 @@
 @import "./base/utilities";
 @import "./base/animations";
 
-
-
 mat-sidenav-container {
   img {
     width: 13rem;
@@ -44,7 +42,7 @@ $theme-colors: (
 );
 
 $custom-colors: (
-  "accent": $inv-accent
+  "accent": $inv-accent,
 );
 
 $theme-colors: map-merge($theme-colors, $custom-colors);
@@ -52,19 +50,19 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 .theme-dark {
   background-color: $mode-bg-dark;
 
-  .snackbar {
-    background: $mode-bg-light !important;
-    color: $mode-txt-light !important;
-  }
-
   &::-webkit-scrollbar {
-    background-color: $inv-accent;
+    background-color: $color-grey-light;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: $color-brown-dark;
+    background: #323938;
     border: 1px;
     border-radius: 4rem;
+  }
+
+  .snackbar {
+    background: $mode-bg-light !important;
+    color: $mode-txt-light !important;
   }
 }
 

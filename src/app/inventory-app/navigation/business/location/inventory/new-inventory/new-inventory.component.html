@@ -50,9 +50,7 @@
   class="new-inventory-container"
   *ngIf="activeLocation?.productList.length > 0"
 >
-  <mat-expansion-panel
-    class="inventory-expansion"
-  >
+  <mat-expansion-panel class="inventory-expansion">
     <mat-expansion-panel-header>
       <mat-panel-title
         ><mat-icon class="new-inventory-icon">addchart</mat-icon> Create New
@@ -111,24 +109,48 @@
 </div>
 <!-- NEW INVENTORY MAIN END END END -->
 
-<!-- NO WORKING DRAFTS MESSAGE -->
-<div *ngIf="!draftInventory || !activeLocation" class="no-drafts">
+<!-- NO WORKING DRAFTS MESSAGES -->
+<!-- ADMIN Users -->
+<div *ngIf="userDept === 'admin' && (!draftInventory || !activeLocation)" class="no-drafts">
   <p *ngIf="activeLocation?.inventoryData.length > 0">
     No working
-    {{ this.userDept !== "admin" ? (userDept | uppercase) : null }} inventory
-    drafts found.
+    {{ userDept !== "admin" ? (userDept | uppercase) : null }} inventory drafts
+    found.
+  </p>
+  <p *ngIf="activeLocation?.inventoryData.length === 0">
+    No
+    {{ userDept !== "admin" ? (userDept | uppercase) : null }} inventories yet.
+    Unfinalized New Inventory drafts will appear here
+  </p>
+</div>
+<!-- NON admin Users -->
+<div
+  *ngIf="userDept !== 'admin' && (!draftInventory || !activeLocation)"
+  class="no-drafts"
+>
+  <p *ngIf="activeLocation?.inventoryData.length > 0">
+    No submitted
+    {{ userDept !== "admin" ? (userDept | uppercase) : null }} inventories
+    found.
+  </p>
+  <p *ngIf="activeLocation?.inventoryData.length === 0">
+    No
+    {{ userDept !== "admin" ? (userDept | uppercase) : null }} inventories yet.
+    Unfinalized New Inventory drafts will appear here
   </p>
 </div>
 
 <!-- WORKING INVENTORIES START -->
 <div *ngIf="draftInventory" class="new-inventory-container">
-  <mat-expansion-panel
-    class="inventory-expansion"
-  >
+  <mat-expansion-panel class="inventory-expansion">
     <mat-expansion-panel-header>
       <mat-panel-title
         ><mat-icon class="new-inventory-icon">insert_chart_outlined</mat-icon>
-        Inventory Draft
+        {{
+          userDept !== "admin"
+            ? "Last Submitted Inventory"
+            : "Current Inventory Draft"
+        }}
         {{ draftInventory.dateEnd | date: "shortDate" }}</mat-panel-title
       >
     </mat-expansion-panel-header>
