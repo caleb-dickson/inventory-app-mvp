@@ -9,13 +9,14 @@ import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../app-store/app.reducer';
 import * as UserActions from '../../user-store/user.actions';
+import { UserService } from '../../user-control/user.service';
 
 @Component({
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  isLoading = false;
+  loading = false;
   error: string = null;
 
   private storeSub: Subscription;
@@ -23,15 +24,16 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private dialog: MatDialog,
+    private _userService: UserService,
     private store: Store<fromAppStore.AppState>
   ) {}
 
   ngOnInit() {
+    console.clear();
+
     this.storeSub = this.store.select('user').subscribe((authState) => {
-      this.isLoading = authState.loading;
+      this.loading = authState.loading;
       this.error = authState.authError;
-      console.clear();
-      console.log(authState);
     });
   }
 
@@ -40,8 +42,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isLoading = true;
-
     this.store.dispatch(
       UserActions.loginStart({
         email: form.value.email,
@@ -49,6 +49,11 @@ export class LoginComponent implements OnInit, OnDestroy {
       })
     );
     form.reset();
+  }
+
+  onReset(mode: string) {
+    this.dialog.getDialogById('login').close();
+    this._userService.resetUser(mode);
   }
 
   ngOnDestroy() {

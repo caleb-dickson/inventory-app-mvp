@@ -8,6 +8,7 @@ import { User } from '../user.model';
 export interface UserState {
   user: User;
   userLocations: Location[];
+  userMessage: string;
   userError: string;
   authError: string;
   loading: boolean;
@@ -16,6 +17,7 @@ export interface UserState {
 const initialState: UserState = {
   user: null,
   userLocations: [],
+  userMessage: null,
   userError: null,
   authError: null,
   loading: false,
@@ -30,6 +32,7 @@ export function userReducer(
     on(
       UserActions.loginStart,
       UserActions.signupStart,
+      UserActions.passwordResetInit,
       (state) => ({
         ...state,
         authError: null,
@@ -48,6 +51,20 @@ export function userReducer(
       authError: action.errorMessage,
       loading: false,
     })),
+    on(UserActions.passwordResetInitSuccess, (state, action) => ({
+      ...state,
+      authError: null,
+      loading: false,
+      userMessage: action.message
+    })),
+    on(UserActions.setUserMessage, (state, action) => ({
+      ...state,
+      authError: null,
+      loading: false,
+      userMessage: action.message
+    })),
+
+
 
     on(UserActions.GETUserLocationsStart, (state) => ({
       ...state,

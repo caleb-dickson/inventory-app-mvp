@@ -6,6 +6,14 @@
                 src="../../../../assets/inv-logo.webp"
                 class="logo-footer"
               />
+              <div class="last-update">
+                <ul>
+                  <li>"Inventory"</li>
+                  <li> {{ lastUpdate ? 'Last Update: ' : null }} {{ !lastUpdate ? null  : lastUpdate | date }} </li>
+                  <li> {{ 'v' + version }} </li>
+                </ul>
+
+              </div>
               <ul>
                 <li>Created by Caleb Dickson</li>
                 <li>Atlanta, Ga 30350</li>

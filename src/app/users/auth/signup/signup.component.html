@@ -11,127 +11,130 @@
     />
     <form [formGroup]="signupForm">
       <mat-dialog-title>Sign Up!</mat-dialog-title>
-      <mat-form-field appearance="outline">
-        <mat-label>First Name</mat-label>
-        <input
-          matInput
-          required
-          formControlName="firstName"
-          type="text"
-          placeholder="First Name"
-        />
-        <mat-error *ngIf="signupForm.get('firstName').invalid"
-          >Please enter your first name.</mat-error
+      <mat-dialog-content>
+
+        <mat-form-field appearance="outline">
+          <mat-label>First Name</mat-label>
+          <input
+            matInput
+            required
+            formControlName="firstName"
+            type="text"
+            placeholder="First Name"
+          />
+          <mat-error *ngIf="signupForm.get('firstName').invalid"
+            >Please enter your first name.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Last Name</mat-label>
+          <input
+            matInput
+            required
+            formControlName="lastName"
+            type="text"
+            placeholder="Last Name"
+          />
+          <mat-error *ngIf="signupForm.get('lastName').invalid"
+            >Please enter your last name.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Account Type</mat-label>
+          <mat-select
+            required
+            formControlName="role"
+            type="number"
+            placeholder="Select your account type"
+          >
+            <mat-option [value]="3"> Business Owner </mat-option>
+            <mat-option [value]="2"> Manager </mat-option>
+            <mat-option [value]="1"> Supervisor / Junior Staff </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field
+          appearance="outline"
+          *ngIf="
+            signupForm.get('role').value && signupForm.get('role').value !== 3
+          "
         >
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Last Name</mat-label>
-        <input
-          matInput
-          required
-          formControlName="lastName"
-          type="text"
-          placeholder="Last Name"
-        />
-        <mat-error *ngIf="signupForm.get('lastName').invalid"
-          >Please enter your last name.</mat-error
-        >
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Account Type</mat-label>
-        <mat-select
-          required
-          formControlName="role"
-          type="number"
-          placeholder="Select your account type"
-        >
-          <mat-option [value]="3"> Business Owner </mat-option>
-          <mat-option [value]="2"> Manager </mat-option>
-          <mat-option [value]="1"> Supervisor / Junior Staff </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field
-        appearance="outline"
-        *ngIf="
-          signupForm.get('role').value && signupForm.get('role').value !== 3
-        "
-      >
-        <mat-label>Department</mat-label>
-        <mat-select
-          formControlName="department"
-          type="text"
-          placeholder="Select your department."
-        >
-          <mat-option value="boh"> Back of House (BOH) </mat-option>
-          <mat-option value="foh"> Front of House (FOH) </mat-option>
-          <mat-option value="admin">
-            Administrative / Access to All Depts
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="input-phone" appearance="outline">
-        <mat-label>Phone Number</mat-label>
-        <input
-          matInput
-          required
-          type="tel"
-          formControlName="phoneNumber"
-          placeholder="Phone Number"
-          pattern="[0-9]{10}"
-          tel
-        />
-        <mat-error *ngIf="signupForm.get('phoneNumber').invalid"
-          >Please enter only your phone number; no dashes or parenthesis (ex.
-          4048535555).</mat-error
-        >
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Email</mat-label>
-        <input
-          matInput
-          email
-          required
-          formControlName="email"
-          type="email"
-          placeholder="E-Mail"
-        />
-        <mat-error *ngIf="signupForm.get('email').invalid"
-          >Please enter a valid email.</mat-error
-        >
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Password</mat-label>
-        <input
-          matInput
-          required
-          [type]="showPass ? 'text' : 'password'"
-          formControlName="password"
-          minlength="6"
-          placeholder="Password"
-        />
-        <mat-icon matSuffix (click)="onShowPass('password')"
-          >visibility</mat-icon
-        >
-        <mat-error *ngIf="signupForm.get('password').invalid"
-          >Please enter a valid password (6 characters minimum).</mat-error
-        >
-      </mat-form-field>
-      <mat-form-field appearance="outline">
-        <mat-label>Confirm Password</mat-label>
-        <input
-          matInput
-          required
-          [type]="showConfirmPass ? 'text' : 'password'"
-          formControlName="confirmPassword"
-          placeholder="Confirm Password"
-        />
-        <mat-icon matSuffix (click)="onShowPass('confirmPassword')"
-          >visibility</mat-icon
-        >
-        <mat-error *ngIf="signupForm.get('confirmPassword').errors?.mustMatch" class="password-error"
-          >Passwords do not match.</mat-error
-        >
-      </mat-form-field>
+          <mat-label>Department</mat-label>
+          <mat-select
+            formControlName="department"
+            type="text"
+            placeholder="Select your department."
+          >
+            <mat-option value="boh"> Back of House (BOH) </mat-option>
+            <mat-option value="foh"> Front of House (FOH) </mat-option>
+            <mat-option value="admin">
+              Administrative / Access to All Depts
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field class="input-phone" appearance="outline">
+          <mat-label>Phone Number</mat-label>
+          <input
+            matInput
+            required
+            type="tel"
+            formControlName="phoneNumber"
+            placeholder="Phone Number"
+            pattern="[0-9]{10}"
+            tel
+          />
+          <mat-error *ngIf="signupForm.get('phoneNumber').invalid"
+            >Please enter only your phone number; no dashes or parenthesis (ex.
+            4048535555).</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            email
+            required
+            formControlName="email"
+            type="email"
+            placeholder="E-Mail"
+          />
+          <mat-error *ngIf="signupForm.get('email').invalid"
+            >Please enter a valid email.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            required
+            [type]="showPass ? 'text' : 'password'"
+            formControlName="password"
+            minlength="6"
+            placeholder="Password"
+          />
+          <mat-icon matSuffix (click)="onShowPass('password')"
+            >visibility</mat-icon
+          >
+          <mat-error *ngIf="signupForm.get('password').invalid"
+            >Please enter a valid password (6 characters minimum).</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Confirm Password</mat-label>
+          <input
+            matInput
+            required
+            [type]="showConfirmPass ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            placeholder="Confirm Password"
+          />
+          <mat-icon matSuffix (click)="onShowPass('confirmPassword')"
+            >visibility</mat-icon
+          >
+          <mat-error *ngIf="signupForm.get('confirmPassword').errors?.mustMatch" class="password-error"
+            >Passwords do not match.</mat-error
+          >
+        </mat-form-field>
+      </mat-dialog-content>
       <mat-dialog-actions align="center">
         <button mat-raised-button type="button" (click)="onSignup()" [disabled]="signupForm.invalid">
           Sign Up

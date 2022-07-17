@@ -2,6 +2,18 @@ mat-form-field {
   width: 100%;
 }
 
+mat-dialog-title {
+  font-size: 2rem;
+}
+
 mat-spinner {
   margin: auto;
+}
+
+.reset {
+  margin-block-start: 2rem;
+
+  p {
+    cursor: pointer;
+  }
 }

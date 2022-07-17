@@ -1,0 +1,36 @@
+.reset {
+  margin-block-start: 2rem;
+
+  &-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    &-logo {
+      width: 5rem;
+    }
+
+    &-text {
+      text-align: center;
+      font-size: 1.3rem
+    }
+  }
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 20vh;
+
+}
+&-inner {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+
+  mat-form-field {
+    width: 120%;
+  }
+
+}
+}

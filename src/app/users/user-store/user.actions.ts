@@ -20,6 +20,24 @@ export const authFail = createAction(
   props<{ errorMessage: string }>()
 );
 
+// PASSWORD RESET ACTIONS
+export const passwordResetInit = createAction(
+  '[User] Password Reset Start',
+  props<{ email: string }>()
+);
+export const passwordResetInitSuccess = createAction(
+  '[User] Password Reset Init Success',
+  props<{ message: string }>()
+);
+export const checkTokenValidity = createAction(
+  '[User] Password Reset Check Token Validity',
+  props<{ token: string }>()
+);
+export const saveNewPassword = createAction(
+  '[User] Save New Password',
+  props<{ newPass: string; userId: string, token: string }>()
+);
+
 export const GETUserLocationsStart = createAction(
   // FETCH ALL LOCATIONS WHERE USER IS AUTHORIZED
   '[User] Fetch User Locations Start',
@@ -41,11 +59,17 @@ export const PUTUpdateUserSuccess = createAction(
   props<{ user: User }>()
 );
 
+export const setUserMessage = createAction(
+  '[User] Set User Action Response Message',
+  props<{ message: string }>()
+);
+
 export const userError = createAction(
   // NON AUTH RELATED ERRORS
   '[User] User Fail',
   props<{ message: string }>()
 );
+
 export const clearError = createAction('[User] Clear Error');
 export const autoLogin = createAction('[User] Auto Login');
 export const logout = createAction('[User] Logout');

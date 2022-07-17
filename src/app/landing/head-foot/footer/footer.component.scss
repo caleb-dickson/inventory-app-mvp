@@ -9,6 +9,7 @@ footer {
 
   ul {
     display: flex;
+    flex-direction: column;
     align-items: center;
 
     li {
@@ -27,6 +28,10 @@ footer {
       margin-bottom: 3rem;
       width: 25vw;
       min-width: 15rem;
+    }
+
+    .last-update {
+      margin-block-end: 0rem;
     }
   }
 
@@ -79,6 +84,18 @@ footer {
 @media only screen and (max-width: var.$bp-tablet-sm) {
   footer {
     display: block;
+
+    ul {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-left: 0rem;
+
+      li {
+        list-style: none;
+        margin-inline: 0rem;
+      }
+    }
 
     .social {
       display: flex;

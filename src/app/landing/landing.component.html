@@ -3,10 +3,11 @@
 
   <div class="landing-hero">
     <div class="landing-hero-box col-xxl-8 px-5 py-5 py-lg-5">
+      <div class="last-update" [ngClass]="getTheme()"> {{ 'v' + version }} </div>
       <div
         class="row flex-lg-row-reverse justify-content-center align-content-center g-5 py-lg-5"
       >
-        <div class="col-10 col-sm-8 col-lg-5">
+      <div class="col-10 col-sm-8 col-lg-5">
           <img
             src="../../assets/inv-logo.webp"
             class="d-block mx-lg-auto img-fluid"

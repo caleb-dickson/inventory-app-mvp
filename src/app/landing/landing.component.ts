@@ -11,6 +11,8 @@ import * as NotificationsActions from '../notifications/notifications-store/noti
 
 import { UserService } from '../users/user-control/user.service';
 import { ThemeService } from '../theme/theme.service';
+import { environment } from 'src/environments/environment';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-landing',
@@ -20,6 +22,7 @@ import { ThemeService } from '../theme/theme.service';
 export class LandingComponent implements OnInit {
   private _userSub: Subscription;
   private _themeSub: Subscription;
+  private _passResetSub: Subscription;
 
   themeMode: string;
 
@@ -30,15 +33,21 @@ export class LandingComponent implements OnInit {
 
   showPreviewReminder = true;
 
+  lastUpdate: Date;
+  version: string;
+
   constructor(
-    // @Inject(DOCUMENT) private document: Document,
-    // private renderer: Renderer2,
+    private route: ActivatedRoute,
     private _userService: UserService,
     private _themeService: ThemeService,
     private _store: Store<fromAppStore.AppState>
   ) {}
 
   ngOnInit() {
+
+    this.lastUpdate = environment.lastUpdate;
+    this.version = environment.version;
+
     this._userSub = this._store
       .select('user')
       .pipe(map((userState) => userState))
@@ -62,13 +71,22 @@ export class LandingComponent implements OnInit {
 
     if (this.showPreviewReminder && !this.isAuthenticated) {
       this._store.dispatch(
-        NotificationsActions.showConfirmMessage({
+        NotificationsActions.showMessage({
           message: "Welcome to Inventory. Don't forget to preview the App!",
           notificationAction: 'Close',
           duration: 5000,
         })
       );
     }
+
+    console.log(this.route)
+    this._passResetSub = this.route.params.subscribe(param => {
+      console.log(param.token)
+      if (param.token) {
+        this._userService.passReset(param.token);
+      }
+    })
+
   }
 
   getTheme() {
@@ -77,7 +95,7 @@ export class LandingComponent implements OnInit {
 
   showMessage(message: string) {
     this._store.dispatch(
-      NotificationsActions.showConfirmMessage({
+      NotificationsActions.showMessage({
         message: message,
         notificationAction: 'Close',
         duration: 1250,
@@ -86,7 +104,6 @@ export class LandingComponent implements OnInit {
   }
 
   onOpenAuth(mode: string) {
-    this._store.dispatch(NotificationsActions.hideSnackBar());
     this._store.dispatch(UserActions.logout());
     this._userService.openAuthForm(mode);
   }

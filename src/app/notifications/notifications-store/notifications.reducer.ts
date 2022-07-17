@@ -22,22 +22,12 @@ export function notificationsReducer(
 ) {
   return createReducer(
     initialState,
-    on(NotificationsActions.showTimeMessage, (state, action) => ({
-      ...state,
-      message: action.message,
-      duration: action.duration,
-      isOpen: true
-    })),
-    on(NotificationsActions.showConfirmMessage, (state, action) => ({
+    on(NotificationsActions.showMessage, (state, action) => ({
       ...state,
       message: action.message,
       notificationAction: action.notificationAction,
       duration: action.duration,
       isOpen: true
-    })),
-    on(NotificationsActions.hideSnackBar, (state) => ({
-      ...state,
-      isOpen: false
-    })),
+    }))
   ) (notificationsState, notificationsAction);
 }

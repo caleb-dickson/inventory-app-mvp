@@ -16,6 +16,7 @@ import {
   exhaustMap,
   map,
   switchMap,
+  take,
   tap,
 } from 'rxjs/operators';
 
@@ -52,7 +53,7 @@ export class UserEffects {
   signupStart$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.signupStart),
-      switchMap((action) => {
+      exhaustMap((action) => {
         return this.http
           .post<{ email: string; password: string }>(BACKEND_URL + '/signup', {
             userId: action.newUser.userId,
@@ -68,7 +69,7 @@ export class UserEffects {
             },
           })
           .pipe(
-            map((resData) => {
+            map(() => {
               return UserActions.loginStart({
                 email: action.newUser.email,
                 password: action.newUser.password,
@@ -151,11 +152,102 @@ export class UserEffects {
     )
   );
 
+  resetPassInit$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UserActions.passwordResetInit),
+      take(1),
+      exhaustMap((action) => {
+        console.warn('||| resetPassInit$ effect called |||');
+        return this.http
+          .post<{ message: string }>(BACKEND_URL + '/reset-pass-init', {
+            email: action.email,
+          })
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              console.warn('||| resetPassInit$ resData |||');
+
+              this.store.dispatch(
+                UserActions.setUserMessage({ message: resData.message })
+              );
+
+              return UserActions.passwordResetInitSuccess({
+                message: resData.message,
+              });
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return of(
+                UserActions.userError({ message: errorRes.error.message })
+              );
+            })
+          );
+      })
+    )
+  );
+
+  checkTokenValidity$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UserActions.checkTokenValidity),
+      take(1),
+      exhaustMap((action) => {
+        console.warn('||| checkTokenValidity$ effect called |||');
+        return this.http
+          .get<{ userId?: string; message?: string }>(
+            BACKEND_URL + '/reset-pass-init/' + action.token
+          )
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              console.warn('||| ^^^ checkTokenValidity$ resData ^^^ |||');
+
+              if (resData.userId) {
+                this.userService.setPassResetUserId(resData.userId);
+              } else if (resData.message) {
+                return UserActions.setUserMessage({ message: resData.message });
+              }
+
+              return { type: 'Action Dispatched' };
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return of(
+                UserActions.userError({ message: errorRes.error.message })
+              );
+            })
+          );
+      })
+    )
+  );
+
+  saveNewPassword$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UserActions.saveNewPassword),
+      exhaustMap((action) => {
+        console.warn('||| saveNewPassword$ effect called |||');
+        return this.http
+          .put<{ message: string }>(BACKEND_URL + '/reset-pass', {
+            newPass: action.newPass,
+            userId: action.userId,
+            token: action.token,
+          })
+          .pipe(
+            map((resData) => {
+              console.log(resData);
+              console.warn('||| ^^^ saveNewPassword$ resData ^^^ |||');
+
+              return UserActions.setUserMessage({ message: resData.message });
+            })
+          );
+      })
+    )
+  );
+
   updateUser$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.PUTUpdateUserSuccess),
       map((action) => {
-        console.warn('||| updateUser$ effect called |||===');
+        console.warn('||| updateUser$ effect called |||');
 
         const userProfileData = {
           _id: action.user.userId,
@@ -177,7 +269,6 @@ export class UserEffects {
     this.actions$.pipe(
       ofType(UserActions.GETUserLocationsStart),
       concatMap((action) => {
-        console.log('||| userId: ===>>>' + action.userId);
         return this.http
           .get<{ fetchedLocations: Location[] }>(
             BACKEND_URL +

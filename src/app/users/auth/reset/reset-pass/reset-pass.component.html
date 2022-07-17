@@ -1,0 +1,70 @@
+<div class="reset">
+  <div matDialogTitle class="reset-title">
+    <mat-spinner *ngIf="loading"></mat-spinner>
+    <img
+      *ngIf="!loading"
+      class="reset-title-logo"
+      src="../../../assets/inv-logo-simple.png"
+    />
+    <h2 class="reset-title-text">Reset Password</h2>
+  </div>
+  <form [formGroup]="resetForm">
+    <mat-dialog-content>
+      <div *ngIf="token" class="reset-inner">
+        <mat-form-field>
+          <mat-label>New Password</mat-label>
+          <input
+            matInput
+            [type]="!showPass ? 'password' : 'text'"
+            formControlName="newPassword"
+          />
+          <mat-icon matSuffix (click)="onShowPass('password')" *ngIf="token"
+            >visibility</mat-icon
+          >
+          <mat-error>Please enter a valid password</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Confirm New Password</mat-label>
+          <input
+            matInput
+            [type]="!showConfirmPass ? 'password' : 'text'"
+            formControlName="confirmNewPassword"
+          />
+          <mat-icon matSuffix (click)="onShowPass('passConfirm')" *ngIf="token"
+            >visibility</mat-icon
+          >
+          <mat-error>Please enter a valid password</mat-error>
+        </mat-form-field>
+      </div>
+      <div *ngIf="!token" class="reset-inner">
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input
+            matInput
+            type="email"
+            formControlName="email"
+            placeholder="email@domain.com"
+          />
+          <mat-error>Please enter a valid email</mat-error>
+          <mat-hint
+            >Enter the email for the account you want to reset the password for.
+            If an account with this email is found, a link will be sent to that
+            email address to reset the password.</mat-hint
+          >
+        </mat-form-field>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="center">
+      <mat-hint>{{ resMessage }}</mat-hint>
+      <button
+        mat-raised-button
+        [disabled]="resetForm.invalid || disableForm"
+        type="button"
+        (click)="onSubmit()"
+      >
+        Reset Password
+      </button>
+    </mat-dialog-actions>
+    <mat-error class="text-center mt-4">{{ error }}</mat-error>
+  </form>
+</div>

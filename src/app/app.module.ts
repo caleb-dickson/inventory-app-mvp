@@ -3,7 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { LayoutModule } from '@angular/cdk/layout';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
@@ -28,6 +28,8 @@ import { FooterComponent } from './landing/head-foot/footer/footer.component';
 import { HeaderComponent } from './landing/head-foot/header/header.component';
 import { SimpleNotificationComponent } from './notifications/simple-notification.component';
 import { PreviewComponent } from './users/auth/preview/preview.component';
+import { ResetPassComponent } from './users/auth/reset/reset-pass/reset-pass.component';
+import { ResetEmailComponent } from './users/auth/reset/reset-email/reset-email.component';
 
 
 @NgModule({
@@ -38,12 +40,15 @@ import { PreviewComponent } from './users/auth/preview/preview.component';
     HeaderComponent,
     FooterComponent,
     SimpleNotificationComponent,
-    PreviewComponent
+    PreviewComponent,
+    ResetPassComponent,
+    ResetEmailComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule,
     AppRoutingModule,
     MaterialModule,

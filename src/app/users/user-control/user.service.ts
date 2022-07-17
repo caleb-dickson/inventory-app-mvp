@@ -10,28 +10,28 @@ import { LoginComponent } from '../auth/login/login.component';
 import { SignupComponent } from '../auth/signup/signup.component';
 import { FormGroup, NgForm } from '@angular/forms';
 import { PreviewComponent } from '../auth/preview/preview.component';
-import { catchError, map, Subscription } from 'rxjs';
+import { BehaviorSubject, catchError, map, Subscription } from 'rxjs';
 import { User } from '../user.model';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { ResetPassComponent } from '../auth/reset/reset-pass/reset-pass.component';
+import { ResetEmailComponent } from '../auth/reset/reset-email/reset-email.component';
+import { Router } from '@angular/router';
 
 const BACKEND_URL = environment.apiUrl + '/user';
-
-// export interface AuthResponseData {
-//   email: string;
-//   password: string;
-// }
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private _userSub: Subscription;
-
   private tokenExpirationTimer: any;
+
+  passResetUserId$ = new BehaviorSubject<string>(null);
 
   isAuthenticated: boolean;
   user: User;
 
   constructor(
+    private router: Router,
     private http: HttpClient,
     private dialog: MatDialog,
     private store: Store<fromAppStore.AppState>
@@ -71,6 +71,7 @@ export class UserService {
         height: 'min-content',
         minWidth: 350,
         minHeight: 500,
+        id: 'login'
       });
     }
     if (mode == 'signup') {
@@ -80,9 +81,45 @@ export class UserService {
         maxHeight: '100vh',
         minWidth: 350,
         minHeight: 700,
+        id: 'signup'
       });
     }
     this.store.dispatch(UserActions.clearError());
+  }
+
+  resetUser(mode: string) {
+    if (mode === 'password') {
+      this.dialog.open(ResetPassComponent, {
+        width: '30vw',
+        height: '60vh',
+        minWidth: 350,
+        id: 'reset-pass-init'
+      });
+    } else if (mode === 'email') {
+      this.dialog.open(ResetEmailComponent, {
+        width: '30vw',
+        height: 'min-content',
+        minWidth: 350,
+        minHeight: 500,
+        id: 'reset-email-init'
+      });
+    }
+  }
+
+  passReset(token: string) {
+    // this.router.navigate(['/']);
+    this.dialog.open(ResetPassComponent, {
+      width: '30vw',
+      height: '55vh',
+      minWidth: 350,
+      // minHeight: 500,
+      id: 'reset-pass',
+      data: token
+    })
+  }
+
+  setPassResetUserId(userId: string) {
+    this.passResetUserId$.next(userId);
   }
 
   openPreviewSelect() {
@@ -122,7 +159,7 @@ export class UserService {
     }
     this.dialog.closeAll();
     this.store.dispatch(
-      NotificationsActions.showConfirmMessage({
+      NotificationsActions.showMessage({
         message: 'You are previewing the App as ' + accType,
         notificationAction: 'Close',
         duration: Infinity,

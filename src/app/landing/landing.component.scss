@@ -3,6 +3,22 @@
 .landing {
   height: 500vh;
 
+  .last-update {
+    display: flex;
+    justify-content: flex-end;
+    color: var.$mode-txt-dark;
+    // width: 6.4rem;
+    // height: min-content;
+    margin-inline-end: -2rem;
+    margin-block-start: -2rem;
+    // transform: translateY(2rem);
+    padding-left: 0rem;
+    padding-right: 0rem;
+    text-align: end !important;
+    font-size: .7rem;
+    // z-index: 1000;
+  }
+
   &-hero {
     display: flex;
     justify-content: center;
@@ -15,6 +31,7 @@
         url(../../assets/landing/cutting-board.webp);
       background-size: cover;
       background-position: center;
+
 
       @supports (
         clip-path: polygon(0 0) or

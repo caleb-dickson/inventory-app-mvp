@@ -17,26 +17,11 @@ export class NotificationsEffects {
     private store: Store<fromAppStore.AppState>
   ) {}
 
-  showTimeMessage$ = createEffect(() =>
-    this._actions$.pipe(
-      ofType(NotificationsActions.showTimeMessage),
-      map((action) => {
-        this._snackBar.open(action.message, null, {
-          duration: action.duration,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          panelClass: ['snackbar'],
-        });
-
-        return { type: 'Action Dispatched' };
-      })
-    )
-  );
-
   showConfirmMessage$ = createEffect(() =>
     this._actions$.pipe(
-      ofType(NotificationsActions.showConfirmMessage),
+      ofType(NotificationsActions.showMessage),
       map((action) => {
+        this._snackBar.dismiss();
         this._snackBar.open(action.message, action.notificationAction, {
           duration: action.duration,
           horizontalPosition: 'center',
@@ -48,14 +33,4 @@ export class NotificationsEffects {
       })
     )
   );
-
-  hideSnackBar$ = createEffect(() =>
-  this._actions$.pipe(
-    ofType(NotificationsActions.hideSnackBar),
-    map(() => {
-      this._snackBar.dismiss();
-
-      return { type: 'Action Dispatched' };
-    })
-  ))
 }

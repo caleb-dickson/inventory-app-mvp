@@ -1,10 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-
-import { Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-import { Store } from '@ngrx/store';
-import * as fromAppStore from '../../../app-store/app.reducer';
+import { Component, OnInit } from '@angular/core';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-footer',
@@ -12,25 +7,16 @@ import * as fromAppStore from '../../../app-store/app.reducer';
   styleUrls: ['./footer.component.scss'],
 })
 export class FooterComponent implements OnInit {
-  currentYear = new Date().getFullYear();
-  isAuthenticated = false;
-  userEmail: string;
-  private userAuthSub: Subscription;
+  currentYear: number;
 
-  constructor(
-    private store: Store<fromAppStore.AppState>
-  ) {}
+  lastUpdate: Date;
+  version: string;
+
+  constructor() {}
 
   ngOnInit(): void {
-    this.userAuthSub = this.store
-      .select('user')
-      .pipe(map((authState) => authState.user))
-      .subscribe((user) => {
-        this.isAuthenticated = !!user;
-        if (this.isAuthenticated) {
-          this.userEmail = user.email;
-        }
-      });
+    this.currentYear = new Date().getFullYear();
+    this.lastUpdate = environment.lastUpdate;
+    this.version = environment.version;
   }
-
 }

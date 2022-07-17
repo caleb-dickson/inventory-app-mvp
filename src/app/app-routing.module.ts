@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 
 const routes: Routes = [
   { path: '', component: LandingComponent, pathMatch: 'full' },
+  { path: 'reset-password/:token', component: LandingComponent, pathMatch: 'full' },
   {
     path: 'app',
     canActivate: [AuthGuard],
