@@ -13,6 +13,7 @@ import { UserService } from '../users/user-control/user.service';
 import { ThemeService } from '../theme/theme.service';
 import { environment } from 'src/environments/environment';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-landing',
@@ -22,9 +23,10 @@ import { ActivatedRoute } from '@angular/router';
 export class LandingComponent implements OnInit {
   private _userSub: Subscription;
   private _themeSub: Subscription;
-  private _passResetSub: Subscription;
+  private _passResetRouteSub: Subscription;
 
   themeMode: string;
+  passResetMode = false;
 
   isAuthenticated = false;
   displayName: string;
@@ -37,14 +39,14 @@ export class LandingComponent implements OnInit {
   version: string;
 
   constructor(
-    private route: ActivatedRoute,
+    private _route: ActivatedRoute,
+    private _dialog: MatDialog,
     private _userService: UserService,
     private _themeService: ThemeService,
     private _store: Store<fromAppStore.AppState>
   ) {}
 
   ngOnInit() {
-
     this.lastUpdate = environment.lastUpdate;
     this.version = environment.version;
 
@@ -69,7 +71,16 @@ export class LandingComponent implements OnInit {
     );
     this._themeService.getThemeMode();
 
-    if (this.showPreviewReminder && !this.isAuthenticated) {
+    console.log(this._route);
+    this._passResetRouteSub = this._route.params.subscribe((param) => {
+      console.log(param.token);
+      if (param.token) {
+        this.passResetMode = true;
+        this._userService.passReset(param.token);
+      }
+    });
+
+    if (this.showPreviewReminder && !this.isAuthenticated && !this.passResetMode) {
       this._store.dispatch(
         NotificationsActions.showMessage({
           message: "Welcome to Inventory. Don't forget to preview the App!",
@@ -79,28 +90,10 @@ export class LandingComponent implements OnInit {
       );
     }
 
-    console.log(this.route)
-    this._passResetSub = this.route.params.subscribe(param => {
-      console.log(param.token)
-      if (param.token) {
-        this._userService.passReset(param.token);
-      }
-    })
-
   }
 
   getTheme() {
     return this.themeMode == 'theme-dark' ? 'mode-dark' : 'mode-light';
-  }
-
-  showMessage(message: string) {
-    this._store.dispatch(
-      NotificationsActions.showMessage({
-        message: message,
-        notificationAction: 'Close',
-        duration: 1250,
-      })
-    );
   }
 
   onOpenAuth(mode: string) {

@@ -41,24 +41,21 @@ export class SignupComponent implements OnInit, OnDestroy {
   }
 
   onSignup(): void {
+    // IF USER IS AN OWNER, SET DEPARTMENT TO ADMIN
+    if (this.signupForm.get('role').value === 3) {
+      this.signupForm.get('department').setValue('admin');
+    }
+
     console.log(this.signupForm.value);
     this.signupForm.updateValueAndValidity();
     console.log(this.signupForm.value);
-    if (!this.signupForm.valid) {
-      this.store.dispatch(
-        UserActions.userError({ message: 'Signup form invalid.' })
-      );
-    } else if (!this.passMatch) {
-      this.store.dispatch(
-        UserActions.userError({ message: 'Passwords do not match.' })
-      );
-    }
 
-    let department = 'admin';
+    // if (!this.passMatch) {
+    //   this.store.dispatch(
+    //     UserActions.userError({ message: 'Passwords do not match.' })
+    //   );
+    // }
 
-    if (this.signupForm.get('department').value) {
-      department = this.signupForm.get('department').value;
-    }
 
     let themePref = !this.signupForm.value.themePref
       ? undefined
@@ -73,7 +70,7 @@ export class SignupComponent implements OnInit, OnDestroy {
           password: this.signupForm.value.password,
           userProfile: {
             role: this.signupForm.value.role,
-            department: department,
+            department: this.signupForm.value.department,
             firstName: this.signupForm.value.firstName,
             lastName: this.signupForm.value.lastName,
             phoneNumber: this.signupForm.value.phoneNumber,
@@ -100,7 +97,7 @@ export class SignupComponent implements OnInit, OnDestroy {
         firstName: new FormControl(null, Validators.required),
         lastName: new FormControl(null, Validators.required),
         role: new FormControl(null, Validators.required),
-        department: new FormControl(null, Validators.required),
+        department: new FormControl(null),
         phoneNumber: new FormControl(null, Validators.required),
         email: new FormControl(null, [Validators.email, Validators.required]),
         password: new FormControl(null, Validators.required),

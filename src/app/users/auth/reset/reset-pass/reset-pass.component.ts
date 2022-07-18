@@ -23,6 +23,7 @@ import { UserService } from 'src/app/users/user-control/user.service';
 export class ResetPassComponent implements OnInit, OnDestroy {
   private _userStoreSub: Subscription;
   private _passResetUserIdSub: Subscription;
+  private _dialogSub: Subscription;
 
   token: string;
   userId: string;
@@ -53,7 +54,7 @@ export class ResetPassComponent implements OnInit, OnDestroy {
       this.error = userState.userError;
       this.loading = userState.loading;
       this.resMessage = userState.userMessage;
-      console.log(this.error);
+      console.log(this.resMessage);
     });
 
     this._passResetUserIdSub = this._userService.passResetUserId$.subscribe(
@@ -70,17 +71,27 @@ export class ResetPassComponent implements OnInit, OnDestroy {
     );
 
     if (this.token) {
+      this._dialogSub = this._dialog
+        .getDialogById('reset-pass')
+        .afterClosed()
+        .subscribe((res) => {
+          this._router.navigate(['/']);
+        });
+    }
+
+    if (this.token) {
       this._store.dispatch(
         UserActions.checkTokenValidity({ token: this.token })
       );
     }
 
     this._initResetForm();
+    console.log(this.inputType);
   }
 
   ngOnDestroy(): void {
-      this._userStoreSub.unsubscribe();
-      this._passResetUserIdSub.unsubscribe();
+    this._userStoreSub.unsubscribe();
+    this._passResetUserIdSub.unsubscribe();
   }
 
   onShowPass(input: string) {
@@ -102,23 +113,26 @@ export class ResetPassComponent implements OnInit, OnDestroy {
       );
 
       this.disableForm = true;
-
+      this._dialog.closeAll();
     } else if (this.inputType === 'newPassword') {
       console.log(this.resetForm.value);
 
-      this._store.dispatch(UserActions.saveNewPassword({
-        newPass: this.resetForm.value.newPassword,
-        userId: this.userId,
-        token: this.token
-      }));
-
       this.disableForm = true;
+      this._dialog.closeAll();
+      
+      this._store.dispatch(
+        UserActions.saveNewPassword({
+          newPass: this.resetForm.value.newPassword,
+          userId: this.userId,
+          token: this.token,
+        })
+      );
+
     }
   }
 
-
-
   private _initResetForm() {
+    console.log(this.inputType);
     if (!this.token) {
       this.inputType = 'email';
 

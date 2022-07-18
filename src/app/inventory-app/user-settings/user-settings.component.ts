@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { Store } from '@ngrx/store';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { MatDialog } from '@angular/material/dialog';
+
 import { Subscription } from 'rxjs';
+
+import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
 import * as UserActions from "../../users/user-store/user.actions";
 
@@ -13,7 +15,8 @@ import { User } from 'src/app/users/user.model';
 import { environment } from 'src/environments/environment';
 import { ThemeService } from 'src/app/theme/theme.service';
 import { UserService } from 'src/app/users/user-control/user.service';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+
+import { UserSettingsAdvancedComponent } from './user-settings-advanced/user-settings-advanced.component';
 
 const BACKEND_URL = environment.apiUrl + '/user';
 
@@ -54,9 +57,10 @@ export class UserSettingsComponent implements OnInit {
   fileSizeOk = true;
 
   constructor(
+    private _dialog: MatDialog,
     private _userService: UserService,
+    private _themeService: ThemeService,
     private _store: Store<fromAppStore.AppState>,
-    private _themeService: ThemeService
   ) {}
 
   ngOnInit() {
@@ -67,7 +71,6 @@ export class UserSettingsComponent implements OnInit {
       this.userDept = userState.user?.userProfile.department;
       this.userPhoto = this.user?.userProfile.userPhoto;
       this.setUserRoleString(userState.user?.userProfile.role);
-      this._initUserProfileForm();
     });
 
     this._themeService.getThemeMode();
@@ -76,7 +79,8 @@ export class UserSettingsComponent implements OnInit {
         this.themeMode = themeModeData;
         this.themePref = themeModeData;
       }
-    );
+      );
+      this._initUserProfileForm();
   }
 
   setUserRoleString(intRole: number): void {
@@ -91,6 +95,15 @@ export class UserSettingsComponent implements OnInit {
         this.userRole = 'staff';
         break;
     }
+  }
+
+  onOpenAdvancedSettings() {
+    this._dialog.open(UserSettingsAdvancedComponent, {
+      id: 'settings-advanced',
+      height: 'max-content',
+      width: 'max-content',
+      data: this.user._id
+    })
   }
 
   onUserProfileSubmit() {

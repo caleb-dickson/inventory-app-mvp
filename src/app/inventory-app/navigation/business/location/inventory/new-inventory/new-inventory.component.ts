@@ -107,10 +107,12 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
 
         this.draftInventory = this.activeInventory;
 
-        this._inventoryService.filterLocationProducts(
-          this.activeLocation?.productList,
-          this.formDept
-        );
+        if (this.activeLocation?.productList.length > 0) {
+          this._inventoryService.filterLocationProducts(
+            this.activeLocation?.productList,
+            this.formDept
+          );
+        }
 
         // IF USER HAS AT LEAST ONE ACTIVATED LOCATION
         if (this.activeLocation?.productList.length > 0) {

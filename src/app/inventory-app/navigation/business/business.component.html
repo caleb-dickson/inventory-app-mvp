@@ -2,11 +2,11 @@
   <mat-card>
     <mat-card-header>
       <mat-icon *ngIf="!business" mat-card-avatar>business</mat-icon>
-      <img *ngIf="business" mat-card-avatar [src]="business.businessPhoto" alt="Business photo" />
+      <img *ngIf="business" mat-card-avatar [src]="business?.businessPhoto" alt="Business photo" />
       <mat-card-title>Manage Business</mat-card-title>
       <mat-card-subtitle>
         {{ user.userProfile.firstName + " " + user.userProfile.lastName }} -
-        {{ userRole }} <span> - {{ business.businessName }}</span>
+        {{ userRole }} <span> - {{ business?.businessName }}</span>
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content class="business">
@@ -16,18 +16,18 @@
 
         <p *ngIf="!businessSubmitMode && !businessLoading" class="business-manage-info-name">
           {{
-            business.businessName ? business.businessName : "Add your business to get started."
+            business?.businessName ? business.businessName : "Add your business to get started."
           }}
           <button
             mat-raised-button
             class="business-manage-info-edit"
-            (click)="onEditBusiness(business.businessName ? 'update' : 'new')"
+            (click)="onEditBusiness(business?.businessName ? 'update' : 'new')"
           >
-            <mat-icon *ngIf="business.businessName" class="business-manage-info-name-edit"
+            <mat-icon *ngIf="business?.businessName" class="business-manage-info-name-edit"
               >edit</mat-icon
             >
-            <mat-icon *ngIf="!business.businessName">domain_add</mat-icon>
-            <mat-label *ngIf="!business.businessName"> Add business</mat-label>
+            <mat-icon *ngIf="!business?.businessName">domain_add</mat-icon>
+            <mat-label *ngIf="!business?.businessName"> Add business</mat-label>
           </button>
         </p>
 
@@ -88,13 +88,13 @@
             <div
               class="image-preview"
               *ngIf="
-                business.businessPhoto &&
+                business?.businessPhoto &&
                 imagePreview !== '' &&
                 businessForm.get('businessPhoto').valid
               "
             >
               <img
-                [src]="imagePreview ? imagePreview : business.businessPhoto"
+                [src]="imagePreview ? imagePreview : business?.businessPhoto"
                 [alt]="
                   businessForm.get('businessName').value + '-businessPhoto'
                     | lowercase
@@ -151,8 +151,8 @@
 
       <br />
 
-      <p *ngIf="!business._id">Add your business to create locations.</p>
-      <button *ngIf="business._id" mat-icon-button class="business-manage-info-add">
+      <p *ngIf="!business?._id">Add your business to create locations.</p>
+      <button *ngIf="business?._id" mat-icon-button class="business-manage-info-add">
         <mat-icon *ngIf="!locationSubmitMode" (click)="onCreateLocation(true)"
           >add_business</mat-icon
         >
@@ -302,7 +302,7 @@
         <!-- ADD MANAGERS BUTTON -->
         <button
           *ngIf="
-            (business._id && !addUserToLocationMode) ||
+            (business?._id && !addUserToLocationMode) ||
             addUserToLocationMode === 'manager'
           "
           mat-raised-button
@@ -358,7 +358,7 @@
         <!-- ADD STAFF BUTTON -->
         <button
           *ngIf="
-            (business._id && !addUserToLocationMode) ||
+            (business?._id && !addUserToLocationMode) ||
             addUserToLocationMode === 'staff'
           "
           mat-raised-button

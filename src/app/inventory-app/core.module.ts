@@ -20,6 +20,7 @@ import { NewInventoryComponent } from './navigation/business/location/inventory/
 import { ProductFormComponent } from './navigation/business/location/inventory/products/product-form/product-form.component';
 import { InventoryFormComponent } from './navigation/business/location/inventory/inventory-form/inventory-form.component';
 import { ProductEditComponent } from './dialog/product-edit/product-edit.component';
+import { UserSettingsAdvancedComponent } from './user-settings/user-settings-advanced/user-settings-advanced.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { ProductEditComponent } from './dialog/product-edit/product-edit.compone
     ProductFormComponent,
     InventoryFormComponent,
     ProductEditComponent,
+    UserSettingsAdvancedComponent,
   ],
   imports: [
     CommonModule,

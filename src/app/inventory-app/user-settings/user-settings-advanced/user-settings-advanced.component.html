@@ -1,0 +1,16 @@
+
+<div *ngIf="init" class="outer outer-1">
+  <mat-spinner *ngIf="loading"></mat-spinner>
+  <button *ngIf="!loading" mat-raised-button color="warn" (click)="nextStep()">Delete My Account</button>
+</div>
+
+<div *ngIf="!init" class="outer-2">
+  <mat-label>Are you sure?</mat-label>
+  <span>This action cannot be undone.</span>
+  <mat-spinner *ngIf="loading"></mat-spinner>
+  <p *ngIf="loading"> Account deleted in: {{ countdown }} </p>
+  <p *ngIf="goodbyeMessage" class="goodbye"> {{ goodbyeMessage }} </p>
+  <button *ngIf="!loading" mat-raised-button color="accent" (click)="cancel()">Nevermind</button>
+  <button *ngIf="loading" mat-raised-button color="accent" (click)="undo()">Wait, stop!</button>
+  <button *ngIf="!loading" mat-raised-button color="warn" (click)="confirm()">Yes, I'm Sure</button>
+</div>

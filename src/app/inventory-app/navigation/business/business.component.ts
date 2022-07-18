@@ -283,7 +283,7 @@ export class BusinessComponent
 
     this._businessService.submitBusiness(
       this.businessForm,
-      this.business._id,
+      this.business?._id,
       this.businessSubmitMode,
       this.bizPhotoUpload,
       this.user

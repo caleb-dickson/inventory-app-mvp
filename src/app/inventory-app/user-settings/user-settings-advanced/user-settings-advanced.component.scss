@@ -1,0 +1,27 @@
+mat-spinner {
+  text-align: center;
+}
+
+.outer {
+
+  &-1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &-2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .goodbye {
+      font-weight: 700;
+    }
+
+    button:not(:first-child) {
+      margin: 0.5rem;
+    }
+  }
+}

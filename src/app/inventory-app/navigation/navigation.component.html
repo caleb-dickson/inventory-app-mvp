@@ -9,7 +9,7 @@
     [opened]="(isHandset$ | async) === false"
   >
     <mat-toolbar-row>
-      <img [src]="user.userProfile.userPhoto" alt="Your profile photo" />
+      <img [src]="user?.userProfile.userPhoto" alt="Your profile photo" />
     </mat-toolbar-row>
     <mat-toolbar-row>
       <!-- **USER NAME BLOCK** -->

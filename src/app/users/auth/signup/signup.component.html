@@ -12,7 +12,6 @@
     <form [formGroup]="signupForm">
       <mat-dialog-title>Sign Up!</mat-dialog-title>
       <mat-dialog-content>
-
         <mat-form-field appearance="outline">
           <mat-label>First Name</mat-label>
           <input
@@ -60,6 +59,7 @@
         >
           <mat-label>Department</mat-label>
           <mat-select
+            [required]="signupForm.get('role').value === 3 ? false : true"
             formControlName="department"
             type="text"
             placeholder="Select your department."
@@ -130,13 +130,20 @@
           <mat-icon matSuffix (click)="onShowPass('confirmPassword')"
             >visibility</mat-icon
           >
-          <mat-error *ngIf="signupForm.get('confirmPassword').errors?.mustMatch" class="password-error"
+          <mat-error
+            *ngIf="signupForm.get('confirmPassword').errors?.mustMatch"
+            class="password-error"
             >Passwords do not match.</mat-error
           >
         </mat-form-field>
       </mat-dialog-content>
       <mat-dialog-actions align="center">
-        <button mat-raised-button type="button" (click)="onSignup()" [disabled]="signupForm.invalid">
+        <button
+          mat-raised-button
+          type="button"
+          (click)="onSignup()"
+          [disabled]="signupForm.invalid"
+        >
           Sign Up
         </button>
       </mat-dialog-actions>

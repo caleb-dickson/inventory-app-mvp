@@ -33,6 +33,7 @@ export function userReducer(
       UserActions.loginStart,
       UserActions.signupStart,
       UserActions.passwordResetInit,
+      UserActions.DELETEUserStart,
       (state) => ({
         ...state,
         authError: null,
@@ -63,7 +64,11 @@ export function userReducer(
       loading: false,
       userMessage: action.message
     })),
-
+    on(UserActions.DELETEUserSuccess, (state) => ({
+      ...state,
+      authError: null,
+      loading: false,
+    })),
 
 
     on(UserActions.GETUserLocationsStart, (state) => ({

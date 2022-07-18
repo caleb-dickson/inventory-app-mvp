@@ -110,7 +110,7 @@ export class UserService {
     // this.router.navigate(['/']);
     this.dialog.open(ResetPassComponent, {
       width: '30vw',
-      height: '55vh',
+      height: 'max-content',
       minWidth: 350,
       // minHeight: 500,
       id: 'reset-pass',
@@ -199,7 +199,7 @@ export class UserService {
 
     // SEND THE PUT REQUEST TO UPDATE THE USER DOC ON BACKEND
     this.http
-      .put<{ updatedUser: User }>(BACKEND_URL + '/update-user', formData)
+      .put<{ updatedUser: User }>(BACKEND_URL + '/user', formData)
       .subscribe((resData) => {
         console.log(resData);
         // SET THE UPDATED USER DATA IN LOCALSTORAGE AND AUTOLOGIN

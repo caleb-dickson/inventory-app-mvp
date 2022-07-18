@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import * as fromAppStore from '../../app-store/app.reducer';
 import * as UserActions from './user.actions';
+import * as NotificationsActions from '../../notifications/notifications-store/notifications.actions';
 import { clearBusinessState } from '../../inventory-app/navigation/business/business-store/business.actions';
 import { clearLocationState } from 'src/app/inventory-app/navigation/business/location/location-store/location.actions';
 
@@ -28,6 +29,7 @@ import { User } from '../user.model';
 import { Location } from '../../inventory-app/models/location.model';
 
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 const BACKEND_URL = environment.apiUrl + '/user';
 
@@ -51,10 +53,11 @@ const handleError = (errorRes: HttpErrorResponse) => {
 @Injectable()
 export class UserEffects {
   signupStart$ = createEffect(() =>
-    this.actions$.pipe(
+    this._actions$.pipe(
       ofType(UserActions.signupStart),
       exhaustMap((action) => {
-        return this.http
+        console.warn('||| signupStart$ effect called |||');
+        return this._http
           .post<{ email: string; password: string }>(BACKEND_URL + '/signup', {
             userId: action.newUser.userId,
             email: action.newUser.email,
@@ -84,11 +87,38 @@ export class UserEffects {
     )
   );
 
+  deleteUserStart$ = createEffect(() =>
+    this._actions$.pipe(
+      ofType(UserActions.DELETEUserStart),
+      exhaustMap((action) => {
+        console.warn('||| deleteUserStart$ effect called |||');
+        return this._http
+          .delete(BACKEND_URL + '/user/' + action.userId)
+          .pipe(
+            map((res) => {
+              console.log(res);
+              console.warn('||| ^^^ deleteUserStart$ resData ^^^ |||');
+
+              this._store.dispatch(UserActions.logout());
+              this._dialog.closeAll();
+
+              return UserActions.DELETEUserSuccess();
+            }),
+            catchError((errorRes) => {
+              console.log(errorRes);
+              return handleError(errorRes);
+            })
+          );
+      })
+    )
+  );
+
   loginStart$ = createEffect(() =>
-    this.actions$.pipe(
+    this._actions$.pipe(
       ofType(UserActions.loginStart),
       switchMap((action) => {
-        return this.http
+        console.warn('||| loginStart$ effect called |||');
+        return this._http
           .post<{
             token: string;
             expiresIn: number;
@@ -102,7 +132,8 @@ export class UserEffects {
             map((resData) => {
               if (resData.token) {
                 console.log(resData.expiresIn);
-                this.userService.setLogoutTimer(resData.expiresIn * 1000);
+                console.warn('||| ^^^ loginStart$ resData ^^^ |||');
+                this._userService.setLogoutTimer(resData.expiresIn * 1000);
 
                 const now = new Date();
                 const expirationDate = new Date(
@@ -130,8 +161,8 @@ export class UserEffects {
                   'userProfileData',
                   JSON.stringify(userProfileData)
                 );
-                this.dialog.closeAll();
-                this.router.navigate(['/app/dashboard']);
+                this._dialog.closeAll();
+                this._router.navigate(['/app/dashboard']);
               }
               return UserActions.authSuccess({
                 user: {
@@ -153,13 +184,13 @@ export class UserEffects {
   );
 
   resetPassInit$ = createEffect(() =>
-    this.actions$.pipe(
+    this._actions$.pipe(
       ofType(UserActions.passwordResetInit),
       take(1),
       exhaustMap((action) => {
         console.warn('||| resetPassInit$ effect called |||');
-        return this.http
-          .post<{ message: string }>(BACKEND_URL + '/reset-pass-init', {
+        return this._http
+          .post<{ message: string }>(BACKEND_URL + '/reset', {
             email: action.email,
           })
           .pipe(
@@ -167,8 +198,16 @@ export class UserEffects {
               console.log(resData);
               console.warn('||| resetPassInit$ resData |||');
 
-              this.store.dispatch(
+              this._store.dispatch(
                 UserActions.setUserMessage({ message: resData.message })
+              );
+
+              this._store.dispatch(
+                NotificationsActions.showMessage({
+                  message: resData.message,
+                  notificationAction: 'dismiss',
+                  duration: 10000,
+                })
               );
 
               return UserActions.passwordResetInitSuccess({
@@ -187,14 +226,14 @@ export class UserEffects {
   );
 
   checkTokenValidity$ = createEffect(() =>
-    this.actions$.pipe(
+    this._actions$.pipe(
       ofType(UserActions.checkTokenValidity),
       take(1),
       exhaustMap((action) => {
         console.warn('||| checkTokenValidity$ effect called |||');
-        return this.http
+        return this._http
           .get<{ userId?: string; message?: string }>(
-            BACKEND_URL + '/reset-pass-init/' + action.token
+            BACKEND_URL + '/reset/' + action.token
           )
           .pipe(
             map((resData) => {
@@ -202,7 +241,7 @@ export class UserEffects {
               console.warn('||| ^^^ checkTokenValidity$ resData ^^^ |||');
 
               if (resData.userId) {
-                this.userService.setPassResetUserId(resData.userId);
+                this._userService.setPassResetUserId(resData.userId);
               } else if (resData.message) {
                 return UserActions.setUserMessage({ message: resData.message });
               }
@@ -221,12 +260,12 @@ export class UserEffects {
   );
 
   saveNewPassword$ = createEffect(() =>
-    this.actions$.pipe(
+    this._actions$.pipe(
       ofType(UserActions.saveNewPassword),
       exhaustMap((action) => {
         console.warn('||| saveNewPassword$ effect called |||');
-        return this.http
-          .put<{ message: string }>(BACKEND_URL + '/reset-pass', {
+        return this._http
+          .put<{ message: string }>(BACKEND_URL + '/reset', {
             newPass: action.newPass,
             userId: action.userId,
             token: action.token,
@@ -236,6 +275,16 @@ export class UserEffects {
               console.log(resData);
               console.warn('||| ^^^ saveNewPassword$ resData ^^^ |||');
 
+              // this._snackbar.dismiss();
+
+              this._store.dispatch(
+                NotificationsActions.showMessage({
+                  message: resData.message,
+                  notificationAction: 'dismiss',
+                  duration: 10000,
+                })
+              );
+
               return UserActions.setUserMessage({ message: resData.message });
             })
           );
@@ -244,7 +293,7 @@ export class UserEffects {
   );
 
   updateUser$ = createEffect(() =>
-    this.actions$.pipe(
+    this._actions$.pipe(
       ofType(UserActions.PUTUpdateUserSuccess),
       map((action) => {
         console.warn('||| updateUser$ effect called |||');
@@ -266,13 +315,13 @@ export class UserEffects {
   );
 
   fetchUserLocations$ = createEffect(() =>
-    this.actions$.pipe(
+    this._actions$.pipe(
       ofType(UserActions.GETUserLocationsStart),
       concatMap((action) => {
-        return this.http
+        return this._http
           .get<{ fetchedLocations: Location[] }>(
             BACKEND_URL +
-              '/fetch-user-locations/' +
+              '/user-locations/' +
               action.userId +
               '/' +
               action.userRole
@@ -300,7 +349,7 @@ export class UserEffects {
   );
 
   autoLogin$ = createEffect(() =>
-    this.actions$.pipe(
+    this._actions$.pipe(
       ofType(UserActions.autoLogin),
       map(() => {
         // PULL AUTHDATA FROM LOCAL STORAGE
@@ -347,7 +396,7 @@ export class UserEffects {
         if (authorizedUser.userId) {
           const now = new Date().getTime();
           const expirationDuration = authorizedUser.expiration.getTime() - now;
-          this.userService.setLogoutTimer(expirationDuration);
+          this._userService.setLogoutTimer(expirationDuration);
           return UserActions.authSuccess({
             user: {
               _id: userAuthData.userId,
@@ -369,16 +418,16 @@ export class UserEffects {
 
   authLogout$ = createEffect(
     () =>
-      this.actions$.pipe(
+      this._actions$.pipe(
         ofType(UserActions.logout),
         tap(() => {
-          this.userService.clearLogoutTimer();
+          this._userService.clearLogoutTimer();
           localStorage.clear();
-          this.store.dispatch(clearBusinessState());
-          this.store.dispatch(clearLocationState());
+          this._store.dispatch(clearBusinessState());
+          this._store.dispatch(clearLocationState());
           const guestUserData = { themePref: 'theme-dark' };
           localStorage.setItem('guestUserData', JSON.stringify(guestUserData));
-          this.router.navigate(['/']);
+          this._router.navigate(['/']);
           console.clear();
           console.log('||| USER WAS LOGGED OUT |||');
         })
@@ -387,11 +436,12 @@ export class UserEffects {
   );
 
   constructor(
-    private dialog: MatDialog,
-    private actions$: Actions,
-    private http: HttpClient,
-    private router: Router,
-    private userService: UserService,
-    private store: Store<fromAppStore.AppState>
+    private _dialog: MatDialog,
+    private _snackbar: MatSnackBar,
+    private _actions$: Actions,
+    private _http: HttpClient,
+    private _router: Router,
+    private _userService: UserService,
+    private _store: Store<fromAppStore.AppState>
   ) {}
 }

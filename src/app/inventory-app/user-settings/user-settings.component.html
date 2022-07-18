@@ -119,17 +119,21 @@
       </form>
     </mat-card-content>
     <mat-card-actions align="center">
-      <button mat-raised-button type="button" (click)="onResetForm()">
+      <button mat-raised-button type="button" color="accent" (click)="onResetForm()">
         Reset All
       </button>
       <button
         mat-raised-button
         type="submit"
+        color="primary"
         (click)="onUserProfileSubmit()"
-        [disabled]="userProfileForm.invalid"
+        [disabled]="userProfileForm.invalid || !userProfileForm.dirty"
       >
         Save
       </button>
     </mat-card-actions>
+    <div class="delete-user">
+      <button mat-raised-button (click)="onOpenAdvancedSettings()">Advanced Settings</button>
+    </div>
   </mat-card>
 </div>
