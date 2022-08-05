@@ -82,11 +82,11 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
       this.userLoading = userState.loading;
       this.user = userState.user;
       if (this.user) {
-        this.setUserRoleString(this.user.userProfile.role);
-        this.userDept = userState.user.userProfile.department;
+        this.setUserRoleString(this.user.role);
+        this.userDept = userState.user.department;
         this.formDept =
           this.userDept !== 'admin'
-            ? this.user.userProfile.department
+            ? this.user.department
             : this.formDept;
       }
     });
@@ -99,7 +99,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
         this.locationError = locationState.locationError;
         this.userLocations = locationState.userLocations;
         this.activeLocation = locationState.activeLocation;
-        this.inventoryData = locationState.activeLocation?.inventoryData;
+        this.inventoryData = locationState.activeLocation?.inventories;
         this.activeInventory = locationState.activeInventory;
         this.activeLocationInventories =
           locationState.activeLocationInventories;
@@ -107,30 +107,30 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
 
         this.draftInventory = this.activeInventory;
 
-        if (this.activeLocation?.productList.length > 0) {
+        if (this.activeLocation?.products.length > 0) {
           this._inventoryService.filterLocationProducts(
-            this.activeLocation?.productList,
+            this.activeLocation?.products,
             this.formDept
           );
         }
 
         // IF USER HAS AT LEAST ONE ACTIVATED LOCATION
-        if (this.activeLocation?.productList.length > 0) {
-          this.locationProducts = this.activeLocation.productList;
+        if (this.activeLocation?.products.length > 0) {
+          this.locationProducts = this.activeLocation.products;
           this.inventoryDataPopulated = this.activeLocationInventories;
 
           // IF PRODUCTS ARE NEEDED AND USER ISN'T AN ADMIN
           if (
             this.activeLocation &&
-            this.user.userProfile.department !== 'admin'
+            this.user.department !== 'admin'
           ) {
             // SET PRODUCTS TO ONLY USER'S DEPT PRODUCTS
-            // this.onDepartmentSelect(this.user.userProfile.department);
+            // this.onDepartmentSelect(this.user.department);
             console.log(this.newInventoryProducts);
             // IF USER IS AN ADMIN
           } else if (
             this.activeLocation &&
-            this.user.userProfile.department === 'admin'
+            this.user.department === 'admin'
           ) {
             // SET PRODUCTS TO ONLY SELECTED DEPT PRODUCTS
             // this.onDepartmentSelect(this.formDept ? this.formDept : 'foh');
@@ -187,7 +187,7 @@ export class NewInventoryComponent implements OnInit, OnDestroy {
     this.newInventoryProducts = [];
     this.formDept = dept;
     this._inventoryService.filterLocationProducts(
-      this.activeLocation.productList,
+      this.activeLocation.products,
       this.formDept
     );
   }

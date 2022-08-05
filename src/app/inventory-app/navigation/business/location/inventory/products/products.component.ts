@@ -24,8 +24,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   constructor(
     private _store: Store<fromAppStore.AppState>,
     private _locationService: LocationService,
-    private _productsService: ProductsService,
-    // private _matExpansion: MatExpansionPanel
+    private _productsService: ProductsService // private _matExpansion: MatExpansionPanel
   ) {}
 
   private _userAuthSub: Subscription;
@@ -39,8 +38,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
   userRole: string;
   userDept: string;
 
-  bizLoading: boolean;
-  locLoading: boolean;
+  loading = false;
 
   matExpanded: boolean;
   newProductForm: NgForm;
@@ -78,9 +76,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
       .pipe(map((authState) => authState.user))
       .subscribe((user) => {
         this.user = user;
-        this.userDept = user?.userProfile?.department;
+        this.userDept = user?.department;
         if (!!user) {
-          switch (user.userProfile.role) {
+          switch (user.role) {
             case 3:
               this.userRole = 'owner';
               break;
@@ -100,7 +98,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.locationState = locState;
         this.activeLocation = locState.activeLocation;
         this.activeProducts = locState.activeProducts;
-        this.locLoading = locState.loading;
+        this.loading = locState.loading;
+
         console.group(
           '%cLocation State',
           `font-size: 1rem;
@@ -113,9 +112,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this._businessStoreLoadingSub = this._store
       .select('business')
       .pipe(map((bizState) => bizState.loading))
-      .subscribe((loading) => (this.bizLoading = loading));
+      .subscribe((loading) => (this.loading = loading));
   }
-
 
   onNewProductSubmit(newProductForm: FormGroup) {
     console.log(newProductForm);
@@ -128,28 +126,27 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this._store.dispatch(
       LocationActions.POSTCreateProductForLocationStart({
         product: {
-          _id: null,
-          parentOrg: this.activeLocation._id,
-          isActive: newProductForm.value.isActive,
+          id: null,
+          createdAt: null,
+          updatedAt: null,
+          name: newProductForm.value.name,
           department: newProductForm.value.department,
           category: newProductForm.value.category,
-          name: newProductForm.value.name,
+          isActive: newProductForm.value.isActive,
           unitSize: newProductForm.value.unitSize,
-          unitMeasure: newProductForm.value.unitMeasure,
+          unitSingular: newProductForm.value.unitMeasure.singular,
+          unitPlural: newProductForm.value.unitMeasure.plural,
           unitsPerPack: newProductForm.value.unitsPerPack,
           packsPerCase: newProductForm.value.packsPerCase,
           casePrice: newProductForm.value.casePrice,
           par: newProductForm.value.par,
+          photo: null,
+          location: this.activeLocation.id,
         },
-        locationId: this.activeLocation._id,
+        locationId: this.activeLocation.id,
       })
     );
   }
-
-  // onProductUpdateSubmit(productUpdateForm: NgForm) {
-  //   console.log(productUpdateForm);
-  //   console.log(productUpdateForm.value);
-  // }
 
   onProductSelect(checked: boolean, product: Product) {
     this._locationService.selectProducts(
@@ -157,9 +154,8 @@ export class ProductsComponent implements OnInit, OnDestroy {
       [...this.activeProducts],
       product
     );
-    // LOG THE CURRENT STATE FOR CONFIRMATION
-    console.log(this.activeProducts); // COMPONENT COPY
-    console.log(this.locationState.activeProducts); // STORE DATA
+
+    console.log(this.activeProducts);
   }
 
   onEditProduct(product: Product) {
@@ -169,9 +165,36 @@ export class ProductsComponent implements OnInit, OnDestroy {
     this._productsService.setUpdateProduct(product);
   }
 
-  // onDeleteSelectedProducts() {
-  //   this.selectedProducts = [];
-  // }
+  onDeleteOne(productId: string) {
+    this._store.dispatch(
+      LocationActions.POSTDeleteProductsFromLocationStart({
+        productIds: [productId],
+        locationId: this.activeLocation.id,
+      })
+    );
+  }
+
+  onDeleteSelected() {
+    let srcArr: any[] = [];
+    let prodArr: string[] = [];
+
+    srcArr = this.activeProducts;
+
+    for (const product of srcArr) {
+      prodArr.push(product.product.id);
+    }
+
+    console.log(prodArr);
+
+    this._store.dispatch(
+      LocationActions.POSTDeleteProductsFromLocationStart({
+        productIds: prodArr,
+        locationId: this.activeLocation.id,
+      })
+    );
+
+    this._store.dispatch(LocationActions.ActivateProducts({ products: [] }));
+  }
 
   ngOnDestroy(): void {
     this._businessStoreLoadingSub.unsubscribe();

@@ -4,7 +4,6 @@ import * as LocationActions from './location.actions';
 import { Inventory } from 'src/app/inventory-app/models/inventory.model';
 import { Product } from 'src/app/inventory-app/models/product.model';
 import { Location } from '../../../../models/location.model';
-import { state } from '@angular/animations';
 
 export interface LocationState {
   userLocations: Location[];
@@ -33,12 +32,28 @@ export function locationReducer(
   return createReducer(
     initialState,
 
+    on(
+      LocationActions.LoadStart,
+      LocationActions.GETUserLocationsStart,
+      LocationActions.GETLocationInventoriesStart,
+      LocationActions.PUTUpdateManagerLocationStart,
+      LocationActions.PUTUpdateInventoryForLocationStart,
+      LocationActions.POSTCreateProductForLocationStart,
+      LocationActions.POSTCreateInventoryForLocationStart,
+      LocationActions.POSTDeleteProductsFromLocationStart,
+      (state) => ({
+      ...state,
+      loading: true
+    })),
+    on(
+      LocationActions.LoadStop,
+      (state) => ({
+      ...state,
+      loading: false
+    })),
+
     // FETCH/READ
     // User's Locations
-    on(LocationActions.GETUserLocationsStart, (state) => ({
-      ...state,
-      loading: true,
-    })),
     on(LocationActions.GETUserLocationsSuccess, (state, action) => ({
       ...state,
       loading: false,
@@ -50,10 +65,6 @@ export function locationReducer(
           : state.activeLocation,
     })),
     // Location Populated Inventory List
-    on(LocationActions.GETLocationInventoriesStart, (state) => ({
-      ...state,
-      loading: true,
-    })),
     on(LocationActions.GETLocationInventoriesSuccess, (state, action) => ({
       ...state,
       loading: false,
@@ -69,20 +80,13 @@ export function locationReducer(
     })),
 
     // UPDATE
-    on(LocationActions.PUTUpdateManagerLocationStart, (state) => ({
-      ...state,
-      loading: true,
-    })),
     on(LocationActions.PUTUpdateManagerLocationSuccess, (state, action) => ({
       ...state,
       loading: false,
       locationError: null,
       userLocations: action.locations,
     })),
-    on(LocationActions.PUTUpdateInventoryForLocationStart, (state) => ({
-      ...state,
-      loading: true,
-    })),
+
     on(
       LocationActions.PUTUpdateInventoryForLocationSuccess,
       (state, action) => ({
@@ -96,18 +100,10 @@ export function locationReducer(
     ),
 
     // CREATE
-    on(LocationActions.POSTCreateProductForLocationStart, (state) => ({
-      ...state,
-      loading: true,
-    })),
     on(LocationActions.POSTCreateProductForLocationSuccess, (state) => ({
       ...state,
       loading: false,
       locationError: null,
-    })),
-    on(LocationActions.POSTCreateInventoryForLocationStart, (state) => ({
-      ...state,
-      loading: true,
     })),
     on(LocationActions.POSTCreateInventoryForLocationSuccess, (state) => ({
       ...state,
@@ -115,15 +111,17 @@ export function locationReducer(
       locationError: null,
     })),
 
+
+    on(LocationActions.POSTDeleteProductsFromLocationSuccess, (state) => ({
+      ...state,
+      loading: false,
+    })),
+
     // SELECT
     on(LocationActions.ActivateLocation, (state, action) => ({
       ...state,
       activeLocation: action.location,
     })),
-    // on(LocationActions.ActivateInventory, (state, action) => ({
-    //   ...state,
-    //   activeInventory: action.inventory,
-    // })),
     on(LocationActions.ActivateProducts, (state, action) => ({
       ...state,
       activeProducts: action.products,
@@ -136,7 +134,7 @@ export function locationReducer(
     })),
 
     // CLEAR STATE ON LOGOUT
-    on(LocationActions.clearLocationState, (state) => ({
+    on(LocationActions.clearLocationState, () => ({
       userLocations: [],
       activeLocation: null,
       activeProducts: [],

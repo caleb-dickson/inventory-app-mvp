@@ -9,22 +9,18 @@
     [opened]="(isHandset$ | async) === false"
   >
     <mat-toolbar-row>
-      <img [src]="user?.userProfile.userPhoto" alt="Your profile photo" />
+      <img [src]="user?.photo" alt="Your profile photo" />
     </mat-toolbar-row>
     <mat-toolbar-row>
       <!-- **USER NAME BLOCK** -->
 
       <!-- **OWNER** -->
       <span *ngIf="userRole === 'owner'" class="sidenav-owner-name">
-        {{
-          business
-            ? business.businessName
-            : user.userProfile.firstName + " " + user.userProfile.lastName
-        }}
+        {{ business ? business.name : user.firstName + " " + user.lastName }}
       </span>
       <!-- **NON-OWNER** -->
       <span *ngIf="userRole !== 'owner'" class="sidenav-non-owner-name">
-        {{ user.userProfile.firstName + " " + user.userProfile.lastName }}
+        {{ user.firstName + " " + user.lastName }}
       </span>
       <br />
     </mat-toolbar-row>
@@ -84,9 +80,7 @@
 
       <!-- MULTI-LOCATION SELECT - FOR OWNER -->
       <div
-        *ngIf="
-          userRole === 'owner' && business?.locations.length > 1
-        "
+        *ngIf="userRole === 'owner' && business?.businesslocations.length > 1"
         class="owner-location-select"
       >
         <form multiLocationSelectForm="ngForm">
@@ -101,26 +95,27 @@
             <mat-label>
               {{
                 activeLocation
-                  ? activeLocation.locationName + " selected"
+                  ? activeLocation.name
                   : "Select Location"
               }}
             </mat-label>
             <mat-select
-              name="activeLocation"
-              matInput
-              [(ngModel)]="activeLocation"
-              [selected]="activeLocation ? activeLocation : selected"
-              (selectionChange)="onActivateLocation(activeLocation)"
+            name="activeLocation"
+            matInput
+            [(ngModel)]="activeLocation"
+            [selected]="activeLocation ? activeLocation : selected"
+            (selectionChange)="onActivateLocation(activeLocation)"
             >
-              <mat-option
-                class="location-select-dropdown"
-                #selectedValue
-                *ngFor="let location of multiBizLocations"
-                [value]="location"
-              >
-                {{ location.locationName }}
-              </mat-option>
-            </mat-select>
+            <mat-option
+            class="location-select-dropdown"
+            #selectedValue
+            *ngFor="let location of multiBizLocations"
+            [value]="location"
+            >
+            {{ location.name }}
+          </mat-option>
+        </mat-select>
+        <mat-icon *ngIf="multiLocationSelectForm.valid" class="sidenav-icon-check-select" matPrefix>done</mat-icon>
           </mat-form-field>
         </form>
       </div>
@@ -138,7 +133,7 @@
           <mat-label>
             {{
               activeLocation
-                ? activeLocation.locationName + " selected"
+                ? activeLocation.name + " selected"
                 : "Select Location"
             }}
           </mat-label>
@@ -154,7 +149,7 @@
               *ngFor="let location of multiUserLocations"
               [value]="location"
             >
-              {{ location.locationName }}
+              {{ location.name }}
             </mat-option>
           </mat-select>
           <mat-hint>Multiple locations detected.</mat-hint>
@@ -167,11 +162,11 @@
         *ngIf="userRole !== 'owner' && userLocations.length === 1"
         mat-list-item
         class="single-location-user"
-        >
+      >
         <!-- (click)="onActivateLocation(userLocations[0])" -->
         <mat-icon class="sidenav-icon">{{ manageIcon }}</mat-icon
         >{{ singleUserLocationName }}
-        <mat-icon class="sidenav-icon-check">done</mat-icon>
+        <mat-icon class="sidenav-icon-check-single">done</mat-icon>
       </a>
 
       <mat-error *ngIf="locationError" class="no-locations">
@@ -186,9 +181,8 @@
         "
         mat-list-item
         routerLinkActive="active"
-        >
-        <mat-icon class="sidenav-icon">store</mat-icon
-        >{{ singleBizLocationName }}
+      >
+        <mat-icon class="sidenav-icon">store</mat-icon>{{ singleBizname }}
       </a>
 
       <!-- SHOW 'MANAGE BUSINESS' LINK IF USER IS OWNER -->
@@ -219,10 +213,7 @@
       <p *ngIf="isAuthenticated" class="user-display">
         {{
           user
-            ? "Logged in as " +
-              user.userProfile.firstName +
-              " " +
-              user.userProfile.lastName
+            ? "Logged in as " + user.firstName + " " + user.lastName
             : "Logged in as " + user.email
         }}
         <br />

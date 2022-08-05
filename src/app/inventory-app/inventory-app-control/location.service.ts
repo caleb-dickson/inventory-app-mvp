@@ -8,11 +8,11 @@ import * as LocationActions from '../navigation/business/location/location-store
 import * as BusinessActions from '../navigation/business/business-store/business.actions';
 
 import { Location } from '../models/location.model';
-import { LocationIds } from '../models/business.model';
 import { LocationState } from '../navigation/business/location/location-store/location.reducer';
 import { BusinessState } from '../navigation/business/business-store/business.reducer';
 import { Product } from '../models/product.model';
 import { Inventory } from '../models/inventory.model';
+import { Business } from '../models/business.model';
 
 @Injectable({
   providedIn: 'root',
@@ -54,7 +54,6 @@ export class LocationService {
         location: activatedLocation,
       })
     );
-    this.getPopulatedInventories(true);
   }
 
   getLocations(userId: string, userStringRole: string, userNumberRole: number) {
@@ -67,14 +66,9 @@ export class LocationService {
     );
 
     if (userStringRole === 'owner') {
-      const storedBusiness: {
-        business: {
-          _id: string | null;
-          businessName: string;
-          ownerId: string;
-          locations: Location[] | LocationIds[] | [] | null;
-        };
-      } = JSON.parse(localStorage.getItem('storedBusiness'));
+      const storedBusiness: Business = JSON.parse(
+        localStorage.getItem('storedBusiness')
+      );
 
       if (businessLocations) {
         console.log(
@@ -98,7 +92,7 @@ export class LocationService {
         console.warn('||| Fetching locations from DB |||');
         this._store.dispatch(
           BusinessActions.GETBusinessLocationsStart({
-            businessId: storedBusiness.business._id,
+            businessId: storedBusiness.id,
           })
         );
       } else {
@@ -141,7 +135,7 @@ export class LocationService {
 
     if (activatedLocation) {
       console.warn(
-        '||| Found active location: ' + activatedLocation.locationName + ' |||'
+        '||| Found active location: ' + activatedLocation.name + ' |||'
       );
       console.log(activatedLocation);
       return this._store.dispatch(
@@ -187,53 +181,5 @@ export class LocationService {
         products: [...activeProducts],
       })
     );
-  }
-
-  // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
-  getPopulatedInventories(initLocInventories: boolean) {
-    // CHECK LOCALSTORAGE FOR ALREADY FETCHED INVENTORIES
-    const storedInv: Inventory[] = JSON.parse(
-      localStorage.getItem('inventoryData')
-    );
-
-    if (storedInv) {
-      // CHECK TO SEE IF ANY DRAFTS ARE IN THE INVs
-      let draft: Inventory = null;
-      for (const inv of storedInv) {
-        if (!inv.isFinal) {
-          draft = inv;
-        }
-      }
-      // SEND INV DATA AND ANY DRAFTS FOUND TO THE STORE
-      console.warn('||| populated inventories found in localStorage |||');
-      console.log(storedInv);
-      this._store.dispatch(
-        LocationActions.GETLocationInventoriesSuccess({
-          inventoryData: storedInv,
-          draft: draft,
-        })
-      );
-      // IF NONE FOUND IN LOCALSTORAGE, FETCH THE POPULATED INVENTORIES
-    } else if (
-      !storedInv &&
-      initLocInventories &&
-      this.locationState.activeLocation.inventoryData &&
-      this.locationState.activeLocation.inventoryData.length > 0
-    ) {
-      console.warn('||| Found ' + this.locationState.activeLocation.inventoryData.length + ' inventories at the ' + this.locationState.activeLocation.locationName + ' location |||');
-      this._store.dispatch(
-        LocationActions.GETLocationInventoriesStart({
-          locationId: this.locationState.activeLocation._id,
-        })
-      );
-    } else if (
-      !storedInv &&
-      initLocInventories &&
-      this.locationState.activeLocation.inventoryData &&
-      this.locationState.activeLocation.inventoryData.length === 0
-    ) {
-      console.warn('||| No inventories found at the ' + this.locationState.activeLocation.locationName + ' location |||');
-      this._store.dispatch(LocationActions.GETLocationInventoriesNull());
-    }
   }
 }

@@ -41,19 +41,19 @@
       class="inventory-products-card"
     >
       <div class="inventory-products-card-input">
-        <h6>{{ product.name }}</h6>
+        <h6>{{ product.name | titlecase }}</h6>
         <p>
           {{
             product.unitSize +
               " " +
               (product.unitSize > 1
-                ? product.unitMeasure.plural
-                : product.unitMeasure.singular)
+                ? product.unitPlural
+                : product.unitSingular)
           }}
           {{ " x " + product.unitsPerPack * product.packsPerCase }}
           per case
         </p>
-        <p>How many {{ product.unitMeasure.plural }} in stock?</p>
+        <p>How many {{ product.unitPlural }} in stock?</p>
         <mat-form-field appearance="outline" hidden>
           <input matInput type="text" #product formControlName="product" />
         </mat-form-field>
@@ -74,7 +74,7 @@
       </div>
     </mat-card>
   </div>
-  <div *ngIf="user.userProfile.role > 1" class="inventory-submit-status">
+  <div *ngIf="user.role > 1" class="inventory-submit-status">
     <mat-label>Save as:</mat-label>
     <mat-radio-group
       required

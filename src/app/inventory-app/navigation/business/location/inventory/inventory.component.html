@@ -11,28 +11,21 @@
     class="inventory-null-message"
   >
     <!-- "NO LOCATION ACTIVE" MESSAGE -->
-    <h4 *ngIf="activeLocation?.inventoryData.length === 0">
+    <h4 *ngIf="activeLocation?.inventories.length === 0">
       Past
       {{ userDept === "admin" ? null : (userDept | uppercase) }} inventories
       will show up here when finalized
     </h4>
   </div>
 
-  <div
-    *ngIf="activeLocationInventories?.length > 0"
-    class="inventory-main"
-  >
+  <div *ngIf="activeLocation?.inventories.length > 0" class="inventory-main">
     <div class="spinner spinner-top">
-      <mat-spinner
-        diameter="100"
-        strokeWidth="4"
-        *ngIf="loading"
-      ></mat-spinner>
+      <mat-spinner diameter="100" strokeWidth="4" *ngIf="loading"></mat-spinner>
     </div>
     <!-- INVENTORY DATE FILTER -->
     <form
       *ngIf="
-        (!loading && inventoryDataPopulatedSorted.length > 0) ||
+        (!loading && activeLocation?.inventories.length > 0) ||
         inventoryData.length > 0
       "
       class="filter"
@@ -99,7 +92,7 @@
           >Category</mat-header-cell
         >
         <mat-cell mat-cell *matCellDef="let inv">{{
-          inv.product.category
+          inv.product.category | titlecase
         }}</mat-cell>
       </ng-container>
 
@@ -109,7 +102,7 @@
           >Product</mat-header-cell
         >
         <mat-cell mat-cell *matCellDef="let inv">{{
-          inv.product.name
+          inv.product.name | titlecase
         }}</mat-cell>
       </ng-container>
 
@@ -132,8 +125,8 @@
           {{ inv.product.unitSize + " " }}
           {{
             inv.product.unitSize > 1
-              ? inv.product.unitMeasure.plural
-              : inv.product.unitMeasure.singular
+              ? inv.product.unitPlural
+              : inv.product.unitSingular
           }}
         </mat-cell>
       </ng-container>
@@ -147,8 +140,8 @@
           {{ inv.product.unitsPerPack * inv.product.packsPerCase }}
           {{
             inv.product.unitsPerPack > 1
-              ? inv.product.unitMeasure.plural
-              : inv.product.unitMeasure.singular
+              ? inv.product.unitPlural
+              : inv.product.unitSingular
           }}
         </mat-cell>
       </ng-container>
@@ -204,18 +197,14 @@
           class="inventory-table-actions"
         >
           <button
-            *ngIf="
-              user.userProfile.department === 'admin' || userRole === 'manager'
-            "
+            *ngIf="user.department === 'admin' || userRole === 'manager'"
             mat-raised-button
             disabled
           >
             Delete
           </button>
           <button
-            *ngIf="
-              user.userProfile.department === 'admin' || userRole === 'manager'
-            "
+            *ngIf="user.department === 'admin' || userRole === 'manager'"
             mat-raised-button
             disabled
           >

@@ -12,7 +12,6 @@ import { LocationService } from '../../../../inventory-app-control/location.serv
 import { Router } from '@angular/router';
 import { Inventory } from '../../../../models/inventory.model';
 import { InventoryService } from '../../../../inventory-app-control/inventory.service';
-import { BusinessInventoryPeriod } from '../../../../models/business.model';
 import { ThemeService } from 'src/app/theme/theme.service';
 import { User } from 'src/app/users/user.model';
 import { Product } from 'src/app/inventory-app/models/product.model';
@@ -72,7 +71,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
   initInvProducts = true;
   initLocInventories = true;
 
-  inventoryPeriod = BusinessInventoryPeriod - 1;
+  inventoryPeriod: number;
   displayedColumns = inventoryColumns;
 
   // PRODUCTS
@@ -104,7 +103,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
       .subscribe((user) => {
         this.user = user;
         if (user) {
-          switch (user.userProfile.role) {
+          switch (user.role) {
             case 3:
               this.userRole = 'owner';
               break;
@@ -115,7 +114,7 @@ export class InventoryComponent implements OnInit, OnDestroy {
               this.userRole = 'staff';
               break;
           }
-          this.userDept = user.userProfile.department;
+          this.userDept = user.department;
         }
       });
 
@@ -125,14 +124,14 @@ export class InventoryComponent implements OnInit, OnDestroy {
         this.activeProducts = locationState.activeProducts;
         this.activeLocation = locationState.activeLocation;
         this.workingInventory = locationState.activeInventory;
-        this.inventoryDataPopulatedSorted = locationState.activeLocationInventories;
+        this.inventoryDataPopulatedSorted = locationState.activeLocation?.inventories;
 
         this.appLoading = locationState.loading;
         this.locationLoading = locationState.loading;
         this.locationError = locationState.locationError;
         this.userLocations = locationState.userLocations;
         this.activeLocation = locationState.activeLocation;
-        this.inventoryData = locationState.activeLocation?.inventoryData;
+        this.inventoryData = locationState.activeLocation?.inventories;
         this.activeInventory = locationState.activeInventory;
         this.activeLocationInventories =
           locationState.activeLocationInventories;
@@ -141,10 +140,10 @@ export class InventoryComponent implements OnInit, OnDestroy {
         // IF USER HAS AT LEAST ONE ACTIVATED LOCATION
         if (
           locationState.activeLocation &&
-          locationState.activeLocation.productList &&
-          locationState.activeLocation.productList.length > 0
+          locationState.activeLocation.products &&
+          locationState.activeLocation.products.length > 0
         ) {
-          this.locationProducts = locationState.activeLocation.productList;
+          this.locationProducts = locationState.activeLocation.products;
         }
 
         if (
@@ -219,11 +218,11 @@ export class InventoryComponent implements OnInit, OnDestroy {
   }
 
   onSetInvProductList() {
-    for (const product of this.activeLocation.productList) {
-      let productDept = product.product.department;
+    for (const product of this.activeLocation.products) {
+      let productDept = product.department;
       if (
-        productDept === this.user.userProfile.department &&
-        product.product.isActive
+        productDept === this.user.department &&
+        product.isActive
       ) {
         this.newInventoryProducts.push(product);
       }

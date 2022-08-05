@@ -5,6 +5,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../../../app-store/app.reducer';
 import * as BusinessActions from './business.actions';
+import * as LocationActions from '../location/location-store/location.actions';
 import { authSuccess } from '../../../../users/user-store/user.actions';
 
 import {
@@ -14,7 +15,7 @@ import {
   concatMap,
   catchError,
   tap,
-  Subscription
+  Subscription,
 } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
@@ -46,10 +47,7 @@ const handleError = (errorRes: HttpErrorResponse) => {
 @Injectable()
 export class BusinessEffects {
   user: User;
-  userAuthSub: Subscription = this.store
-    .select('user')
-    .pipe(map((authState) => authState.user))
-    .subscribe((userAuth) => (this.user = userAuth));
+  userAuthSub: Subscription;
 
   //  MOVED TO business.service.ts
   // addBusinessStart$ = createEffect(() =>
@@ -65,7 +63,7 @@ export class BusinessEffects {
   //           updatedUser: User;
   //           updatedUserId: string;
   //         }>(BACKEND_URL + '/create-business', {
-  //           businessName: action.business.businessName,
+  //           name: action.business.name,
   //           ownerId: action.business.ownerId,
   //           locations: [],
   //         })
@@ -75,8 +73,8 @@ export class BusinessEffects {
   //             if (resData.business) {
   //               const storedBusiness = {
   //                 business: {
-  //                   _id: resData.businessId,
-  //                   businessName: resData.business.businessName,
+  //                   id: resData.businessId,
+  //                   name: resData.business.name,
   //                   ownerId: resData.business.ownerId,
   //                   locations: resData.business.locations,
   //                 },
@@ -101,7 +99,7 @@ export class BusinessEffects {
   //             this.store.dispatch(
   //               authSuccess({
   //                 user: {
-  //                   _id: resData.updatedUserId,
+  //                   id: resData.updatedUserId,
   //                   userId: resData.updatedUserId,
   //                   email: resData.updatedUser.email,
   //                   password: resData.updatedUser.password,
@@ -112,8 +110,8 @@ export class BusinessEffects {
 
   //             return BusinessActions.POSTBusinessSuccess({
   //               business: {
-  //                 _id: resData.businessId,
-  //                 businessName: resData.business.businessName,
+  //                 id: resData.businessId,
+  //                 name: resData.business.name,
   //                 ownerId: resData.business.ownerId,
   //                 businessPhoto: resData.business.businessPhoto,
   //                 locations: [],
@@ -140,8 +138,8 @@ export class BusinessEffects {
   //           updatedBusiness: Business;
   //           updatedBusinessId: string;
   //         }>(BACKEND_URL + '/update-business/', {
-  //           businessId: action.business._id,
-  //           updatedBusinessName: action.business.businessName,
+  //           businessId: action.business.id,
+  //           updatedBusinessName: action.business.name,
   //         })
   //         .pipe(
   //           map((resData) => {
@@ -173,42 +171,36 @@ export class BusinessEffects {
       ofType(BusinessActions.GETBusinessStart),
       switchMap((action) => {
         console.warn('||| fetchBusiness$ effect called |||');
-        return this.http
-          .get<{ business: Business; businessId: string; message: string }>(
-            BACKEND_URL + '/fetch-business/' + action.ownerId
-          )
-          .pipe(
-            map((resData) => {
-              console.log(resData)
-              const storedBusiness = {
-                business: resData.business,
-              };
+        return this.http.get<Business>(BACKEND_URL + '/' + action.ownerId).pipe(
+          map((business) => {
+            console.log(business);
+            const storedBusiness: Business = business;
 
-              if (!resData && !resData.business) {
-                return BusinessActions.GETEntityFail({
-                  errorMessage: 'No business found.',
-                });
-              } else {
-                localStorage.setItem(
-                  'storedBusiness',
-                  JSON.stringify(storedBusiness)
-                );
-                console.warn('||| fetching locations |||');
-                this.store.dispatch(
-                  BusinessActions.GETBusinessLocationsStart({
-                    businessId: resData.businessId,
-                  })
-                );
-                return BusinessActions.GETBusinessSuccess({
-                  business: resData.business,
-                });
-              }
-            }),
-            catchError((errorRes) => {
-              console.log(errorRes);
-              return handleError(errorRes);
-            })
-          );
+            if (!business) {
+              return BusinessActions.GETEntityFail({
+                errorMessage: 'No business found.',
+              });
+            } else {
+              localStorage.setItem(
+                'storedBusiness',
+                JSON.stringify(storedBusiness)
+              );
+              console.warn('||| fetching locations |||');
+              this.store.dispatch(
+                BusinessActions.GETBusinessLocationsStart({
+                  businessId: business.id,
+                })
+              );
+              return BusinessActions.GETBusinessSuccess({
+                business: business,
+              });
+            }
+          }),
+          catchError((errorRes) => {
+            console.log(errorRes);
+            return handleError(errorRes);
+          })
+        );
       })
     )
   );
@@ -220,24 +212,25 @@ export class BusinessEffects {
         console.warn('||| addLocationStart$ effect called |||');
         return this.http
           .post<{
-            message: string;
-            location: { createdLoc: Location; id: string };
-            updatedBusiness: { business: Business; id: string };
-          }>(BACKEND_URL + '/create-location', {
-            locationName: action.location.locationName,
-            parentBusiness: action.location.parentBusiness,
-            inventoryData: [],
-          })
+            newLocation: Location,
+            populatedBusiness: Business
+          }>(
+            environment.apiUrl + '/location',
+            {
+              name: action.location.name,
+              businessId: action.location.business,
+            }
+          )
           .pipe(
             map((resData) => {
-              console.log(resData)
+              console.log(resData);
 
               const storedBusiness = {
                 business: {
-                  _id: resData.updatedBusiness.id,
-                  businessName: resData.updatedBusiness.business.businessName,
-                  locations: resData.updatedBusiness.business.locations,
-                  ownerId: resData.updatedBusiness.business.ownerId,
+                  id: resData.populatedBusiness.id,
+                  name: resData.populatedBusiness.name,
+                  locations: resData.populatedBusiness.businesslocations,
+                  ownerId: resData.populatedBusiness.owner,
                 },
               };
 
@@ -249,11 +242,11 @@ export class BusinessEffects {
               console.log(storedBusiness);
               this.store.dispatch(
                 BusinessActions.GETBusinessLocationsStart({
-                  businessId: resData.updatedBusiness.id,
+                  businessId: resData.populatedBusiness.id,
                 })
               );
               return BusinessActions.GETBusinessSuccess({
-                business: resData.updatedBusiness.business,
+                business: resData.populatedBusiness,
               });
             }),
             catchError((errorRes) => {
@@ -271,18 +264,41 @@ export class BusinessEffects {
       concatMap((action) => {
         console.warn('||| fetchBusinessLocations$ effect called |||');
         return this.http
-          .get<{ fetchedLocations: Location[] }>(
-            BACKEND_URL + '/fetch-business-locations/' + action.businessId
-          )
+          .get<Location[]>(BACKEND_URL + '/locations/' + action.businessId)
           .pipe(
-            map((resData) => {
-              console.log(resData);
-              if (resData && resData.fetchedLocations) {
-                const businessLocations = resData.fetchedLocations;
-                localStorage.setItem('businessLocations', JSON.stringify(businessLocations));
+            map((locations) => {
+              console.log(locations);
+              if (locations) {
+                const businessLocations = locations;
+                localStorage.setItem(
+                  'businessLocations',
+                  JSON.stringify(businessLocations)
+                );
+
+                // RE-SET ACTIVE LOCATION IF NEEDED
+                const activeLocation: Location = JSON.parse(
+                  localStorage.getItem('activatedLocation')
+                );
+
+                if (activeLocation) {
+                  const filteredLocation = businessLocations.filter(
+                    (location) => location.id === activeLocation.id
+                  );
+
+                  this.store.dispatch(
+                    LocationActions.ActivateLocation({
+                      location: filteredLocation[0],
+                    })
+                  );
+
+                  localStorage.setItem(
+                    'activatedLocation',
+                    JSON.stringify(filteredLocation[0])
+                  );
+                }
 
                 return BusinessActions.GETBusinessLocationsSuccess({
-                  locations: resData.fetchedLocations,
+                  locations: locations,
                 });
               }
             }),
@@ -309,10 +325,10 @@ export class BusinessEffects {
           })
           .pipe(
             map((resData) => {
-              console.log(resData)
+              console.log(resData);
 
               return BusinessActions.GETBusinessStart({
-                ownerId: this.user.userId,
+                ownerId: this.user.id,
               });
             }),
             catchError((errorRes) => {
@@ -336,7 +352,7 @@ export class BusinessEffects {
             {
               emails: action.emails,
               role: action.role,
-              location: action.location._id,
+              location: action.location.id,
             }
           )
           .pipe(
@@ -354,7 +370,7 @@ export class BusinessEffects {
 
               return BusinessActions.GETBusinessLocationsStart({
                 businessId: resData.businessId,
-              })
+              });
             }),
             catchError((errorRes) => {
               console.log(errorRes);
@@ -369,5 +385,10 @@ export class BusinessEffects {
     private actions$: Actions,
     private http: HttpClient,
     private store: Store<fromAppStore.AppState>
-  ) {}
+  ) {
+    this.userAuthSub = this.store
+      .select('user')
+      .pipe(map((authState) => authState.user))
+      .subscribe((userAuth) => (this.user = userAuth));
+  }
 }

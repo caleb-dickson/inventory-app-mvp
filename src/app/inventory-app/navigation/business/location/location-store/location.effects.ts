@@ -53,21 +53,20 @@ export class LocationEffects {
       switchMap((action) => {
         console.warn('|||[Location] fetchUserLocations$ effect called |||');
         return this.http
-          .get<{ fetchedLocations: Location[] }>(
-            BACKEND_URL +
-              '/fetch-user-locations/' +
+          .get<Location[]>(
+            environment.apiUrl +
+              '/user/locations/' +
               action.userId +
               '/' +
               action.userRole
           )
           .pipe(
-            map((resData) => {
+            map((locations) => {
               if (
-                resData &&
-                resData.fetchedLocations &&
-                resData.fetchedLocations.length > 0
+                locations &&
+                locations.length > 0
               ) {
-                const userLocations = resData.fetchedLocations;
+                const userLocations = locations;
                 localStorage.setItem(
                   'userLocations',
                   JSON.stringify(userLocations)
@@ -124,14 +123,14 @@ export class LocationEffects {
                 );
               }
 
-              if (authState.user.userProfile.role === 3) {
+              if (authState.user.role === 3) {
                 return BusinessActions.GETBusinessLocationsStart({
-                  businessId: businessState.business._id,
+                  businessId: businessState.business.id,
                 });
               } else {
                 return LocationActions.GETUserLocationsStart({
-                  userId: authState.user.userId,
-                  userRole: authState.user.userProfile.role,
+                  userId: authState.user.id,
+                  userRole: authState.user.role,
                 });
               }
             }),
@@ -184,23 +183,23 @@ export class LocationEffects {
 
               this.store.dispatch(
                 LocationActions.GETLocationInventoriesStart({
-                  locationId: action.location._id,
+                  locationId: action.location.id,
                 })
               );
-              if (authState.user.userProfile.department !== 'admin') {
+              if (authState.user.department !== 'admin') {
                 console.log(
                   "|||[Location] Fetching Non-Owner USER's Locations |||"
                 );
                 return LocationActions.GETUserLocationsStart({
-                  userId: authState.user.userId,
-                  userRole: authState.user.userProfile.role,
+                  userId: authState.user.id,
+                  userRole: authState.user.role,
                 });
               } else {
                 console.log(
                   "|||[Location] Fetching OWNER's BUSINESS Locations |||"
                 );
                 return BusinessActions.GETBusinessLocationsStart({
-                  businessId: businessState.business._id,
+                  businessId: businessState.business.id,
                 });
               }
             }),
@@ -232,11 +231,11 @@ export class LocationEffects {
               console.log(resData);
               console.warn('|||updateLocationProduct$ resData |||');
               if (resData.updatedProduct) {
-
                 // UPDATE THE LOCATION LOCALLY AND ACTIVATE IT
                 localStorage.setItem(
                   'activatedLocation',
-                  JSON.stringify(resData.updatedLocation));
+                  JSON.stringify(resData.updatedLocation)
+                );
                 this.store.dispatch(
                   LocationActions.ActivateLocation({
                     location: resData.updatedLocation,
@@ -250,18 +249,18 @@ export class LocationEffects {
                 );
                 this.store.dispatch(
                   LocationActions.GETLocationInventoriesStart({
-                    locationId: resData.updatedProduct.parentOrg,
+                    locationId: resData.updatedProduct.location,
                   })
                 );
               }
-              if (authState.user.userProfile.role === 3) {
+              if (authState.user.role === 3) {
                 return BusinessActions.GETBusinessLocationsStart({
-                  businessId: businessState.business._id,
+                  businessId: businessState.business.id,
                 });
               } else {
                 return LocationActions.GETUserLocationsStart({
-                  userId: authState.user.userId,
-                  userRole: authState.user.userProfile.role,
+                  userId: authState.user.id,
+                  userRole: authState.user.role,
                 });
               }
             }),
@@ -300,18 +299,18 @@ export class LocationEffects {
                 );
                 this.store.dispatch(
                   LocationActions.GETLocationInventoriesStart({
-                    locationId: resData.updatedInventory.parentLocation,
+                    locationId: resData.updatedInventory.location,
                   })
                 );
               }
-              if (authState.user.userProfile.role === 3) {
+              if (authState.user.role === 3) {
                 return BusinessActions.GETBusinessLocationsStart({
-                  businessId: businessState.business._id,
+                  businessId: businessState.business.id,
                 });
               } else {
                 return LocationActions.GETUserLocationsStart({
-                  userId: authState.user.userId,
-                  userRole: authState.user.userProfile.role,
+                  userId: authState.user.id,
+                  userRole: authState.user.role,
                 });
               }
             }),
@@ -324,55 +323,102 @@ export class LocationEffects {
     )
   );
 
-  fetchLocationInventories$ = createEffect(() =>
+  deleteProducts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(LocationActions.GETLocationInventoriesStart),
-      switchMap((action) => {
-        console.warn(
-          '|||[Location] fetchLocationInventories$ effect called |||'
-        );
+      ofType(LocationActions.POSTDeleteProductsFromLocationStart),
+      withLatestFrom(this.store.select('user'), this.store.select('business')),
+      exhaustMap(([action, userState, businessState]) => {
+        console.warn('||| [Location] deleteProducts$ effect called |||');
 
         return this.http
-          .get<{ fetchedInventories: Inventory[]; message: string }>(
-            BACKEND_URL + '/fetch-location-inventories/' + action.locationId
+          .post<{ message: string }>(
+            environment.apiUrl + '/product/product-delete',
+            {
+              productIds: action.productIds,
+              locationId: action.locationId,
+            }
           )
           .pipe(
             map((resData) => {
-              const inventoryData = resData.fetchedInventories;
-              if (
-                resData &&
-                resData.fetchedInventories &&
-                resData.fetchedInventories.length > 0
-              ) {
-                let draft: Inventory = null;
-                localStorage.setItem(
-                  'inventoryData',
-                  JSON.stringify(inventoryData)
+              console.log(resData);
+              console.warn('||| ^^^ deleteProducts$ resData ^^^ |||');
+
+              if (+userState.user.role === 3) {
+                this.store.dispatch(
+                  BusinessActions.GETBusinessLocationsStart({
+                    businessId: businessState.business.id,
+                  })
                 );
-
-                for (const inv of resData.fetchedInventories) {
-                  if (!inv.isFinal) {
-                    draft = inv;
-                  }
-                }
-                if (draft) {
-                  console.log(draft);
-                }
-
-                return LocationActions.GETLocationInventoriesSuccess({
-                  inventoryData: [...resData.fetchedInventories],
-                  draft: draft,
-                });
+              } else {
+                this.store.dispatch(
+                  LocationActions.GETUserLocationsStart({
+                    userId: userState.user.id,
+                    userRole: userState.user.role,
+                  })
+                );
               }
+
+              return LocationActions.POSTDeleteProductsFromLocationSuccess();
             }),
             catchError((errorRes) => {
-              console.warn(errorRes);
+              console.error(errorRes);
+              this.store.dispatch(LocationActions.LoadStop());
               return handleError(errorRes);
             })
           );
       })
     )
   );
+
+  // fetchLocationInventories$ = createEffect(() =>
+  //   this.actions$.pipe(
+  //     ofType(LocationActions.GETLocationInventoriesStart),
+  //     switchMap((action) => {
+  //       console.warn(
+  //         '||| [Location] fetchLocationInventories$ effect called |||'
+  //       );
+
+  //       return this.http
+  //         .get<{ fetchedInventories: Inventory[]; message: string }>(
+  //           BACKEND_URL + '/fetch-location-inventories/' + action.locationId
+  //         )
+  //         .pipe(
+  //           map((resData) => {
+  //             const inventoryData = resData.fetchedInventories;
+  //             if (
+  //               resData &&
+  //               resData.fetchedInventories &&
+  //               resData.fetchedInventories.length > 0
+  //             ) {
+  //               let draft: Inventory = null;
+  //               localStorage.setItem(
+  //                 'inventoryData',
+  //                 JSON.stringify(inventoryData)
+  //               );
+
+  //               for (const inv of resData.fetchedInventories) {
+  //                 if (!inv.isFinal) {
+  //                   draft = inv;
+  //                 }
+  //               }
+  //               if (draft) {
+  //                 console.log(draft);
+  //               }
+
+  //               return LocationActions.GETLocationInventoriesSuccess({
+  //                 inventoryData: [...resData.fetchedInventories],
+  //                 draft: draft,
+  //               });
+  //             }
+  //           }),
+  //           catchError((errorRes) => {
+  //             console.error(errorRes);
+  //             return handleError(errorRes);
+  //           })
+  //         );
+  //     })
+  //   )
+  // );
 
   constructor(
     private actions$: Actions,

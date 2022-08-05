@@ -36,7 +36,7 @@ export class DashboardComponent implements OnInit {
       this.userLoading = userState.loading;
 
       if (userState.user) {
-        switch (userState.user.userProfile.role) {
+        switch (userState.user.role) {
           case 3:
             this.userRole = 'owner';
             break;

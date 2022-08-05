@@ -9,7 +9,7 @@
 
 <div
   class="location"
-  *ngIf="activeLocation?.productList.length > 0 && !locationLoading"
+  *ngIf="activeLocation?.products.length > 0 && !locationLoading"
 >
   <h4>{{ activeLocation.locationName }}</h4>
   <h5>{{ userDept | uppercase }}</h5>
@@ -21,7 +21,7 @@
 </div>
 
 <!-- "NO DEPARTMENT PRODUCTS IN LOCATION" MESSAGE -->
-<div class="location" *ngIf="activeLocation?.productList.length === 0">
+<div class="location" *ngIf="activeLocation?.products.length === 0">
   <!-- OWNERS, MANAGEMENT AND ADMINS -->
   <h4 *ngIf="userRole !== 'staff' && activeLocation">
     Add
@@ -48,7 +48,7 @@
 <!-- NEW INVENTORY MAIN START -->
 <div
   class="new-inventory-container"
-  *ngIf="activeLocation?.productList.length > 0"
+  *ngIf="activeLocation?.products.length > 0"
 >
   <mat-expansion-panel class="inventory-expansion">
     <mat-expansion-panel-header>
@@ -60,7 +60,7 @@
 
     <div
       class="inventory-new-main"
-      *ngIf="activeLocation?.productList.length > 0"
+      *ngIf="activeLocation?.products.length > 0"
     >
       <mat-card class="inventory-card">
         <mat-card-content>
@@ -112,12 +112,12 @@
 <!-- NO WORKING DRAFTS MESSAGES -->
 <!-- ADMIN Users -->
 <div *ngIf="userDept === 'admin' && (!draftInventory || !activeLocation)" class="no-drafts">
-  <p *ngIf="activeLocation?.inventoryData.length > 0">
+  <p *ngIf="activeLocation?.inventories.length > 0">
     No working
     {{ userDept !== "admin" ? (userDept | uppercase) : null }} inventory drafts
     found.
   </p>
-  <p *ngIf="activeLocation?.inventoryData.length === 0">
+  <p *ngIf="activeLocation?.inventories.length === 0">
     No
     {{ userDept !== "admin" ? (userDept | uppercase) : null }} inventories yet.
     Unfinalized New Inventory drafts will appear here
@@ -128,12 +128,12 @@
   *ngIf="userDept !== 'admin' && (!draftInventory || !activeLocation)"
   class="no-drafts"
 >
-  <p *ngIf="activeLocation?.inventoryData.length > 0">
+  <p *ngIf="activeLocation?.inventories.length > 0">
     No submitted
     {{ userDept !== "admin" ? (userDept | uppercase) : null }} inventories
     found.
   </p>
-  <p *ngIf="activeLocation?.inventoryData.length === 0">
+  <p *ngIf="activeLocation?.inventories.length === 0">
     No
     {{ userDept !== "admin" ? (userDept | uppercase) : null }} inventories yet.
     Unfinalized New Inventory drafts will appear here

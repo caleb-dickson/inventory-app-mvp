@@ -7,7 +7,7 @@ import { Location } from '../../../../models/location.model';
 // GET
 export const GETUserLocationsStart = createAction(
   '[Location] Fetch Locations Where User is Authorized START',
-  props<{ userId: string, userRole: number }>()
+  props<{ userId: string; userRole: number }>()
 );
 export const GETUserLocationsSuccess = createAction(
   '[Location] Fetch Locations Where User is Authorized SUCCESS',
@@ -20,7 +20,7 @@ export const GETLocationInventoriesStart = createAction(
 );
 export const GETLocationInventoriesSuccess = createAction(
   '[Location] Fetch a List of Location Inventories SUCCESS',
-  props<{ inventoryData: Inventory[], draft: Inventory }>()
+  props<{ inventoryData: Inventory[]; draft: Inventory }>()
 );
 export const GETLocationInventoriesNull = createAction(
   '[Location] Fetch a List of Location Inventories NULL Result'
@@ -28,14 +28,14 @@ export const GETLocationInventoriesNull = createAction(
 //POST
 export const POSTCreateProductForLocationStart = createAction(
   '[Location] Save a New Product to Location START',
-  props<{ product: Product, locationId: string }>()
+  props<{ product: Product; locationId: string }>()
 );
 export const POSTCreateProductForLocationSuccess = createAction(
   '[Location] Save a New Product to Location SUCCESS'
 );
 export const POSTCreateInventoryForLocationStart = createAction(
   '[Location] Save a New Inventory to Location START',
-  props<{ location: Location, inventory: Inventory }>()
+  props<{ location: Location; inventory: Inventory }>()
 );
 export const POSTCreateInventoryForLocationSuccess = createAction(
   '[Location] Save a New Inventory to Location SUCCESS'
@@ -67,11 +67,11 @@ export const PUTUpdateProductForLocationSuccess = createAction(
 );
 
 // DELETE - working
-export const DELETEProductFromLocationStart = createAction(
+export const POSTDeleteProductsFromLocationStart = createAction(
   '[Location] Remove Products from Location START',
-  props<{ product: Product[], locationId: string }>()
+  props<{ productIds: string[], locationId: string }>()
 );
-export const DELETEFromLocationSuccess = createAction(
+export const POSTDeleteProductsFromLocationSuccess = createAction(
   '[Location] Remove Products from Location SUCCESS'
 );
 
@@ -89,6 +89,14 @@ export const ActivateProducts = createAction(
 export const LocationError = createAction(
   '[Location] Location Errors',
   props<{ errorMessage: string }>()
+);
+
+// LOADING
+export const LoadStart = createAction(
+  '[Location] Start Loading'
+);
+export const LoadStop = createAction(
+  '[Location] Stop Loading'
 );
 
 // CLEAR STATE

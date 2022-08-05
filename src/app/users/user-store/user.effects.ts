@@ -59,17 +59,14 @@ export class UserEffects {
         console.warn('||| signupStart$ effect called |||');
         return this._http
           .post<{ email: string; password: string }>(BACKEND_URL + '/signup', {
-            userId: action.newUser.userId,
             email: action.newUser.email,
             password: action.newUser.password,
-            userProfile: {
-              role: action.newUser.userProfile.role,
-              department: action.newUser.userProfile.department,
-              firstName: action.newUser.userProfile.firstName,
-              lastName: action.newUser.userProfile.lastName,
-              phoneNumber: action.newUser.userProfile.phoneNumber,
-              themePref: action.newUser.userProfile.themePref,
-            },
+            firstName: action.newUser.firstName,
+            lastName: action.newUser.lastName,
+            phoneNumber: action.newUser.phoneNumber,
+            role: action.newUser.role,
+            department: action.newUser.department,
+            themePref: action.newUser.themePref,
           })
           .pipe(
             map(() => {
@@ -92,23 +89,21 @@ export class UserEffects {
       ofType(UserActions.DELETEUserStart),
       exhaustMap((action) => {
         console.warn('||| deleteUserStart$ effect called |||');
-        return this._http
-          .delete(BACKEND_URL + '/user/' + action.userId)
-          .pipe(
-            map((res) => {
-              console.log(res);
-              console.warn('||| ^^^ deleteUserStart$ resData ^^^ |||');
+        return this._http.delete(BACKEND_URL + '/user/' + action.userId).pipe(
+          map((res) => {
+            console.log(res);
+            console.warn('||| ^^^ deleteUserStart$ resData ^^^ |||');
 
-              this._store.dispatch(UserActions.logout());
-              this._dialog.closeAll();
+            this._store.dispatch(UserActions.logout());
+            this._dialog.closeAll();
 
-              return UserActions.DELETEUserSuccess();
-            }),
-            catchError((errorRes) => {
-              console.log(errorRes);
-              return handleError(errorRes);
-            })
-          );
+            return UserActions.DELETEUserSuccess();
+          }),
+          catchError((errorRes) => {
+            console.log(errorRes);
+            return handleError(errorRes);
+          })
+        );
       })
     )
   );
@@ -123,7 +118,6 @@ export class UserEffects {
             token: string;
             expiresIn: number;
             user: User;
-            userId: string;
           }>(BACKEND_URL + '/login', {
             email: action.email,
             password: action.password,
@@ -131,7 +125,7 @@ export class UserEffects {
           .pipe(
             map((resData) => {
               if (resData.token) {
-                console.log(resData.expiresIn);
+                console.log(resData);
                 console.warn('||| ^^^ loginStart$ resData ^^^ |||');
                 this._userService.setLogoutTimer(resData.expiresIn * 1000);
 
@@ -143,36 +137,20 @@ export class UserEffects {
                 const userAuthData = {
                   token: resData.token,
                   expiration: expirationDate.toISOString(),
-                  userId: resData.userId,
                 };
 
-                const userProfileData = {
-                  userId: resData.userId,
-                  email: resData.user.email,
-                  userProfile: resData.user.userProfile,
-                };
+                const userData = resData.user;
 
                 localStorage.removeItem('guestUserData');
                 localStorage.setItem(
                   'userAuthData',
                   JSON.stringify(userAuthData)
                 );
-                localStorage.setItem(
-                  'userProfileData',
-                  JSON.stringify(userProfileData)
-                );
+                localStorage.setItem('userData', JSON.stringify(userData));
                 this._dialog.closeAll();
                 this._router.navigate(['/app/dashboard']);
               }
-              return UserActions.authSuccess({
-                user: {
-                  _id: resData.userId,
-                  userId: resData.userId,
-                  email: resData.user.email,
-                  password: resData.token,
-                  userProfile: resData.user.userProfile,
-                },
-              });
+              return UserActions.authSuccess({ user: resData.user, token: resData.token });
             }),
             catchError((errorRes) => {
               console.log(errorRes);
@@ -298,17 +276,9 @@ export class UserEffects {
       map((action) => {
         console.warn('||| updateUser$ effect called |||');
 
-        const userProfileData = {
-          _id: action.user.userId,
-          userId: action.user._id,
-          email: action.user.email,
-          userProfile: action.user.userProfile,
-        };
+        const user = action.user;
 
-        localStorage.setItem(
-          'userProfileData',
-          JSON.stringify(userProfileData)
-        );
+        localStorage.setItem('userData', JSON.stringify(user));
         return UserActions.autoLogin();
       })
     )
@@ -353,61 +323,26 @@ export class UserEffects {
       ofType(UserActions.autoLogin),
       map(() => {
         // PULL AUTHDATA FROM LOCAL STORAGE
-        const userAuthData: {
-          token: string;
-          expiration: string;
-          userId: string;
-        } = JSON.parse(localStorage.getItem('userAuthData'));
+        const userAuthData = JSON.parse(localStorage.getItem('userAuthData'));
         if (!userAuthData) {
           console.log('||| Log in to continue |||');
           return { type: 'No user logged in.' };
         }
 
         // PULL PROFILE DATA FROM LOCAL STORAGE
-        const userProfileData: {
-          userId: string | null;
-          email: string;
-          password: string;
-          userProfile: {
-            role: number;
-            department: string;
-            firstName: string;
-            lastName: string;
-            phoneNumber: string;
-            themePref: string | null;
-            userPhoto: string | null;
-          };
-        } = JSON.parse(localStorage.getItem('userProfileData'));
-
-        const locations = JSON.parse(localStorage.getItem('locations'));
-
-        const authorizedUser = {
+        const authDataParsed = {
           token: userAuthData.token,
-          expiration: new Date(userAuthData.expiration),
-          userId: userAuthData.userId,
-        };
+          expiration: new Date(userAuthData.expiration)
+        }
+        const userData: User = JSON.parse(localStorage.getItem('userData'));
 
-        const userProfile = {
-          userId: userProfileData.userId,
-          email: userProfileData.email,
-          userProfile: userProfileData.userProfile,
-        };
-
-        if (authorizedUser.userId) {
+        if (authDataParsed.token) {
           const now = new Date().getTime();
-          const expirationDuration = authorizedUser.expiration.getTime() - now;
+          const expirationDuration = authDataParsed.expiration.getTime() - now;
           this._userService.setLogoutTimer(expirationDuration);
-          return UserActions.authSuccess({
-            user: {
-              _id: userAuthData.userId,
-              userId: userAuthData.userId,
-              email: userProfile.email,
-              password: userAuthData.token,
-              userProfile: userProfile.userProfile,
-            },
-          });
+          return UserActions.authSuccess({ user: userData, token: userAuthData.token });
         } else {
-          console.log('User ID is: ' + authorizedUser.userId);
+          console.log('User ID is: ' + userData.id);
           return UserActions.authFail({
             errorMessage: 'Not authenticated! Log in.',
           });

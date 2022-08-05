@@ -7,6 +7,7 @@ import { User } from '../user.model';
 
 export interface UserState {
   user: User;
+  authToken: string;
   userLocations: Location[];
   userMessage: string;
   userError: string;
@@ -16,6 +17,7 @@ export interface UserState {
 
 const initialState: UserState = {
   user: null,
+  authToken: null,
   userLocations: [],
   userMessage: null,
   userError: null,
@@ -45,6 +47,7 @@ export function userReducer(
       authError: null,
       loading: false,
       user: action.user,
+      authToken: action.token
     })),
     on(UserActions.authFail, (state, action) => ({
       ...state,

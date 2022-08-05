@@ -174,7 +174,7 @@ export class UserService {
     userDept: string
   ) {
     const formData = new FormData();
-    formData.append('userId', this.user._id ? this.user._id : this.user.userId);
+    formData.append('id', this.user.id ? this.user.id : this.user.id);
     formData.append('firstName', userProfileForm.value.firstName);
     formData.append('lastName', userProfileForm.value.lastName);
     formData.append('phoneNumber', userProfileForm.value.phoneNumber);

@@ -31,10 +31,10 @@ export class ManagerGuard implements CanActivate {
     return this.store.select('user').pipe(
       take(1),
       map((authState) => {
-        return authState.user.userProfile;
+        return authState.user;
       }),
-      map((userProfile) => {
-        const isMgr = userProfile.role > 1 || userProfile.department === 'admin' ? true : false;
+      map((user) => {
+        const isMgr = user.role > 1 || user.department === 'admin' ? true : false;
         if (isMgr) {
           return true;
         }

@@ -21,12 +21,10 @@ const BACKEND_URL = environment.apiUrl + '/business';
   providedIn: 'root',
 })
 export class BusinessService {
-
   constructor(
     private _store: Store<fromAppStore.AppState>,
     private http: HttpClient
-    ) {
-  }
+  ) {}
 
   submitBusiness(
     businessForm: FormGroup,
@@ -34,7 +32,7 @@ export class BusinessService {
     businessSubmitMode: string,
     bizPhotoUpload: Blob | null,
     user: User
-    ) {
+  ) {
     if (businessForm.invalid) {
       return;
     }
@@ -42,14 +40,14 @@ export class BusinessService {
       businessForm.updateValueAndValidity();
 
       const formData = new FormData();
-      formData.append('_id', null);
-      formData.append('businessName', businessForm.value.businessName);
-      formData.append('ownerId', user._id);
+      formData.append('id', null);
+      formData.append('name', businessForm.value.name);
+      formData.append('ownerId', user.id);
       if (bizPhotoUpload) {
         formData.append(
           'businessPhoto',
           businessForm.value.businessPhoto,
-          businessForm.value.businessName
+          businessForm.value.name
         );
       }
       formData.append('locations', null);
@@ -57,25 +55,15 @@ export class BusinessService {
       this._store.dispatch(BusinessActions.POSTBusinessStart());
 
       this.http
-        .post<{
-          message: string;
-          business: Business;
-          businessId: string;
-          updatedUser: User;
-          updatedUserId: string;
-        }>(BACKEND_URL + '/create-business', formData)
+        .post<{ newBusiness: Business }>(
+          BACKEND_URL + '/create-business',
+          formData
+        )
         .pipe(
           map((resData) => {
             console.log(resData);
-            if (resData.business) {
-              const storedBusiness = {
-                business: {
-                  _id: resData.businessId,
-                  businessName: resData.business.businessName,
-                  ownerId: resData.business.ownerId,
-                  locations: resData.business.locations,
-                },
-              };
+            if (resData.newBusiness) {
+              const storedBusiness = resData.newBusiness;
 
               localStorage.setItem(
                 'storedBusiness',
@@ -83,37 +71,9 @@ export class BusinessService {
               );
             }
 
-            const userProfileData = {
-              userId: resData.updatedUserId,
-              email: resData.updatedUser.email,
-              userProfile: resData.updatedUser.userProfile,
-            };
-            localStorage.setItem(
-              'userProfileData',
-              JSON.stringify(userProfileData)
-            );
-
-            this._store.dispatch(
-              authSuccess({
-                user: {
-                  _id: resData.updatedUserId,
-                  userId: resData.updatedUserId,
-                  email: resData.updatedUser.email,
-                  password: resData.updatedUser.password,
-                  userProfile: resData.updatedUser.userProfile,
-                },
-              })
-            );
-
             this._store.dispatch(
               BusinessActions.POSTBusinessSuccess({
-                business: {
-                  _id: resData.businessId,
-                  businessName: resData.business.businessName,
-                  ownerId: resData.business.ownerId,
-                  businessPhoto: resData.business.businessPhoto,
-                  locations: [],
-                },
+                business: resData.newBusiness,
               })
             );
           }),
@@ -122,20 +82,19 @@ export class BusinessService {
           })
         )
         .subscribe();
-
     } else {
       businessSubmitMode === 'update';
       businessForm.updateValueAndValidity();
 
       const formData = new FormData();
       formData.append('businessId', businessId);
-      formData.append('businessName', businessForm.value.businessName);
-      formData.append('ownerId', user._id);
+      formData.append('name', businessForm.value.name);
+      formData.append('ownerId', user.id);
       if (bizPhotoUpload) {
         formData.append(
           'businessPhoto',
           businessForm.value.businessPhoto,
-          businessForm.value.businessName + '_photo'
+          businessForm.value.name + '_photo'
         );
       }
       formData.append('locations', null);
@@ -174,9 +133,6 @@ export class BusinessService {
           })
         )
         .subscribe();
-
     }
-
   }
-
 }

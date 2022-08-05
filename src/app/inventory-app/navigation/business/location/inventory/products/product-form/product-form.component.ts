@@ -77,7 +77,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       .subscribe((user) => {
         this.user = user;
         if (user) {
-          switch (user.userProfile.role) {
+          switch (user.role) {
             case 3:
               this.userRole = 'owner';
               break;
@@ -88,7 +88,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
               this.userRole = 'staff';
               break;
           }
-          this.userDept = user.userProfile.department;
+          this.userDept = user.department;
         }
       });
 
@@ -111,7 +111,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       .subscribe((user) => {
         this.user = user;
         if (!!user) {
-          switch (user.userProfile.role) {
+          switch (user.role) {
             case 3:
               this.userRole = 'owner';
               break;
@@ -206,7 +206,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
     if (this.productFormMode === 'new') {
       this.productForm = new FormGroup({
-        _id: new FormControl(null),
+        id: new FormControl(null),
         parentOrg: new FormControl(null),
         isActive: new FormControl(this.productStatus, Validators.required),
         department: new FormControl(productDepartment, deptRequired),
@@ -227,9 +227,9 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         : 'Inactive';
 
       this.productForm = new FormGroup({
-        _id: new FormControl(this.updateProduct?._id, Validators.required),
+        id: new FormControl(this.updateProduct?.id, Validators.required),
         parentOrg: new FormControl(
-          this.updateProduct?.parentOrg,
+          this.updateProduct?.location,
           Validators.required
         ),
         isActive: new FormControl(
@@ -247,7 +247,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           Validators.required
         ),
         unitMeasure: new FormControl(
-          this.updateProduct?.unitMeasure,
+          { singular: this.updateProduct?.unitSingular, plural: this.updateProduct?.unitPlural },
           Validators.required
         ),
         unitsPerPack: new FormControl(

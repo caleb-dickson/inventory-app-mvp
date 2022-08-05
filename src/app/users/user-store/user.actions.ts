@@ -14,7 +14,7 @@ export const signupStart = createAction(
 );
 export const authSuccess = createAction(
   '[User] Auth Success',
-  props<{ user: User }>()
+  props<{ user: User, token: string }>()
 );
 export const authFail = createAction(
   '[User] Auth Fail',

@@ -29,14 +29,13 @@ import { Inventory } from '../../../../../models/inventory.model';
 
 import { LocationService } from '../../../../../inventory-app-control/location.service';
 import { InventoryService } from '../../../../../inventory-app-control/inventory.service';
-import { BusinessInventoryPeriod } from '../../../../../models/business.model';
 import { MatRadioChange } from '@angular/material/radio';
 
 @Injectable()
 export class RangeSelectionStrategy<D>
   implements MatDateRangeSelectionStrategy<D>
 {
-  inventoryPeriod = BusinessInventoryPeriod - 1;
+  inventoryPeriod = this;
 
   constructor(private _dateAdapter: DateAdapter<D>) {}
 
@@ -49,7 +48,7 @@ export class RangeSelectionStrategy<D>
   private _createDateRange(date: D | null): DateRange<D> {
     if (date) {
       const start = this._dateAdapter.addCalendarDays(date, 0);
-      const end = this._dateAdapter.addCalendarDays(date, this.inventoryPeriod);
+      const end = this._dateAdapter.addCalendarDays(date, 13);
       return new DateRange<D>(start, end);
     }
     return new DateRange<D>(null, null);
@@ -104,7 +103,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
   activeProducts: Product[] = [];
 
   inventoryForm: FormGroup;
-  inventoryPeriod = BusinessInventoryPeriod - 1;
+  inventoryPeriod: number;
   formIsFinal = false;
   formError: string;
 
@@ -122,7 +121,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
       .subscribe((user) => {
         this.user = user;
         if (user) {
-          switch (user.userProfile.role) {
+          switch (user.role) {
             case 3:
               this.userRole = 'owner';
               break;
@@ -133,7 +132,7 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
               this.userRole = 'staff';
               break;
           }
-          this.userDept = user.userProfile.department;
+          this.userDept = user.department;
         }
       });
 
@@ -147,9 +146,9 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
         this.activeLocation = locState.activeLocation;
 
         // IF USER HAS AT LEAST ONE ACTIVATED LOCATION
-        if (locState.activeLocation?.productList.length > 0) {
-          this.locationProducts = locState.activeLocation.productList;
-          this.inventoryData = locState.activeLocation.inventoryData;
+        if (locState.activeLocation?.products.length > 0) {
+          this.locationProducts = locState.activeLocation.products;
+          this.inventoryData = locState.activeLocation.inventories;
           this.inventoryDataPopulated = locState.activeLocationInventories;
 
           // IF THERE'S A DRAFT WORKING INVENTORY, INITIALIZE THAT TOO
@@ -247,8 +246,8 @@ export class InventoryFormComponent implements OnInit, OnDestroy {
       }
 
       this.inventoryForm = new FormGroup({
-        _id: new FormControl(this.draftInventory._id),
-        parentLocation: new FormControl(this.draftInventory.parentLocation),
+        id: new FormControl(this.draftInventory.id),
+        parentLocation: new FormControl(this.draftInventory.location),
         dateStart: new FormControl(
           this.draftInventory.dateStart,
           Validators.required

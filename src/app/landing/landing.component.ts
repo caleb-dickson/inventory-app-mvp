@@ -58,9 +58,9 @@ export class LandingComponent implements OnInit {
         this.userLoading = userState.loading;
         if (this.isAuthenticated) {
           this.displayName =
-            userState.user.userProfile.firstName +
+            userState.user.firstName +
             ' ' +
-            userState.user.userProfile.lastName;
+            userState.user.lastName;
         }
       });
 

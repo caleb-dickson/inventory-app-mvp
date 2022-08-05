@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 import { Store } from '@ngrx/store';
 import * as fromAppStore from '../../app-store/app.reducer';
@@ -13,12 +16,11 @@ import { map, shareReplay } from 'rxjs/operators';
 import { ThemeService } from 'src/app/theme/theme.service';
 import { Business } from '../models/business.model';
 import { Location } from '../models/location.model';
-import { LocationService } from '../inventory-app-control/location.service';
 import { Inventory } from '../models/inventory.model';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { User } from 'src/app/users/user.model';
 import { Product } from '../models/product.model';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+
+import { LocationService } from '../inventory-app-control/location.service';
 
 @Component({
   selector: 'app-navigation',
@@ -88,7 +90,7 @@ export class NavigationComponent implements OnInit {
   // BUSINESS STATE
   businessState: BusinessState;
   business: Business;
-  businessName: string;
+  name: string;
   businessId: string;
   // OWNER USER SPECIFIC BUSINESS STATE
   singleBizLocationName: string;
@@ -111,8 +113,8 @@ export class NavigationComponent implements OnInit {
       this.userLoading = userState.loading;
       this.user = userState.user;
       this.isAuthenticated = !!userState.user;
-      this.userDept = userState.user?.userProfile.department;
-      this.setUserRoleString(userState.user?.userProfile.role);
+      this.userDept = userState.user?.department;
+      this.setUserRoleString(userState.user?.role);
     });
 
     this._locationStoreSub = this._store
@@ -123,7 +125,7 @@ export class NavigationComponent implements OnInit {
         this.locationError = locationState.locationError;
         this.userLocations = locationState.userLocations;
         this.activeLocation = locationState.activeLocation;
-        this.inventoryData = locationState.activeLocation?.inventoryData;
+        this.inventoryData = locationState.activeLocation?.inventories;
         this.activeInventory = locationState.activeInventory;
         this.activeLocationInventories =
           locationState.activeLocationInventories;
@@ -142,52 +144,40 @@ export class NavigationComponent implements OnInit {
 
         this.singleUserLocationName =
           locationState.userLocations.length === 1
-            ? locationState.userLocations[0].locationName
+            ? locationState.userLocations[0].name
             : null;
 
         // SET AN ERROR ON THE LOCATION SELECTOR
         // IF NO LOCATION HAS BEEN SELECED YET
         this._initMultiLocationSelectForm();
-        if (!this.activeLocation) {
-          this.multiLocationSelectForm.markAsTouched();
-          this.multiLocationSelectForm.markAsDirty();
-          this.multiLocationSelectForm
-            .get('activeLocation')
-            .setErrors({ noActiveLocation: true });
-        } else {
-          this.multiLocationSelectForm
-            .get('activeLocation')
-            .setValue(this.activeLocation);
-          this.multiLocationSelectForm.updateValueAndValidity();
-          console.log(this.multiLocationSelectForm.value);
-        }
 
-        // ONCE A LOCATION HAS BEEN SELECTED/ACTIVATED
-        if (locationState.activeLocation?.productList.length > 0) {
-          this.locationProducts = locationState.activeLocation.productList;
+        // IF A LOCATION WITH PRODUCTS HAS BEEN SELECTED/ACTIVATED
+        if (locationState.activeLocation?.products.length > 0) {
+          this.locationProducts = locationState.activeLocation.products;
           this.inventoryDataPopulated = locationState.activeLocationInventories;
 
           // AND POPULATED (JOINED) INVENTORIES WERE NOT ALREADY
           // FETCHED SINCE LAST RELOAD
-          if (
-            !locationState.activeLocationInventories ||
-            (locationState.activeLocationInventories?.length === 0 &&
-              locationState.activeLocation?.inventoryData.length > 0)
-          ) {
-            this._onGetPopulatedInventories();
-          }
+          // if (
+          //   !locationState.activeLocationInventories ||
+          //   (locationState.activeLocationInventories?.length === 0 &&
+          //     locationState.activeLocation?.inventories.length > 0)
+          // ) {
+          //   this._onGetPopulatedInventories();
+          // }
         }
+        console.log(this.multiBizLocations);
       });
 
     this._businessStoreSub = this._store
       .select('business')
       .subscribe((businessState) => {
         this.businessState = businessState;
-        if (businessState.business && businessState.business._id) {
+        if (businessState.business && businessState.business.id) {
           this.businessLoading = businessState.loading;
           this.business = businessState.business;
-          this.businessName = businessState.business.businessName;
-          this.businessId = businessState.business._id;
+          this.name = businessState.business.name;
+          this.businessId = businessState.business.id;
           this.multiBizLocations =
             this.businessState.businessLocations.length > 1
               ? businessState.businessLocations
@@ -195,9 +185,10 @@ export class NavigationComponent implements OnInit {
 
           this.singleBizLocationName =
             this.businessState.businessLocations.length === 1
-              ? businessState.businessLocations[0].locationName
+              ? businessState.businessLocations[0].name
               : null;
         }
+        console.log(businessState);
       });
 
     this._themeService.getThemeMode();
@@ -283,16 +274,24 @@ export class NavigationComponent implements OnInit {
     this.sideNavOpen = !this.sideNavOpen;
   }
 
-  // GET AND STORE A POPULATED LIST OF THIS LOCATION'S INVENTORIES
-  private _onGetPopulatedInventories() {
-    this._locationService.getPopulatedInventories(this.initLocInventories);
-    this.initLocInventories = false;
-  }
-
   private _initMultiLocationSelectForm() {
     this.multiLocationSelectForm = new FormGroup({
       activeLocation: new FormControl(this.activeLocation, Validators.required),
     });
+
+    if (!this.activeLocation) {
+      this.multiLocationSelectForm.markAsTouched();
+      this.multiLocationSelectForm.markAsDirty();
+      this.multiLocationSelectForm
+        .get('activeLocation')
+        .setErrors({ noActiveLocation: true });
+    } else {
+      this.multiLocationSelectForm
+        .get('activeLocation')
+        .setValue(this.activeLocation);
+      this.multiLocationSelectForm.updateValueAndValidity();
+      console.log(this.multiLocationSelectForm.value);
+    }
   }
 
   onActivateLocation(activeLocation: Location) {
@@ -318,25 +317,29 @@ export class NavigationComponent implements OnInit {
   }
 
   getBusiness() {
-    const storedBusiness: {
-      business: Business;
-    } = JSON.parse(localStorage.getItem('storedBusiness'));
+    const storedBusiness: Business = JSON.parse(
+      localStorage.getItem('storedBusiness')
+    );
 
     if (storedBusiness) {
       console.log(
         '%cStored Business',
         `font-size: 1rem;
           color: lightgreen;`,
-        storedBusiness.business
+        storedBusiness
       );
       this._store.dispatch(
         BusinessActions.GETBusinessSuccess({
           business: {
-            _id: storedBusiness.business._id,
-            businessName: storedBusiness.business.businessName,
-            ownerId: storedBusiness.business.ownerId,
-            businessPhoto: storedBusiness.business.businessPhoto,
-            locations: [...storedBusiness.business.locations],
+            id: storedBusiness.id,
+            createdAt: storedBusiness.createdAt,
+            updatedAt: storedBusiness.updatedAt,
+            name: storedBusiness.name,
+            photo: storedBusiness.photo,
+            owner: storedBusiness.owner,
+            inventoryDueDates: storedBusiness.inventoryDueDates,
+            inventoryPeriod: storedBusiness.inventoryPeriod,
+            businesslocations: [...storedBusiness.businesslocations],
           },
         })
       );
@@ -345,7 +348,7 @@ export class NavigationComponent implements OnInit {
       console.warn('||| Fetching business from DB |||');
       this._store.dispatch(
         BusinessActions.GETBusinessStart({
-          ownerId: this.user.userId,
+          ownerId: this.user.id,
         })
       );
     } else {
@@ -358,9 +361,9 @@ export class NavigationComponent implements OnInit {
 
   onGetLocations() {
     this._locationService.getLocations(
-      this.user.userId,
+      this.user.id,
       this.userRole,
-      this.user.userProfile.role
+      this.user.role
     );
   }
 }

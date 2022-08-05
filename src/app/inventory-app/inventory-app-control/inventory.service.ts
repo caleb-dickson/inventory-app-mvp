@@ -7,8 +7,7 @@ import * as fromAppStore from '../../app-store/app.reducer';
 import * as LocationActions from '../navigation/business/location/location-store/location.actions';
 import * as BusinessActions from '../navigation/business/business-store/business.actions';
 
-import { Location, ProductList } from '../models/location.model';
-import { LocationIds } from '../models/business.model';
+import { Location } from '../models/location.model';
 import { LocationState } from '../navigation/business/location/location-store/location.reducer';
 import { BusinessState } from '../navigation/business/business-store/business.reducer';
 import { Product } from '../models/product.model';
@@ -51,12 +50,14 @@ export class InventoryService implements OnInit {
     this.$updateInventory.next(inventory);
   }
 
-  filterLocationProducts(locationProducts: ProductList[], selectedDepartment: string) {
+  filterLocationProducts(locationProducts: Product[], selectedDepartment: string) {
+    console.log(locationProducts);
+    console.log(selectedDepartment);
     let newInventoryProducts: Product[] = [];
     for (const product of locationProducts) {
-      let productDept = product.product.department;
-      if (productDept === selectedDepartment && product.product.isActive) {
-        newInventoryProducts.push(product.product);
+      let productDept = product.department;
+      if (productDept === selectedDepartment && product.isActive) {
+        newInventoryProducts.push(product);
       }
       console.log(newInventoryProducts)
       this.$activeDepartmentProducts.next(newInventoryProducts);
@@ -78,8 +79,10 @@ export class InventoryService implements OnInit {
   ) {
     // CREATE A NEW INVENTORY OBJ BASED ON FORM INPUT AND CALC TOTAL VALUE
     const inventory: Inventory = {
-      _id: inventoryForm.value._id,
-      parentLocation: activeLocation._id,
+      id: inventoryForm.value.id,
+      createdAt: activeLocation.createdAt,
+      updatedAt: activeLocation.updatedAt,
+      location: activeLocation.id,
       dateStart: inventoryForm.value.dateStart,
       dateEnd: inventoryForm.value.dateEnd,
       department: formDept,

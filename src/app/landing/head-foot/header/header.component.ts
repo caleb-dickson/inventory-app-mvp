@@ -40,7 +40,7 @@ export class HeaderComponent implements OnInit {
       .subscribe((userAuth) => {
         this.isAuthenticated = !!userAuth;
         if (this.isAuthenticated) {
-          this.displayName = userAuth.userProfile.firstName + ' ' + userAuth.userProfile.lastName;
+          this.displayName = userAuth.firstName + ' ' + userAuth.lastName;
           this.userEmail = userAuth.email;
         }
       });

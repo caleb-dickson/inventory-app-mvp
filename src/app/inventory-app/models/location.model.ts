@@ -3,33 +3,34 @@ import { BaseEntity } from "./base.model";
 import { Inventory } from "./inventory.model";
 import { Product } from "./product.model";
 
-export interface Manager { manager: string | User };
-export interface Staff { staffMember: string | User };
-export interface ProductList { product: Product };
-export interface InventoryData { inventory: string | Inventory };
+// export interface Manager { manager: string | User };
+// export interface Staff { staffMember: string | User };
+// export interface ProductList { product: Product };
+// export interface InventoryData { inventory: string | Inventory };
 
 export class Location extends BaseEntity {
-  public locationName: string;
-  public parentBusiness: string;
-  public managers: Manager[] | [];
-  public staff: Staff[] | [];
-  public productList: ProductList[] | [];
-  public inventoryData: InventoryData[] | [];
+  public name: string;
+  public photo: string;
+  public business: string;
+  public managers: User[] | [];
+  public staff: User[] | [];
+  public inventories: Inventory[] | [];
+  public products: Product[] | [];
 
   constructor(
-    locationName: string,
-    parentBusiness: string,
-    managers: Manager[] | [],
-    staff: Staff[] | [],
-    productList: ProductList[] | [],
-    inventoryData: InventoryData[] | []
+    name: string,
+    business: string,
+    managers: User[] | [],
+    staff: User[] | [],
+    products: Product[] | [],
+    inventories: Inventory[] | []
   ) {
     super();
-    this.locationName = locationName;
-    this.parentBusiness = parentBusiness;
+    this.name = name;
+    this.business = business;
     this.managers = managers;
     this.staff = staff;
-    this.productList = productList;
-    this.inventoryData = inventoryData;
+    this.products = products;
+    this.inventories = inventories;
   }
 }

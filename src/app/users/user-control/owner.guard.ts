@@ -31,10 +31,10 @@ export class OwnerGuard implements CanActivate {
     return this.store.select('user').pipe(
       take(1),
       map((authState) => {
-        return authState.user.userProfile;
+        return authState.user;
       }),
-      map((userProfile) => {
-        const isOwner = userProfile.role === 3 || userProfile.department === 'admin' ? true : false;
+      map((user) => {
+        const isOwner = user.role === 3 || user.department === 'admin' ? true : false;
         if (isOwner) {
           return true;
         }

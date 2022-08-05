@@ -8,12 +8,12 @@
     <mat-card-header *ngIf="!userLoading">
       <img
         mat-card-avatar
-        [src]="user.userProfile.userPhoto"
+        [src]="user.photo"
         alt="Your profile photo"
       />
       <mat-card-title>Settings</mat-card-title>
       <mat-card-subtitle>
-        {{ user.userProfile.firstName + " " + user.userProfile.lastName }} -
+        {{ user.firstName + " " + user.lastName }} -
         {{ userRole }}
       </mat-card-subtitle>
     </mat-card-header>

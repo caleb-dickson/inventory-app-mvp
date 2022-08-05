@@ -1,3 +1,5 @@
 export class BaseEntity {
-  _id: string | null;
+  id: string | null;
+  createdAt: number | null;
+  updatedAt: number | null;
 }

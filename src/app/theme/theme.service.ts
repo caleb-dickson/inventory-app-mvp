@@ -20,14 +20,14 @@ export class ThemeService {
       themePref: string;
     } = JSON.parse(localStorage.getItem('guestUserData'));
 
-    const userProfileData = JSON.parse(localStorage.getItem('userProfileData'));
+    const userData = JSON.parse(localStorage.getItem('userData'));
 
     if (guestUserData) {
       this.themeStatus.next(guestUserData.themePref);
       console.log('||| Theme data found in guestUserData |||');
-    } else if (userProfileData) {
-      this.themeStatus.next(userProfileData.userProfile.themePref)
-      console.warn('||| Theme data found in userProfileData |||');
+    } else if (userData) {
+      this.themeStatus.next(userData.themePref)
+      console.warn('||| Theme data found in userData |||');
 
     } else {
       console.log('||| No theme data found in localstorage |||');

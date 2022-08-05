@@ -68,9 +68,11 @@ export class UserSettingsComponent implements OnInit {
       this.appLoading = userState.loading;
       this.userLoading = userState.loading;
       this.user = userState.user;
-      this.userDept = userState.user?.userProfile.department;
-      this.userPhoto = this.user?.userProfile.userPhoto;
-      this.setUserRoleString(userState.user?.userProfile.role);
+      this.userDept = userState.user?.department;
+      this.userPhoto = this.user?.photo;
+      this.setUserRoleString(userState.user?.role);
+      this._initUserProfileForm();
+      console.log(userState);
     });
 
     this._themeService.getThemeMode();
@@ -102,7 +104,7 @@ export class UserSettingsComponent implements OnInit {
       id: 'settings-advanced',
       height: 'max-content',
       width: 'max-content',
-      data: this.user._id
+      data: this.user.id
     })
   }
 
@@ -130,7 +132,7 @@ export class UserSettingsComponent implements OnInit {
     this.mimeTypeValid = true;
     this.fileSizeOk = true;
     this.imagePreview = null;
-    this.themePref = this.user.userProfile.themePref;
+    this.themePref = this.user.themePref;
     this._initUserProfileForm();
   }
 
@@ -200,18 +202,18 @@ export class UserSettingsComponent implements OnInit {
         }
       ),
       department: new FormControl(
-        { value: this.user?.userProfile.department, disabled: true },
+        { value: this.user?.department, disabled: true },
         {
           validators: [Validators.required],
         }
       ),
-      firstName: new FormControl(this.user?.userProfile.firstName, {
+      firstName: new FormControl(this.user?.firstName, {
         validators: [Validators.required],
       }),
-      lastName: new FormControl(this.user?.userProfile.lastName, {
+      lastName: new FormControl(this.user?.lastName, {
         validators: [Validators.required],
       }),
-      phoneNumber: new FormControl(this.user?.userProfile.phoneNumber, {
+      phoneNumber: new FormControl(this.user?.phoneNumber, {
         validators: [Validators.required],
       }),
       themePref: new FormControl(this.themePref, {

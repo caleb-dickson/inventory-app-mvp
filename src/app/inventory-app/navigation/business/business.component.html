@@ -2,11 +2,11 @@
   <mat-card>
     <mat-card-header>
       <mat-icon *ngIf="!business" mat-card-avatar>business</mat-icon>
-      <img *ngIf="business" mat-card-avatar [src]="business?.businessPhoto" alt="Business photo" />
+      <img *ngIf="business" mat-card-avatar [src]="business?.photo" alt="Business photo" />
       <mat-card-title>Manage Business</mat-card-title>
       <mat-card-subtitle>
-        {{ user.userProfile.firstName + " " + user.userProfile.lastName }} -
-        {{ userRole }} <span> - {{ business?.businessName }}</span>
+        {{ user.firstName + " " + user.lastName }} -
+        {{ userRole | titlecase }} <span> - {{ business?.name }}</span>
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content class="business">
@@ -16,24 +16,23 @@
 
         <p *ngIf="!businessSubmitMode && !businessLoading" class="business-manage-info-name">
           {{
-            business?.businessName ? business.businessName : "Add your business to get started."
+            business?.name ? business.name : "Add your business to get started."
           }}
           <button
             mat-raised-button
             class="business-manage-info-edit"
-            (click)="onEditBusiness(business?.businessName ? 'update' : 'new')"
+            (click)="onEditBusiness(business?.name ? 'update' : 'new')"
           >
-            <mat-icon *ngIf="business?.businessName" class="business-manage-info-name-edit"
+            <mat-icon *ngIf="business?.name" class="business-manage-info-name-edit"
               >edit</mat-icon
             >
-            <mat-icon *ngIf="!business?.businessName">domain_add</mat-icon>
-            <mat-label *ngIf="!business?.businessName"> Add business</mat-label>
+            <mat-icon *ngIf="!business?.name">domain_add</mat-icon>
+            <mat-label *ngIf="!business?.name"> Add business</mat-label>
           </button>
         </p>
 
         <form
           [formGroup]="businessForm"
-          (ngSubmit)="onBusinessSubmit()"
           class="business-manage-form"
         >
           <div *ngIf="businessSubmitMode">
@@ -43,10 +42,10 @@
                 matInput
                 type="text"
                 spellcheck="false"
-                formControlName="businessName"
+                formControlName="name"
                 autofocus
               />
-              <mat-error *ngIf="businessForm.get('businessName').invalid">
+              <mat-error *ngIf="businessForm.get('name').invalid">
                 Please enter a name for your business.
               </mat-error>
             </mat-form-field>
@@ -67,60 +66,62 @@
               Cancel
             </button>
             <mat-error
-              *ngIf="businessError && !businessForm.get('businessName')"
+              *ngIf="businessError && !businessForm.get('name')"
               >{{ businessError }}</mat-error
             >
           </div>
-          <div *ngIf="businessSubmitMode" class="business-manage-info-photo">
-            <button
-              mat-stroked-button
-              type="button"
-              (click)="filePicker.click()"
-            >
-              Upload Business Photo
-            </button>
-            <input
-              #filePicker
-              type="file"
-              accept="image/png, image/jpg, image/jpeg"
-              (change)="onBusinessPhotoPicked($event)"
-            />
-            <div
-              class="image-preview"
-              *ngIf="
-                business?.businessPhoto &&
-                imagePreview !== '' &&
-                businessForm.get('businessPhoto').valid
-              "
-            >
-              <img
-                [src]="imagePreview ? imagePreview : business?.businessPhoto"
-                [alt]="
-                  businessForm.get('businessName').value + '-businessPhoto'
-                    | lowercase
-                "
-              />
-            </div>
-          </div>
-          <button
-          *ngIf="businessForm.get('businessPhoto').value || businessForm.get('businessName').touched"
-          class="business-cancel"
-          type="button"
-          mat-raised-button
-          (click)="onCancelForm('business')"
-        >
-          Reset
-        </button>
-          <button
-          *ngIf="businessForm.get('businessPhoto').value"
-          class="business-manage-info-submit"
-          type="submit"
-          mat-raised-button
-          [disabled]="businessForm.invalid"
-          >
-          {{ businessSubmitMode === "update" || businessPhoto ? "Update" : "Create" }}
-        </button>
         </form>
+        <div class="business-manage-info-photo">
+          <button
+            mat-stroked-button
+            type="button"
+            (click)="filePicker.click()"
+          >
+            Upload Business Photo
+          </button>
+          <!-- <p> {{ business?.photo }} </p> -->
+          <input
+            #filePicker
+            type="file"
+            accept="image/png, image/jpg, image/jpeg"
+            (change)="onBusinessPhotoPicked($event)"
+          />
+          <div
+            class="image-preview"
+            *ngIf="
+              business?.photo &&
+              imagePreview !== '' &&
+              businessForm.get('businessPhoto').valid
+            "
+          >
+            <img
+              [src]="imagePreview ? imagePreview : business?.photo"
+              [alt]="
+                businessForm.get('name').value + '-businessPhoto'
+                  | lowercase
+              "
+            />
+          </div>
+        </div>
+        <button
+        *ngIf="businessForm.get('businessPhoto').value || businessForm.get('name').touched"
+        class="business-cancel"
+        type="button"
+        mat-raised-button
+        (click)="onCancelForm('business')"
+      >
+        Reset
+      </button>
+        <button
+        *ngIf="businessForm.get('businessPhoto').value"
+        class="business-manage-info-submit"
+        type="submit"
+        mat-raised-button
+        [disabled]="businessForm.invalid"
+        (click)="onBusinessSubmit()"
+        >
+        {{ businessSubmitMode === "update" || business?.photo ? "Update" : "Create" }}
+      </button>
         <mat-spinner
           diameter="70"
           strokeWidth="3"
@@ -132,17 +133,17 @@
         </h6>
         <div *ngFor="let location of locations" class="business-manage-info-locations">
           <a
-            [href]="'/app/business#' + location._id"
+            [href]="'/app/business#' + location.id"
             class="business-manage-info-locations-list"
           >
-            <mat-icon class="mat-tag">tag</mat-icon>{{ location.locationName }}
+            <mat-icon class="mat-tag">tag</mat-icon>{{ location.name }}
           </a>
           <mat-spinner
             diameter="30"
             color="accent"
             *ngIf="
               locationEditMode &&
-              location.locationName === locationEditSelector.locationName &&
+              location.name === locationEditSelector.name &&
               isbusinessLoading
             "
           ></mat-spinner>
@@ -151,8 +152,8 @@
 
       <br />
 
-      <p *ngIf="!business?._id">Add your business to create locations.</p>
-      <button *ngIf="business?._id" mat-icon-button class="business-manage-info-add">
+      <p *ngIf="!business?.id">Add your business to create locations.</p>
+      <button *ngIf="business?.id" mat-icon-button class="business-manage-info-add">
         <mat-icon *ngIf="!locationSubmitMode" (click)="onCreateLocation(true)"
           >add_business</mat-icon
         >
@@ -211,20 +212,19 @@
     <mat-card-header>
       <img
         mat-card-avatar
-        [src]="location.locationPhoto"
-        alt="Business photo"
+        [src]="location.photo"
+        alt="Location photo"
       />
-      <mat-card-title [id]="location._id">
+      <mat-card-title [id]="location.id">
         <mat-icon class="store-icon">store</mat-icon>
-        {{ location.locationName }}
+        {{ location.name }}
       </mat-card-title>
-      <mat-card-subtitle>Subtitle</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
       <section>
         <p class="location-title">Location Name</p>
         <p *ngIf="!locationEditMode">
-          {{ location.locationName }}
+          {{ location.name }}
           <button
             mat-mini-fab
             color="none"
@@ -278,7 +278,7 @@
 
       <section class="location-staff">
         <p class="location-title">Authorized Staff</p>
-        <p *ngIf="!businessId">Add your business to create locations.</p>
+        <p *ngIf="!business.id">Add your business to create locations.</p>
         <p>Managers</p>
         <p [ngClass]="location.managers.length === 0 ? 'text-muted' : null">
           {{ location.managers.length > 0 ? null : "No Managers found." }}
@@ -291,18 +291,18 @@
             i +
               1 +
               ". " +
-              manager.manager.userProfile.firstName +
+              manager.firstName +
               " " +
-              manager.manager.userProfile.lastName +
+              manager.lastName +
               " - " +
-              manager.manager.email
+              manager.email
           }}
         </p>
 
         <!-- ADD MANAGERS BUTTON -->
         <button
           *ngIf="
-            (business?._id && !addUserToLocationMode) ||
+            (business?.id && !addUserToLocationMode) ||
             addUserToLocationMode === 'manager'
           "
           mat-raised-button
@@ -346,11 +346,11 @@
               i +
                 1 +
                 ". " +
-                staff.staffMember.userProfile.firstName +
+                staff.firstName +
                 " " +
-                staff.staffMember.userProfile.lastName +
+                staff.lastName +
                 " - " +
-                staff.staffMember.email
+                staff.email
             }}
           </p>
         </div>
@@ -358,7 +358,7 @@
         <!-- ADD STAFF BUTTON -->
         <button
           *ngIf="
-            (business?._id && !addUserToLocationMode) ||
+            (business?.id && !addUserToLocationMode) ||
             addUserToLocationMode === 'staff'
           "
           mat-raised-button

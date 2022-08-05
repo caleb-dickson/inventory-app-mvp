@@ -92,8 +92,8 @@ export class BusinessComponent
       this.appLoading = userState.loading;
       this.userLoading = userState.loading;
       this.user = userState.user;
-        this.userDept = userState.user?.userProfile.department;
-        this.setUserRoleString(userState.user?.userProfile.role);
+        this.userDept = userState.user?.department;
+        this.setUserRoleString(userState.user?.role);
     });
 
     this._locationStoreSub = this._store
@@ -133,7 +133,7 @@ export class BusinessComponent
         this.businessLoading = businessState.loading;
         this.businessError = businessState.businessError;
         this._initBusinessForm();
-        if (businessState.business && businessState.business._id) {
+        if (businessState.business && businessState.business.id) {
           this.locations = businessState.businessLocations;
           this.locationAddUserSelector = businessState.locationSelected;
           this.locationEditSelector = businessState.locationSelected;
@@ -141,13 +141,13 @@ export class BusinessComponent
           if (businessState.business) {
             this._initNewLocationForm();
           }
-          if (businessState.business.locations.length > 0) {
+          if (businessState.business.businesslocations.length > 0) {
             this._initUpdateLocationForm();
           }
 
           if (
             this.locationAddUserSelector &&
-            this.locationAddUserSelector.locationName
+            this.locationAddUserSelector.name
           ) {
             this._initAddUserToLocationForm();
           }
@@ -283,7 +283,7 @@ export class BusinessComponent
 
     this._businessService.submitBusiness(
       this.businessForm,
-      this.business?._id,
+      this.business?.id,
       this.businessSubmitMode,
       this.bizPhotoUpload,
       this.user
@@ -301,13 +301,16 @@ export class BusinessComponent
     this._store.dispatch(
       BusinessActions.POSTLocationStart({
         location: {
-          _id: null,
-          locationName: this.newLocationForm.value.locationName,
-          parentBusiness: this.business._id,
+          id: null,
+          createdAt: null,
+          updatedAt: null,
+          name: this.newLocationForm.value.locationName,
+          photo: null,
+          business: this.business.id,
           managers: [],
           staff: [],
-          productList: [],
-          inventoryData: [],
+          inventories: [],
+          products: [],
         },
       })
     );
@@ -321,13 +324,16 @@ export class BusinessComponent
     this._store.dispatch(
       BusinessActions.PUTLocationStart({
         location: {
-          _id: this.locationEditSelector._id,
-          locationName: this.updateLocationForm.value.locationName,
-          parentBusiness: this.locationEditSelector.parentBusiness,
+          id: this.locationEditSelector.id,
+          createdAt: null,
+          updatedAt: null,
+          name: this.updateLocationForm.value.locationName,
+          photo: null,
+          business: this.locationEditSelector.business,
           managers: this.locationEditSelector.managers,
           staff: this.locationEditSelector.staff,
-          productList: this.locationEditSelector.productList,
-          inventoryData: this.locationEditSelector.inventoryData,
+          products: this.locationEditSelector.products,
+          inventories: this.locationEditSelector.inventories,
         },
       })
     );
@@ -347,7 +353,7 @@ export class BusinessComponent
     console.log(emailStringArr);
 
     console.log(this.addUserToLocationForm.value);
-    console.log(this.locationAddUserSelector._id);
+    console.log(this.locationAddUserSelector.id);
 
     const authRole = this.addUserToLocationMode;
     console.log(authRole);
@@ -364,7 +370,7 @@ export class BusinessComponent
 
   private _initBusinessForm(): void {
     this.businessForm = new FormGroup({
-      businessName: new FormControl(this.business?.businessName, {
+      name: new FormControl(this.business?.name, {
         validators: [Validators.required],
       }),
       businessPhoto: new FormControl(null),
@@ -380,9 +386,9 @@ export class BusinessComponent
   }
 
   private _initUpdateLocationForm(): void {
-    if (this.locationEditSelector && this.locationEditSelector.locationName) {
+    if (this.locationEditSelector && this.locationEditSelector.name) {
       this.updateLocationForm = new FormGroup({
-        locationName: new FormControl(this.locationEditSelector.locationName, {
+        locationName: new FormControl(this.locationEditSelector.name, {
           validators: [Validators.required],
         }),
       });

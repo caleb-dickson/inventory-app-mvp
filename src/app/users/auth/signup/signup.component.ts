@@ -56,7 +56,6 @@ export class SignupComponent implements OnInit, OnDestroy {
     //   );
     // }
 
-
     let themePref = !this.signupForm.value.themePref
       ? undefined
       : this.signupForm.get('themePref').value;
@@ -64,19 +63,22 @@ export class SignupComponent implements OnInit, OnDestroy {
     this.store.dispatch(
       UserActions.signupStart({
         newUser: {
-          _id: null,
-          userId: null,
+          id: null,
+          createdAt: null,
+          updatedAt: null,
           email: this.signupForm.value.email,
           password: this.signupForm.value.password,
-          userProfile: {
-            role: this.signupForm.value.role,
-            department: this.signupForm.value.department,
-            firstName: this.signupForm.value.firstName,
-            lastName: this.signupForm.value.lastName,
-            phoneNumber: this.signupForm.value.phoneNumber,
-            themePref: themePref,
-            userPhoto: null,
-          },
+          resetToken: null,
+          resetTokenExpiration: null,
+          firstName: this.signupForm.value.firstName,
+          lastName: this.signupForm.value.lastName,
+          role: this.signupForm.value.role,
+          department: this.signupForm.value.department,
+          phoneNumber: this.signupForm.value.phoneNumber,
+          themePref: themePref,
+          photo: null,
+          managerAt: [],
+          staffAt: []
         },
       })
     );

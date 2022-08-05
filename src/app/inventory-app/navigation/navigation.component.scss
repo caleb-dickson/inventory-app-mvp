@@ -69,8 +69,12 @@
       .sidenav-icon {
         margin-inline-end: 0.3rem;
 
-        &-check {
+        &-check-single {
           margin-inline-start: 1rem;
+          color: var.$color-green-light;
+        }
+
+        &-check-select {
           color: var.$color-green-light;
         }
       }
